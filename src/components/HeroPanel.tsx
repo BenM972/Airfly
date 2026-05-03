@@ -93,7 +93,7 @@ export default function HeroPanel({
               style={{
                 fontFamily: "Mirloanne, serif",
                 letterSpacing: "0.25em",
-                fontSize: "clamp(2.5rem, 5vw, 5rem)",
+                fontSize: "clamp(2.8rem, 10vw, 5rem)",
               }}
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
@@ -111,7 +111,7 @@ export default function HeroPanel({
             >
               <Link
                 href={href}
-                className="inline-block border border-white text-white uppercase tracking-widest text-sm px-8 py-4 hover:bg-white hover:text-black transition-colors duration-300"
+                className="inline-block border border-white text-white uppercase tracking-widest text-base md:text-sm px-8 py-5 md:py-4 hover:bg-white hover:text-black transition-colors duration-300"
                 style={{ fontFamily: "Mirloanne, serif" }}
               >
                 {cta}
