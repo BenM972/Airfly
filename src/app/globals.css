@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Mirloanne";
+  src: url("/Mirloanne.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
