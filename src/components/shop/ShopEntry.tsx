@@ -26,7 +26,7 @@ const panels = [
 
 export default function ShopEntry({ onSelect }: Props) {
   return (
-    <section className="h-screen flex">
+    <section className="h-screen flex flex-row">
       {panels.map((panel, i) => (
         <motion.button
           key={panel.id}
@@ -64,7 +64,7 @@ export default function ShopEntry({ onSelect }: Props) {
               Collection
             </motion.p>
             <motion.h2
-              className="text-white text-5xl md:text-7xl uppercase font-light mb-4"
+              className="text-white text-3xl md:text-7xl uppercase font-light mb-4"
               style={{ fontFamily: "Mirloanne, serif" }}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -73,7 +73,7 @@ export default function ShopEntry({ onSelect }: Props) {
               {panel.label}
             </motion.h2>
             <motion.p
-              className="text-white/60 text-base"
+              className="hidden md:block text-white/60 text-base"
               style={{ fontFamily: "var(--font-cormorant)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
