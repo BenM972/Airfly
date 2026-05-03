@@ -26,7 +26,7 @@ const panels = [
 
 export default function ShopEntry({ onSelect }: Props) {
   return (
-    <section className="h-screen flex flex-row">
+    <section className="h-screen flex flex-col md:flex-row">
       {panels.map((panel, i) => (
         <motion.button
           key={panel.id}
@@ -49,7 +49,7 @@ export default function ShopEntry({ onSelect }: Props) {
 
           {/* Separator line */}
           {i === 0 && (
-            <div className="absolute right-0 top-0 h-full w-px bg-white/20 z-10" />
+            <div className="absolute right-0 bottom-0 md:top-0 md:h-full md:w-px h-px w-full bg-white/20 z-10" />
           )}
 
           {/* Content */}
@@ -73,7 +73,7 @@ export default function ShopEntry({ onSelect }: Props) {
               {panel.label}
             </motion.h2>
             <motion.p
-              className="hidden md:block text-white/60 text-base"
+              className="text-white/60 text-base"
               style={{ fontFamily: "var(--font-cormorant)" }}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
