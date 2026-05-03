@@ -56,6 +56,7 @@ type Props = {
 export default function ShopCatalogue({ initialCategory }: Props) {
   const [activeCategory, setActiveCategory] = useState<Category>(initialCategory ?? "textile");
   const [activeSub, setActiveSub] = useState<string | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [products, setProducts] = useState<WCProduct[]>([]);
   const [categories, setCategories] = useState<WCCategory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -211,6 +212,21 @@ export default function ShopCatalogue({ initialCategory }: Props) {
             </motion.aside>
           </AnimatePresence>
 
+          {/* Bouton filtres mobile */}
+          <div className="md:hidden flex-1">
+            <button
+              onClick={() => setFilterOpen(true)}
+              className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-500 border border-gray-200 px-4 py-2 mb-8 hover:border-gray-900 hover:text-gray-900 transition-colors duration-200"
+              style={{ fontFamily: "Mirloanne, serif" }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+              </svg>
+              Filtrer
+              {activeSub && <span className="w-1.5 h-1.5 bg-[#FF0080] rounded-full" />}
+            </button>
+          </div>
+
           {/* Grille produits */}
           <div className="flex-1">
             {loading ? (
@@ -247,6 +263,87 @@ export default function ShopCatalogue({ initialCategory }: Props) {
 
         </div>
       </div>
+
+      {/* Drawer filtres mobile */}
+      <AnimatePresence>
+        {filterOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              className="fixed inset-0 bg-black/40 z-[80] md:hidden"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setFilterOpen(false)}
+            />
+            {/* Drawer */}
+            <motion.div
+              className="fixed bottom-0 left-0 right-0 z-[90] bg-white px-6 pt-6 pb-10 md:hidden"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 30, stiffness: 300 }}
+            >
+              {/* Handle */}
+              <div className="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-6" />
+
+              <div className="flex items-center justify-between mb-6">
+                <p className="text-xs uppercase tracking-widest text-gray-900" style={{ fontFamily: "Mirloanne, serif" }}>Filtres</p>
+                {activeSub && (
+                  <button
+                    onClick={() => { setActiveSub(null); setFilterOpen(false); }}
+                    className="text-xs text-[#FF0080] uppercase tracking-widest"
+                    style={{ fontFamily: "Mirloanne, serif" }}
+                  >
+                    Réinitialiser
+                  </button>
+                )}
+              </div>
+
+              {/* Tout */}
+              <button
+                onClick={() => { setActiveSub(null); setFilterOpen(false); }}
+                className={`block w-full text-left py-3 border-b border-gray-100 text-sm uppercase tracking-widest transition-colors duration-200 ${activeSub === null ? "text-[#FF0080]" : "text-gray-500"}`}
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                Tout
+              </button>
+
+              {/* Textile : liste plate */}
+              {directCats.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => { setActiveSub(cat.slug === activeSub ? null : cat.slug); setFilterOpen(false); }}
+                  className={`block w-full text-left py-3 border-b border-gray-100 transition-colors duration-200 ${activeSub === cat.slug ? "text-[#FF0080]" : "text-gray-500"}`}
+                  style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem" }}
+                >
+                  {cat.name}
+                </button>
+              ))}
+
+              {/* Matériel : groupes */}
+              {groups.map((group) => (
+                <div key={group.id}>
+                  <p className="py-3 border-b border-gray-100 text-xs uppercase tracking-widest text-gray-900" style={{ fontFamily: "Mirloanne, serif" }}>
+                    {group.name}
+                  </p>
+                  {childrenOf(group.id).map((child) => (
+                    <button
+                      key={child.id}
+                      onClick={() => { setActiveSub(child.slug === activeSub ? null : child.slug); setFilterOpen(false); }}
+                      className={`block w-full text-left py-3 pl-4 border-b border-gray-100 transition-colors duration-200 ${activeSub === child.slug ? "text-[#FF0080]" : "text-gray-500"}`}
+                      style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem" }}
+                    >
+                      {child.name}
+                    </button>
+                  ))}
+                </div>
+              ))}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
     </section>
   );
 }
