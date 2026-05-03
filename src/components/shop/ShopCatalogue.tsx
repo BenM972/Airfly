@@ -154,6 +154,21 @@ export default function ShopCatalogue({ initialCategory }: Props) {
           ))}
         </div>
 
+        {/* Bouton filtres mobile — hors du flex layout */}
+        <div className="md:hidden mb-6">
+          <button
+            onClick={() => setFilterOpen(true)}
+            className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-500 border border-gray-200 px-4 py-2 hover:border-gray-900 hover:text-gray-900 transition-colors duration-200"
+            style={{ fontFamily: "Mirloanne, serif" }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
+            </svg>
+            Filtrer
+            {activeSub && <span className="w-1.5 h-1.5 bg-[#FF0080] rounded-full" />}
+          </button>
+        </div>
+
         {/* Layout sidebar + grille */}
         <div className="flex gap-12">
 
@@ -211,21 +226,6 @@ export default function ShopCatalogue({ initialCategory }: Props) {
               ))}
             </motion.aside>
           </AnimatePresence>
-
-          {/* Bouton filtres mobile */}
-          <div className="md:hidden flex-1">
-            <button
-              onClick={() => setFilterOpen(true)}
-              className="flex items-center gap-2 text-xs uppercase tracking-widest text-gray-500 border border-gray-200 px-4 py-2 mb-8 hover:border-gray-900 hover:text-gray-900 transition-colors duration-200"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
-              </svg>
-              Filtrer
-              {activeSub && <span className="w-1.5 h-1.5 bg-[#FF0080] rounded-full" />}
-            </button>
-          </div>
 
           {/* Grille produits */}
           <div className="flex-1">
