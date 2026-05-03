@@ -4,7 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
-import ChatBot from "@/components/ChatBot";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -31,7 +30,6 @@ export default function RootLayout({
         <Navbar />
         {children}
         <Footer />
-        <ChatBot />
       </body>
     </html>
   );
