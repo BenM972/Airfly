@@ -99,7 +99,7 @@ function MobilePanelItem({
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
         <motion.span
           className="text-white uppercase font-light text-center"
-          style={{ fontFamily: "Mirloanne, serif", fontSize: "clamp(2rem, 9vw, 3rem)", letterSpacing: "0.2em" }}
+          style={{ fontFamily: "Mirloanne, serif", fontSize: "clamp(1.4rem, 5vw, 2rem)", letterSpacing: "0.2em" }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
