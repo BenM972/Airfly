@@ -96,10 +96,10 @@ function MobilePanelItem({
         priority
       />
       <div className="absolute inset-0 bg-black/40" />
-      <div className="absolute inset-0 flex flex-col items-center justify-end pb-14 gap-3">
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">
         <motion.span
-          className="text-white uppercase tracking-wider text-base font-light"
-          style={{ fontFamily: "Mirloanne, serif" }}
+          className="text-white uppercase font-light text-center"
+          style={{ fontFamily: "Mirloanne, serif", fontSize: "clamp(2rem, 9vw, 3rem)", letterSpacing: "0.2em" }}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -108,8 +108,8 @@ function MobilePanelItem({
         </motion.span>
         <Link
           href={panel.href}
-          className="border border-white text-white uppercase text-[9px] tracking-wider px-4 py-1.5 hover:bg-white hover:text-black transition-colors duration-300 text-center"
-          style={{ fontFamily: "Mirloanne, serif", letterSpacing: "0.1em" }}
+          className="border border-white text-white uppercase tracking-widest text-xs px-8 py-3 hover:bg-white hover:text-black transition-colors duration-300 text-center"
+          style={{ fontFamily: "Mirloanne, serif" }}
         >
           {panel.cta}
         </Link>
