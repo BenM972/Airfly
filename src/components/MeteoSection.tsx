@@ -1,7 +1,19 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import SectionTitle from "./SectionTitle";
+
+const WIND_PHRASES: { max: number; text: string }[] = [
+  { max: 8,  text: "Brise légère ce matin — idéal pour une première session avec nos profs au spot." },
+  { max: 15, text: "Belle brise à Pointe Faula — passez récupérer votre matos avant de descendre au spot." },
+  { max: 20, text: "Les conditions sont au rendez-vous — venez équipés, on vous attend au shop." },
+  { max: 25, text: "Vent soutenu aujourd'hui — le spot est vivant, notre équipe aussi." },
+  { max: Infinity, text: "Ça déchire à Pointe Faula — pour les riders confirmés, le shop est ouvert." },
+];
+
+function getWindPhrase(kts: number): string {
+  return WIND_PHRASES.find((p) => kts < p.max)?.text ?? "";
+}
 
 const CURR_DIV_ID = "wgs_widget_4164_1704756029749";
 const FORECAST_DIV_ID = "wg_fwdg_1206002_100_1777735567467";
@@ -48,18 +60,33 @@ function loadForecastWidget() {
 }
 
 export default function MeteoSection() {
+  const [windPhrase, setWindPhrase] = useState("");
+
+  function readWindAndSetPhrase() {
+    setTimeout(() => {
+      const el = document.getElementById("wgs-wind_avg");
+      if (!el) return;
+      const kts = parseFloat(el.textContent ?? "");
+      if (!isNaN(kts)) setWindPhrase(getWindPhrase(kts));
+    }, 2000);
+  }
+
   useEffect(() => {
     // --- Relevés actuels : charge le script une fois, refresh toutes les 5 min ---
     if (!document.getElementById("wg-curr-script")) {
       const script = document.createElement("script");
       script.id = "wg-curr-script";
       script.src = "https://www.windguru.cz/js/wgs_widget.php";
-      script.onload = initCurrWidget;
+      script.onload = () => { initCurrWidget(); readWindAndSetPhrase(); };
       document.body.appendChild(script);
     } else {
       initCurrWidget();
+      readWindAndSetPhrase();
     }
-    const currInterval = setInterval(initCurrWidget, 5 * 60 * 1000);
+    const currInterval = setInterval(() => {
+      initCurrWidget();
+      readWindAndSetPhrase();
+    }, 5 * 60 * 1000);
 
     // --- Prévisions : charge puis refresh toutes les 30 min ---
     loadForecastWidget();
@@ -98,7 +125,7 @@ export default function MeteoSection() {
             </div>
           </div>
 
-          {/* Relevés balise — placeholder en attendant le uid station */}
+          {/* Relevés en temps réel */}
           <div>
             <p
               className="uppercase tracking-widest text-lg text-[#FF0080] mb-4"
@@ -106,9 +133,17 @@ export default function MeteoSection() {
             >
               Releves en temps reel
             </p>
-            <div className="overflow-x-auto">
+            <div className="flex justify-center overflow-x-auto">
               <div id="wgs_widget_4164_1704756029749" />
             </div>
+            {windPhrase && (
+              <p
+                className="text-center text-gray-500 text-base mt-6 italic"
+                style={{ fontFamily: "var(--font-cormorant)" }}
+              >
+                {windPhrase}
+              </p>
+            )}
           </div>
         </div>
 
