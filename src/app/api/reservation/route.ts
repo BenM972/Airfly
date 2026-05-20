@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
-
-// ─── Chemins des fichiers de données ────────────────────────────────────────
-const DATA_DIR = path.join(process.cwd(), "data");
-const SUBMISSIONS_FILE = path.join(DATA_DIR, "submissions.json");
-const CLIENTS_FILE = path.join(DATA_DIR, "clients.json");
+import { getSupabase } from "@/lib/supabase";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
-interface Submission {
+interface SubmissionRow {
   id: string;
   created_at: string;
   prenom: string;
@@ -18,136 +12,35 @@ interface Submission {
   discipline: string;
   prestation: string;
   niveau: string;
-  date_souhaitee: string;
+  date_souhaitee: string | null;
   message: string;
   ip: string;
-}
-
-interface Reservation {
-  id: string;
-  date: string;
-  discipline: string;
-  prestation: string;
-  niveau: string;
-  date_souhaitee: string;
-  message: string;
-}
-
-interface Client {
-  id: string;
-  created_at: string;
-  updated_at: string;
-  prenom: string;
-  nom: string;
-  email: string;
-  telephone: string;
-  disciplines: string[];
-  tags: string[];
-  reservations: Reservation[];
-  nb_reservations: number;
-  last_contact: string;
-}
-
-// ─── Helpers fichiers ────────────────────────────────────────────────────────
-function ensureDataDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
-}
-
-function readJSON<T>(file: string, fallback: T): T {
-  try {
-    return JSON.parse(fs.readFileSync(file, "utf-8")) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function writeJSON(file: string, data: unknown) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2), "utf-8");
 }
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
-// ─── Logique BDD clients ─────────────────────────────────────────────────────
-function upsertClient(clients: Client[], submission: Submission): Client[] {
-  const now = new Date().toISOString();
-  const existing = clients.find(
-    (c) => c.email.toLowerCase() === submission.email.toLowerCase()
-  );
-
-  const reservation: Reservation = {
-    id: submission.id,
-    date: submission.created_at,
-    discipline: submission.discipline,
-    prestation: submission.prestation,
-    niveau: submission.niveau,
-    date_souhaitee: submission.date_souhaitee,
-    message: submission.message,
-  };
-
-  // Tags automatiques
-  const tags: string[] = [];
-  if (submission.discipline) tags.push(submission.discipline.toLowerCase());
-  if (submission.niveau) tags.push(submission.niveau.toLowerCase());
-
-  if (existing) {
-    existing.updated_at = now;
-    existing.last_contact = now;
-    existing.telephone = submission.telephone || existing.telephone;
-    existing.reservations.push(reservation);
-    existing.nb_reservations += 1;
-    if (!existing.disciplines.includes(submission.discipline)) {
-      existing.disciplines.push(submission.discipline);
-    }
-    // Merge tags sans doublons
-    for (const tag of tags) {
-      if (!existing.tags.includes(tag)) existing.tags.push(tag);
-    }
-    // Tag fidélité
-    if (existing.nb_reservations >= 3 && !existing.tags.includes("fidèle")) {
-      existing.tags.push("fidèle");
-    }
-    return clients;
-  }
-
-  const newClient: Client = {
-    id: generateId(),
-    created_at: now,
-    updated_at: now,
-    prenom: submission.prenom,
-    nom: submission.nom,
-    email: submission.email,
-    telephone: submission.telephone,
-    disciplines: submission.discipline ? [submission.discipline] : [],
-    tags: ["prospect", ...tags],
-    reservations: [reservation],
-    nb_reservations: 1,
-    last_contact: now,
-  };
-
-  return [...clients, newClient];
-}
-
 // ─── Handler POST ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-
     const { prenom, nom, email, telephone, discipline, prestation, niveau, date_souhaitee, message } = body;
 
+    // Validation
     if (!prenom || !nom || !email || !discipline || !prestation) {
       return NextResponse.json({ error: "Champs obligatoires manquants." }, { status: 400 });
     }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Email invalide." }, { status: 400 });
     }
 
-    const submission: Submission = {
-      id: generateId(),
-      created_at: new Date().toISOString(),
+    const submissionId = generateId();
+    const now = new Date().toISOString();
+
+    const submission: SubmissionRow = {
+      id: submissionId,
+      created_at: now,
       prenom: String(prenom).trim(),
       nom: String(nom).trim(),
       email: String(email).trim().toLowerCase(),
@@ -155,24 +48,83 @@ export async function POST(req: NextRequest) {
       discipline: String(discipline).trim(),
       prestation: String(prestation).trim(),
       niveau: String(niveau ?? "").trim(),
-      date_souhaitee: String(date_souhaitee ?? "").trim(),
+      date_souhaitee: date_souhaitee ? String(date_souhaitee).trim() : null,
       message: String(message ?? "").trim(),
       ip: req.headers.get("x-forwarded-for") ?? "unknown",
     };
 
-    ensureDataDir();
+    // 1. Insérer la submission brute
+    const { error: subError } = await getSupabase().from("submissions").insert(submission);
+    if (subError) throw subError;
 
-    // 1. Log toutes les submissions
-    const submissions = readJSON<Submission[]>(SUBMISSIONS_FILE, []);
-    submissions.push(submission);
-    writeJSON(SUBMISSIONS_FILE, submissions);
+    // 2. Tags automatiques
+    const autoTags = ["prospect"];
+    if (submission.discipline) autoTags.push(submission.discipline.toLowerCase());
+    if (submission.niveau) autoTags.push(submission.niveau.toLowerCase());
 
-    // 2. Upsert BDD clients
-    const clients = readJSON<Client[]>(CLIENTS_FILE, []);
-    const updatedClients = upsertClient(clients, submission);
-    writeJSON(CLIENTS_FILE, updatedClients);
+    // 3. Upsert client (dedup par email)
+    const { data: existingClients } = await getSupabase()
+      .from("clients")
+      .select("*")
+      .eq("email", submission.email)
+      .limit(1);
 
-    return NextResponse.json({ success: true, id: submission.id });
+    let clientId: string;
+
+    if (existingClients && existingClients.length > 0) {
+      const client = existingClients[0];
+      clientId = client.id;
+
+      const updatedDisciplines = Array.from(new Set([...client.disciplines, submission.discipline]));
+      const updatedTags = Array.from(new Set([...client.tags, ...autoTags]));
+      const newCount = client.nb_reservations + 1;
+      if (newCount >= 3 && !updatedTags.includes("fidèle")) updatedTags.push("fidèle");
+
+      const { error: updateError } = await getSupabase()
+        .from("clients")
+        .update({
+          updated_at: now,
+          last_contact: now,
+          telephone: submission.telephone || client.telephone,
+          disciplines: updatedDisciplines,
+          tags: updatedTags,
+          nb_reservations: newCount,
+        })
+        .eq("id", clientId);
+      if (updateError) throw updateError;
+    } else {
+      clientId = generateId();
+      const { error: insertError } = await getSupabase().from("clients").insert({
+        id: clientId,
+        created_at: now,
+        updated_at: now,
+        prenom: submission.prenom,
+        nom: submission.nom,
+        email: submission.email,
+        telephone: submission.telephone,
+        disciplines: submission.discipline ? [submission.discipline] : [],
+        tags: autoTags,
+        nb_reservations: 1,
+        last_contact: now,
+      });
+      if (insertError) throw insertError;
+    }
+
+    // 4. Insérer la réservation liée au client
+    const { error: resError } = await getSupabase().from("reservations").insert({
+      id: generateId(),
+      client_id: clientId,
+      submission_id: submissionId,
+      created_at: now,
+      discipline: submission.discipline,
+      prestation: submission.prestation,
+      niveau: submission.niveau,
+      date_souhaitee: submission.date_souhaitee,
+      message: submission.message,
+    });
+    if (resError) throw resError;
+
+    return NextResponse.json({ success: true, id: submissionId });
   } catch (err) {
     console.error("[reservation] error:", err);
     return NextResponse.json({ error: "Erreur serveur." }, { status: 500 });
@@ -182,22 +134,27 @@ export async function POST(req: NextRequest) {
 // ─── Handler GET — stats rapides ─────────────────────────────────────────────
 export async function GET() {
   try {
-    ensureDataDir();
-    const submissions = readJSON<Submission[]>(SUBMISSIONS_FILE, []);
-    const clients = readJSON<Client[]>(CLIENTS_FILE, []);
+    const [{ count: totalSubmissions }, { count: totalClients }, { data: disciplineRows }, { count: fideles }] =
+      await Promise.all([
+        getSupabase().from("submissions").select("*", { count: "exact", head: true }),
+        getSupabase().from("clients").select("*", { count: "exact", head: true }),
+        getSupabase().from("submissions").select("discipline"),
+        getSupabase().from("clients").select("*", { count: "exact", head: true }).contains("tags", ["fidèle"]),
+      ]);
 
-    const disciplineCount = submissions.reduce<Record<string, number>>((acc, s) => {
-      acc[s.discipline] = (acc[s.discipline] ?? 0) + 1;
+    const disciplineCount = (disciplineRows ?? []).reduce<Record<string, number>>((acc, r) => {
+      acc[r.discipline] = (acc[r.discipline] ?? 0) + 1;
       return acc;
     }, {});
 
     return NextResponse.json({
-      total_submissions: submissions.length,
-      total_clients: clients.length,
+      total_submissions: totalSubmissions ?? 0,
+      total_clients: totalClients ?? 0,
       disciplines: disciplineCount,
-      fideles: clients.filter((c) => c.tags.includes("fidèle")).length,
+      fideles: fideles ?? 0,
     });
-  } catch {
+  } catch (err) {
+    console.error("[reservation] GET error:", err);
     return NextResponse.json({ error: "Erreur lecture données." }, { status: 500 });
   }
 }
