@@ -1,5 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { Resend } from "resend";
+
+const NOTIFY_EMAIL = "contact@bmconsultingfwi.fr";
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error("RESEND_API_KEY manquant.");
+  return new Resend(key);
+}
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface SubmissionRow {
@@ -123,6 +132,35 @@ export async function POST(req: NextRequest) {
       message: submission.message,
     });
     if (resError) throw resError;
+
+    // 5. Notif email
+    try {
+      await getResend().emails.send({
+        from: "AIRFLY <onboarding@resend.dev>",
+        to: NOTIFY_EMAIL,
+        subject: `Nouvelle réservation — ${submission.discipline} — ${submission.prenom} ${submission.nom}`,
+        html: `
+          <div style="font-family:sans-serif;max-width:520px;margin:auto">
+            <h2 style="color:#FF0080;margin-bottom:4px">Nouvelle demande de réservation</h2>
+            <p style="color:#888;font-size:13px;margin-top:0">${new Date(now).toLocaleString("fr-FR", { timeZone: "America/Martinique" })} (Martinique)</p>
+            <table style="width:100%;border-collapse:collapse;margin-top:16px">
+              <tr><td style="padding:8px 0;color:#555;width:140px">Prénom / Nom</td><td style="padding:8px 0;font-weight:600">${submission.prenom} ${submission.nom}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Email</td><td style="padding:8px 4px"><a href="mailto:${submission.email}">${submission.email}</a></td></tr>
+              <tr><td style="padding:8px 0;color:#555">Téléphone</td><td style="padding:8px 0">${submission.telephone || "—"}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Discipline</td><td style="padding:8px 4px;font-weight:600">${submission.discipline}</td></tr>
+              <tr><td style="padding:8px 0;color:#555">Prestation</td><td style="padding:8px 0">${submission.prestation}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Niveau</td><td style="padding:8px 4px">${submission.niveau || "—"}</td></tr>
+              <tr><td style="padding:8px 0;color:#555">Date souhaitée</td><td style="padding:8px 0">${submission.date_souhaitee || "—"}</td></tr>
+              ${submission.message ? `<tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555;vertical-align:top">Message</td><td style="padding:8px 4px">${submission.message}</td></tr>` : ""}
+            </table>
+            <p style="margin-top:24px;font-size:12px;color:#aaa">ID: ${submissionId}</p>
+          </div>
+        `,
+      });
+    } catch (emailErr) {
+      // L'email échoue silencieusement — la réservation est déjà enregistrée
+      console.error("[reservation] email error:", emailErr);
+    }
 
     return NextResponse.json({ success: true, id: submissionId });
   } catch (err) {
