@@ -32,14 +32,30 @@ export default function EcoleReservation() {
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [discipline, setDiscipline] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    setLoading(false);
-    setSubmitted(true);
+    setError("");
+
+    const data = Object.fromEntries(new FormData(e.currentTarget));
+
+    try {
+      const res = await fetch("/api/reservation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Erreur envoi");
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -84,11 +100,11 @@ export default function EcoleReservation() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Prénom</label>
-                <input required type="text" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+                <input required type="text" name="prenom" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Nom</label>
-                <input required type="text" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+                <input required type="text" name="nom" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
             </div>
 
@@ -96,11 +112,11 @@ export default function EcoleReservation() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Email</label>
-                <input required type="email" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+                <input required type="email" name="email" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Téléphone</label>
-                <input type="tel" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+                <input type="tel" name="telephone" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
             </div>
 
@@ -109,6 +125,7 @@ export default function EcoleReservation() {
               <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Discipline</label>
               <select
                 required
+                name="discipline"
                 value={discipline}
                 onChange={(e) => setDiscipline(e.target.value)}
                 className={inputClass}
@@ -167,14 +184,20 @@ export default function EcoleReservation() {
             {/* Date souhaitée */}
             <div>
               <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitée</label>
-              <input type="date" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+              <input type="date" name="date_souhaitee" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
             </div>
 
             {/* Message */}
             <div>
               <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Message (optionnel)</label>
-              <textarea rows={4} className={`${inputClass} resize-none`} style={{ fontFamily: "var(--font-cormorant)" }} />
+              <textarea rows={4} name="message" className={`${inputClass} resize-none`} style={{ fontFamily: "var(--font-cormorant)" }} />
             </div>
+
+            {error && (
+              <p className="text-red-500 text-sm text-center" style={{ fontFamily: "var(--font-cormorant)" }}>
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
