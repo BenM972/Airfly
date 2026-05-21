@@ -10,10 +10,11 @@ type Tab = typeof tabs[number];
 
 const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?: string; note?: string }[]> = {
   Kitesurf: [
-    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire", note: "Navigation encadree incluse sur le meme creneau" },
+    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire", note: "La navigation encadree se deroule sur le meme creneau — c'est une prestation distincte." },
+    { label: "Navigation encadree", detail: "Session sur le spot · meme creneau que le cours collectif", price: "85 €" },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
     { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers.", note: "Uniquement pour un groupe deja forme — deux personnes seules ne peuvent pas composer un duo." },
-    { label: "Tracte / Simulateur", detail: "Waterstart & equilibre sur foil sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
+    { label: "Tracte / Simulateur", detail: "Waterstart & equilibre en traction douce sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
   ],
   Wingfoil: [
     { label: "Cours collectif", detail: "2h · eleves individuels bienvenus", price: "135 € / pers.", badge: "Populaire", note: "Les participants viennent individuellement — pas besoin de groupe constitue." },
@@ -36,7 +37,7 @@ const kiteLoyaltyRates = [
 
 const options = [
   { label: "Navigation guidee", detail: "Session accompagnee sur le spot", note: "Incluse avec le cours collectif" },
-  { label: "Depart de plage", detail: "Technique de lancement autonome" },
+  { label: "Depart de plage", detail: "Technique de lancement autonome", price: "85 €" },
   { label: "Coaching perfection", detail: "Tricks & progression avancee" },
 ];
 
@@ -205,18 +206,16 @@ export default function EcoleTarifs() {
                 >
                   {o.detail}
                 </p>
-                {o.note ? (
-                  <p
-                    className="text-[#FF0080]/70 text-xs italic"
-                    style={{ fontFamily: "var(--font-cormorant)" }}
-                  >
+                {"price" in o && o.price ? (
+                  <p className="text-[#FF0080] text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {o.price}
+                  </p>
+                ) : o.note ? (
+                  <p className="text-[#FF0080]/70 text-xs italic" style={{ fontFamily: "var(--font-cormorant)" }}>
                     {o.note}
                   </p>
                 ) : (
-                  <p
-                    className="text-gray-500 text-sm italic"
-                    style={{ fontFamily: "var(--font-cormorant)" }}
-                  >
+                  <p className="text-gray-500 text-sm italic" style={{ fontFamily: "var(--font-cormorant)" }}>
                     Prix sur demande
                   </p>
                 )}
