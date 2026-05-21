@@ -5,6 +5,14 @@ import { useRef } from "react";
 import CarteMartinique from "./CarteMartinique";
 import SectionTitle from "./SectionTitle";
 
+function openNavigation() {
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const url = isIOS
+    ? `maps://maps.apple.com/?q=14.541922560749377,-60.82981741961289`
+    : `https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289`;
+  window.open(url, "_blank");
+}
+
 export default function SpotSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -48,6 +56,21 @@ export default function SpotSection() {
                 Les zones de navigation sont balisées par arrêté préfectoral pour la sécurité de tous.
               </p>
             </motion.div>
+
+            <motion.button
+              type="button"
+              onClick={openNavigation}
+              className="flex items-center gap-3 border border-gray-400 text-gray-600 uppercase tracking-widest text-sm px-6 py-3.5 hover:border-gray-900 hover:text-gray-900 transition-colors duration-300"
+              style={{ fontFamily: "Mirloanne, serif" }}
+              initial={{ opacity: 0, y: 12 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: 0.5 }}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              Emmenes-moi au spot
+            </motion.button>
 
           </div>
 

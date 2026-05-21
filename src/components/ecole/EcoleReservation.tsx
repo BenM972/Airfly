@@ -4,16 +4,6 @@ import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import SectionTitle from "../SectionTitle";
 
-const GPS_LAT = 14.541922560749377;
-const GPS_LNG = -60.82981741961289;
-
-function openNavigation() {
-  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
-  const url = isIOS
-    ? `maps://maps.apple.com/?q=${GPS_LAT},${GPS_LNG}`
-    : `https://www.google.com/maps/dir/?api=1&destination=${GPS_LAT},${GPS_LNG}`;
-  window.open(url, "_blank");
-}
 
 const niveaux = ["Débutant", "Intermédiaire", "Avancé"];
 
@@ -238,18 +228,6 @@ export default function EcoleReservation() {
               {loading ? "Envoi en cours..." : "Envoyer ma demande"}
             </button>
 
-            <button
-              type="button"
-              onClick={openNavigation}
-              className="w-full flex items-center justify-center gap-3 border border-gray-200 text-gray-500 uppercase tracking-widest text-sm py-4 hover:border-[#FF0080] hover:text-[#FF0080] transition-colors duration-300"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              Emmenes-moi au spot
-            </button>
           </motion.form>
         )}
       </div>
