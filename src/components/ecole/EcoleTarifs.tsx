@@ -17,7 +17,7 @@ const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?
     { label: "Tracte / Simulateur", detail: "Waterstart & equilibre en traction douce sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
   ],
   Wingfoil: [
-    { label: "Cours collectif", detail: "2h · eleves individuels bienvenus", price: "135 € / pers.", badge: "Populaire", note: "Les participants viennent individuellement — pas besoin de groupe constitue." },
+    { label: "Cours collectif", detail: "2h · 2 eleves max · inscription individuelle", price: "135 € / pers.", badge: "Populaire", note: "Pas besoin de venir a deux — les places sont ouvertes a tous." },
     { label: "Cours trio", detail: "3h · groupe constitue uniquement", price: "100 € / pers.", note: "Session reservee a un groupe deja forme de 3 personnes." },
     { label: "Initiation wing", detail: "1h30 · paddle avec une aile de wing · tous niveaux", price: "90 € / pers." },
     { label: "Tracte / Simulateur", detail: "Foil tracte derriere bateau — equilibre sans gestion de l'aile", price: "Sur demande", note: "Progresser sur le foil en conditions controlees, vent ou pas. Ideal en debut de formation." },
