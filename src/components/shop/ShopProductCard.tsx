@@ -56,7 +56,7 @@ export default function ShopProductCard({ product, index }: Props) {
               Promo
             </span>
           )}
-          <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-300 bg-gray-900/90 py-3 text-center">
+          <div className="absolute inset-x-0 bottom-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 bg-gray-900/90 py-3 text-center">
             <span
               className="text-white text-xs uppercase tracking-widest"
               style={{ fontFamily: "Mirloanne, serif" }}

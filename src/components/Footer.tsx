@@ -18,15 +18,15 @@ export default function Footer() {
     <footer className="bg-gray-950 text-white">
 
       {/* Mobile footer — épuré */}
-      <div className="md:hidden px-6 py-10 flex flex-col items-center gap-6 text-center">
+      <div className="md:hidden px-6 py-10 flex flex-col items-center gap-7 text-center">
         <Image src="/logo-airfly.webp" alt="Airfly" width={70} height={28} className="object-contain" />
 
-        <div className="flex gap-6">
+        <div className="grid grid-cols-2 gap-3 w-full">
           {navLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-gray-400 hover:text-white transition-colors duration-200 uppercase tracking-widest text-xs"
+              className="text-gray-400 hover:text-white transition-colors duration-200 uppercase tracking-widest text-sm py-2"
               style={{ fontFamily: "Mirloanne, serif" }}
             >
               {link.label}
@@ -34,15 +34,15 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="flex gap-5">
+        <div className="flex gap-6">
           <a href="https://www.instagram.com/airfly972" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-xs uppercase tracking-widest"
+            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
             style={{ fontFamily: "Mirloanne, serif" }}>Instagram</a>
           <a href="https://www.facebook.com/airfly972" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-xs uppercase tracking-widest"
+            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
             style={{ fontFamily: "Mirloanne, serif" }}>Facebook</a>
           <a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-xs uppercase tracking-widest"
+            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
             style={{ fontFamily: "Mirloanne, serif" }}>WhatsApp</a>
         </div>
 

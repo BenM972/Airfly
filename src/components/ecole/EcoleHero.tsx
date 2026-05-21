@@ -25,7 +25,7 @@ export default function EcoleHero() {
           Pointe Faula — Vauclin, Martinique
         </motion.p>
         <motion.h1
-          className="text-5xl md:text-7xl font-light text-white uppercase mb-6"
+          className="text-4xl md:text-7xl font-light text-white uppercase mb-6"
           style={{ fontFamily: "Mirloanne, serif" }}
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}

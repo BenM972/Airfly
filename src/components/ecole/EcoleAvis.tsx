@@ -79,14 +79,14 @@ export default function EcoleAvis() {
           <div className="relative overflow-hidden min-h-[220px] flex items-center">
             <button
               onClick={() => { direction.current = -1; setCurrent((c) => (c === 0 ? avis.length - 1 : c - 1)); }}
-              className="absolute left-0 z-10 h-full px-2 text-gray-400 hover:text-[#FF0080] transition-colors duration-300"
+              className="absolute left-0 z-10 h-full px-4 text-gray-400 hover:text-[#FF0080] transition-colors duration-300 min-w-[44px]"
               aria-label="Précédent"
             >
               ‹
             </button>
             <button
               onClick={() => { direction.current = 1; setCurrent((c) => (c + 1) % avis.length); }}
-              className="absolute right-0 z-10 h-full px-2 text-gray-400 hover:text-[#FF0080] transition-colors duration-300"
+              className="absolute right-0 z-10 h-full px-4 text-gray-400 hover:text-[#FF0080] transition-colors duration-300 min-w-[44px]"
               aria-label="Suivant"
             >
               ›
@@ -100,7 +100,7 @@ export default function EcoleAvis() {
                 animate="center"
                 exit="exit"
                 transition={{ duration: 0.4, ease: "easeInOut" }}
-                className="w-full bg-white px-16 py-10 shadow-sm text-center"
+                className="w-full bg-white px-8 md:px-16 py-8 md:py-10 shadow-sm text-center"
               >
                 <Stars n={avis[current].note} />
                 <p

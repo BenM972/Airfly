@@ -110,7 +110,7 @@ export default function EcoleReservation() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             {/* Nom & Prénom */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Prenom</label>
                 <input required type="text" name="prenom" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
@@ -122,7 +122,7 @@ export default function EcoleReservation() {
             </div>
 
             {/* Email & Téléphone */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Email</label>
                 <input required type="email" name="email" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
@@ -195,7 +195,7 @@ export default function EcoleReservation() {
             </div>
 
             {/* Date + créneau */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
                 <input type="date" name="date_souhaitee" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />

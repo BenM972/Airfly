@@ -127,7 +127,7 @@ export default function ChatBot() {
       <AnimatePresence>
         {open && (
           <motion.div
-            className="fixed bottom-24 right-6 z-[99] w-[350px] max-w-[calc(100vw-3rem)] bg-white shadow-2xl flex flex-col"
+            className="fixed bottom-24 right-0 left-0 mx-3 md:left-auto md:right-6 md:mx-0 md:w-[350px] z-[99] bg-white shadow-2xl flex flex-col"
             style={{ height: "480px" }}
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
