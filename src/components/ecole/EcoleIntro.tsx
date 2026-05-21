@@ -5,10 +5,10 @@ import { useRef } from "react";
 import SectionTitle from "../SectionTitle";
 
 const atouts = [
-  { icon: "◆", title: "3 élèves max", desc: "Chaque session est limitée pour garantir un suivi personnalisé et une sécurité optimale." },
-  { icon: "◆", title: "Bateau de sécurité", desc: "Un bateau accompagne chaque cours. Vous n'êtes jamais seul sur l'eau." },
-  { icon: "◆", title: "Moniteurs diplômés", desc: "Bienveillants, pédagogues, rassurants — ils construisent votre confiance dès la première session." },
-  { icon: "◆", title: "Radio & équipement", desc: "Casque radio, gilet, chaussons, planche et aile fournis. Vous arrivez, on s'occupe du reste." },
+  { icon: "◆", title: "3 eleves max", desc: "Chaque session est limitée pour garantir un suivi personnalisé et une sécurité optimale." },
+  { icon: "◆", title: "Bateau de securite", desc: "Un bateau accompagne chaque cours. Vous n'êtes jamais seul sur l'eau." },
+  { icon: "◆", title: "Moniteurs diplomes", desc: "Bienveillants, pédagogues, rassurants — ils construisent votre confiance dès la première session." },
+  { icon: "◆", title: "Radio & equipement", desc: "Casque radio, gilet, chaussons, planche et aile fournis. Vous arrivez, on s'occupe du reste." },
 ];
 
 export default function EcoleIntro() {

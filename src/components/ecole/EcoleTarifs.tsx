@@ -21,7 +21,7 @@ const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?
     { label: "Initiation paddle", detail: "1h30 · tous niveaux", price: "90 € / pers." },
   ],
   Kitefoil: [
-    { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €", badge: "Recommandé" },
+    { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €", badge: "Recommande" },
     { label: "Cours duo", detail: "2h · 2 élèves", price: "135 € / pers." },
   ],
 };

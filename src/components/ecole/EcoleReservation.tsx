@@ -82,7 +82,7 @@ export default function EcoleReservation() {
           >
             <p className="text-[#FF0080] text-4xl mb-4">◆</p>
             <p className="text-gray-900 text-2xl uppercase tracking-widest mb-3" style={{ fontFamily: "Mirloanne, serif" }}>
-              Demande envoyée !
+              Demande envoyee !
             </p>
             <p className="text-gray-500 text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
               On vous recontacte très prochainement. À bientôt sur l'eau !
@@ -99,7 +99,7 @@ export default function EcoleReservation() {
             {/* Nom & Prénom */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Prénom</label>
+                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Prenom</label>
                 <input required type="text" name="prenom" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
               <div>
@@ -115,7 +115,7 @@ export default function EcoleReservation() {
                 <input required type="email" name="email" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
               <div>
-                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Téléphone</label>
+                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Telephone</label>
                 <input type="tel" name="telephone" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
               </div>
             </div>
@@ -183,7 +183,7 @@ export default function EcoleReservation() {
 
             {/* Date souhaitée */}
             <div>
-              <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitée</label>
+              <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
               <input type="date" name="date_souhaitee" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
             </div>
 

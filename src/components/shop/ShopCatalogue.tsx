@@ -295,7 +295,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                     className="text-xs text-[#FF0080] uppercase tracking-widest"
                     style={{ fontFamily: "Mirloanne, serif" }}
                   >
-                    Réinitialiser
+                    Reinitialiser
                   </button>
                 )}
               </div>

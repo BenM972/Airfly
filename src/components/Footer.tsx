@@ -122,7 +122,7 @@ export default function Footer() {
         <div className="border-t border-gray-800">
           <div className="max-w-7xl mx-auto px-16 py-6 flex items-center justify-between">
             <p className="text-gray-600 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
-              © {new Date().getFullYear()} Airfly — Tous droits réservés
+              © {new Date().getFullYear()} Airfly — Tous droits reserves
             </p>
             <a href="https://www.bmconsultingfwi.fr" target="_blank" rel="noopener noreferrer"
               className="text-gray-600 hover:text-white transition-colors duration-200 text-xs"

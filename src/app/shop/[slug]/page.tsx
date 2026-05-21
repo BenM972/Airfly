@@ -338,7 +338,7 @@ export default function ProductPage() {
                   className="text-xs uppercase tracking-widest text-gray-500 cursor-pointer hover:text-gray-900 transition-colors"
                   style={{ fontFamily: "Mirloanne, serif" }}
                 >
-                  Description complète
+                  Description complete
                 </summary>
                 <div
                   className="mt-4 text-gray-600 text-base leading-relaxed prose prose-sm max-w-none"
