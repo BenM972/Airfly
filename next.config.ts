@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async redirects() {
+    if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return [];
     return [
       {
         source: "/:path*",
