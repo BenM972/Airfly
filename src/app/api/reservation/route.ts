@@ -22,6 +22,7 @@ interface SubmissionRow {
   prestation: string;
   niveau: string;
   date_souhaitee: string | null;
+  creneau: string;
   message: string;
   ip: string;
 }
@@ -34,7 +35,7 @@ function generateId(): string {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { prenom, nom, email, telephone, discipline, prestation, niveau, date_souhaitee, message } = body;
+    const { prenom, nom, email, telephone, discipline, prestation, niveau, date_souhaitee, creneau, message } = body;
 
     // Validation
     if (!prenom || !nom || !email || !discipline || !prestation) {
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
       prestation: String(prestation).trim(),
       niveau: String(niveau ?? "").trim(),
       date_souhaitee: date_souhaitee ? String(date_souhaitee).trim() : null,
+      creneau: String(creneau ?? "").trim(),
       message: String(message ?? "").trim(),
       ip: req.headers.get("x-forwarded-for") ?? "unknown",
     };
@@ -151,6 +153,7 @@ export async function POST(req: NextRequest) {
               <tr><td style="padding:8px 0;color:#555">Prestation</td><td style="padding:8px 0">${submission.prestation}</td></tr>
               <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Niveau</td><td style="padding:8px 4px">${submission.niveau || "—"}</td></tr>
               <tr><td style="padding:8px 0;color:#555">Date souhaitée</td><td style="padding:8px 0">${submission.date_souhaitee || "—"}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Créneau</td><td style="padding:8px 4px">${submission.creneau || "—"}</td></tr>
               ${submission.message ? `<tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555;vertical-align:top">Message</td><td style="padding:8px 4px">${submission.message}</td></tr>` : ""}
             </table>
             <p style="margin-top:24px;font-size:12px;color:#aaa">ID: ${submissionId}</p>

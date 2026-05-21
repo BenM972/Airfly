@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS submissions (
   prestation    TEXT NOT NULL,
   niveau        TEXT,
   date_souhaitee DATE,
+  creneau       TEXT,
   message       TEXT,
   ip            TEXT
 );

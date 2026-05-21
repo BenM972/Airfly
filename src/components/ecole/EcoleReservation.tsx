@@ -183,10 +183,27 @@ export default function EcoleReservation() {
               </div>
             </div>
 
-            {/* Date souhaitée */}
-            <div>
-              <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
-              <input type="date" name="date_souhaitee" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+            {/* Date + créneau */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
+                <input type="date" name="date_souhaitee" className={inputClass} style={{ fontFamily: "var(--font-cormorant)" }} />
+              </div>
+              <div>
+                <label className={labelClass} style={{ fontFamily: "Mirloanne, serif" }}>Creneau</label>
+                <div className="flex h-[46px]">
+                  {(["Matin", "Apres-midi"] as const).map((slot) => (
+                    <label
+                      key={slot}
+                      className="flex-1 flex items-center justify-center border border-gray-200 bg-[#f5f0e8] cursor-pointer text-sm text-gray-700 transition-colors duration-200 has-[:checked]:bg-gray-900 has-[:checked]:text-white has-[:checked]:border-gray-900 first:border-r-0"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      <input type="radio" name="creneau" value={slot} className="sr-only" />
+                      {slot}
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* Message */}
