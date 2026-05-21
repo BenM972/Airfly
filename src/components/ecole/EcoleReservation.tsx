@@ -11,15 +11,18 @@ const prestations: Record<string, { label: string; detail: string; price: string
     { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €" },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
     { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers." },
+    { label: "Tracte / Simulateur", detail: "Waterstart & equilibre foil sans kite", price: "Sur demande" },
   ],
   Wingfoil: [
-    { label: "Cours duo", detail: "2h · 2 élèves max", price: "135 € / pers." },
-    { label: "Cours trio", detail: "3h · 3 élèves", price: "100 € / pers." },
-    { label: "Initiation paddle", detail: "1h30 · tous niveaux", price: "90 € / pers." },
+    { label: "Cours collectif", detail: "2h · eleves individuels bienvenus", price: "135 € / pers." },
+    { label: "Cours trio", detail: "3h · groupe constitue uniquement", price: "100 € / pers." },
+    { label: "Initiation wing", detail: "1h30 · paddle avec une aile de wing", price: "90 € / pers." },
+    { label: "Tracte / Simulateur", detail: "Foil tracte derriere bateau", price: "Sur demande" },
   ],
   Kitefoil: [
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €" },
-    { label: "Cours duo", detail: "2h · 2 élèves", price: "135 € / pers." },
+    { label: "Cours duo", detail: "2h · 2 eleves", price: "135 € / pers." },
+    { label: "Tracte / Simulateur", detail: "Simulateur mast fixe ou tracte bateau", price: "Sur demande" },
   ],
 };
 

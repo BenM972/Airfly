@@ -13,19 +13,22 @@ const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?
     { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire", note: "Navigation encadree incluse sur le meme creneau" },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
     { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers.", note: "Uniquement pour un groupe deja forme — deux personnes seules ne peuvent pas composer un duo." },
+    { label: "Tracte / Simulateur", detail: "Waterstart & equilibre sur foil sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
   ],
   Wingfoil: [
-    { label: "Cours duo", detail: "2h · 2 eleves max", price: "135 € / pers.", badge: "Populaire" },
-    { label: "Cours trio", detail: "3h · 3 eleves", price: "100 € / pers." },
-    { label: "Initiation paddle", detail: "1h30 · tous niveaux", price: "90 € / pers." },
+    { label: "Cours collectif", detail: "2h · eleves individuels bienvenus", price: "135 € / pers.", badge: "Populaire", note: "Les participants viennent individuellement — pas besoin de groupe constitue." },
+    { label: "Cours trio", detail: "3h · groupe constitue uniquement", price: "100 € / pers.", note: "Session reservee a un groupe deja forme de 3 personnes." },
+    { label: "Initiation wing", detail: "1h30 · paddle avec une aile de wing · tous niveaux", price: "90 € / pers." },
+    { label: "Tracte / Simulateur", detail: "Foil tracte derriere bateau — equilibre sans gestion de l'aile", price: "Sur demande", note: "Progresser sur le foil en conditions controlees, vent ou pas. Ideal en debut de formation." },
   ],
   Kitefoil: [
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €", badge: "Recommande" },
     { label: "Cours duo", detail: "2h · 2 eleves", price: "135 € / pers." },
+    { label: "Tracte / Simulateur", detail: "Foil tracte bateau · simulateur mast fixe · apprentissage accelere", price: "Sur demande", note: "La methode la plus rapide pour apprendre le kitefoil : simulateur mast fixe sur bateau ou traction douce — concentration totale sur l'equilibre et le pilotage." },
   ],
 };
 
-const kiteLoalyaltyRates = [
+const kiteLoyaltyRates = [
   { label: "Cours collectif", before: "115 €", after: "100 €" },
   { label: "Cours solo", before: "200 €", after: "175 €" },
   { label: "Cours duo", before: "135 € / pers.", after: "115 € / pers." },
@@ -112,7 +115,7 @@ export default function EcoleTarifs() {
                     </p>
                   </div>
                   <p
-                    className="text-white text-xl font-light whitespace-nowrap ml-6"
+                    className={`text-xl font-light whitespace-nowrap ml-6 ${t.price === "Sur demande" ? "text-[#FF0080]/80 text-base italic" : "text-white"}`}
                     style={{ fontFamily: "var(--font-cormorant)" }}
                   >
                     {t.price}
@@ -152,7 +155,7 @@ export default function EcoleTarifs() {
                 </p>
               </div>
               <div className="grid md:grid-cols-3 gap-3">
-                {kiteLoalyaltyRates.map((r) => (
+                {kiteLoyaltyRates.map((r) => (
                   <div key={r.label} className="flex flex-col gap-1">
                     <p
                       className="text-gray-400 text-xs uppercase tracking-widest"
