@@ -41,6 +41,15 @@ export type WCCategory = {
   parent: number;
 };
 
+function decodeHTML(str: string) {
+  return str
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'");
+}
+
 const CATEGORY_MAP: Record<Category, string[]> = {
   textile: ["textile", "tee-shirts", "hoodies", "shorts", "lycras", "tops-techniques", "casquettes-chapeaux"],
   materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
@@ -199,7 +208,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                   className={`${navButtonClass(cat.slug)} text-sm block mb-3`}
                   style={{ fontFamily: "var(--font-cormorant)" }}
                 >
-                  {cat.name}
+                  {decodeHTML(cat.name)}
                 </button>
               ))}
 
@@ -210,7 +219,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                     className="uppercase tracking-widest text-xs text-gray-900 mb-2"
                     style={{ fontFamily: "Mirloanne, serif" }}
                   >
-                    {group.name}
+                    {decodeHTML(group.name)}
                   </p>
                   {childrenOf(group.id).map((child) => (
                     <button
@@ -219,7 +228,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                       className={`${navButtonClass(child.slug)} text-sm block mb-2 pl-3 border-l border-gray-200`}
                       style={{ fontFamily: "var(--font-cormorant)" }}
                     >
-                      {child.name}
+                      {decodeHTML(child.name)}
                     </button>
                   ))}
                 </div>
@@ -317,7 +326,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                   className={`block w-full text-left py-3 border-b border-gray-100 transition-colors duration-200 ${activeSub === cat.slug ? "text-[#FF0080]" : "text-gray-500"}`}
                   style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem" }}
                 >
-                  {cat.name}
+                  {decodeHTML(cat.name)}
                 </button>
               ))}
 
@@ -325,7 +334,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
               {groups.map((group) => (
                 <div key={group.id}>
                   <p className="py-3 border-b border-gray-100 text-xs uppercase tracking-widest text-gray-900" style={{ fontFamily: "Mirloanne, serif" }}>
-                    {group.name}
+                    {decodeHTML(group.name)}
                   </p>
                   {childrenOf(group.id).map((child) => (
                     <button
@@ -334,7 +343,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                       className={`block w-full text-left py-3 pl-4 border-b border-gray-100 transition-colors duration-200 ${activeSub === child.slug ? "text-[#FF0080]" : "text-gray-500"}`}
                       style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem" }}
                     >
-                      {child.name}
+                      {decodeHTML(child.name)}
                     </button>
                   ))}
                 </div>
