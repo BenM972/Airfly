@@ -55,6 +55,21 @@ export default function Navbar() {
             ))}
           </nav>
 
+          {/* GPS desktop */}
+          <a
+            href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest"
+            style={{ fontFamily: "Mirloanne, serif" }}
+            aria-label="Itineraire vers le spot"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            Le spot
+          </a>
+
           {/* Réseaux sociaux desktop */}
           <div className="hidden md:flex items-center gap-4">
             <a
@@ -160,6 +175,26 @@ export default function Navbar() {
               >
                 Reserver un cours
               </Link>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * (links.length + 1), duration: 0.3 }}
+            >
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 text-white/50 uppercase tracking-widest text-sm hover:text-white transition-colors duration-200"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                Emmenes-moi au spot
+              </a>
             </motion.div>
           </motion.div>
         )}

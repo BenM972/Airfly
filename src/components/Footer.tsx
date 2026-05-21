@@ -113,7 +113,21 @@ export default function Footer() {
               <li><a href="tel:+596596762531" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>+596 596 76 25 31</a></li>
               <li><a href="mailto:info@airfly972.com" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>info@airfly972.com</a></li>
               <li><a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>WhatsApp</a></li>
-              <li className="pt-2"><p className="text-gray-500 text-sm leading-relaxed" style={{ fontFamily: "var(--font-cormorant)" }}>Plage de Pointe Faula<br />Le Vauclin, Martinique</p></li>
+              <li className="pt-2">
+                <p className="text-gray-500 text-sm leading-relaxed mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>Plage de Pointe Faula<br />Le Vauclin, Martinique</p>
+                <a
+                  href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-gray-600 hover:text-[#FF0080] transition-colors duration-200 text-xs uppercase tracking-widest"
+                  style={{ fontFamily: "Mirloanne, serif" }}
+                >
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                  </svg>
+                  Itineraire
+                </a>
+              </li>
             </ul>
           </div>
 
