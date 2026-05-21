@@ -10,8 +10,8 @@ type Tab = typeof tabs[number];
 
 const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?: string; note?: string }[]> = {
   Kitesurf: [
-    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire", note: "La navigation encadree se deroule sur le meme creneau — c'est une prestation distincte." },
-    { label: "Navigation encadree", detail: "Session sur le spot · meme creneau que le cours collectif", price: "85 €" },
+    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire" },
+    { label: "Navigation integree", detail: "Session sur le spot · meme creneau que le cours collectif", price: "85 €", note: "Prestation distincte du cours collectif — les deux se deroulent sur le meme creneau." },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
     { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers.", note: "Uniquement pour un groupe deja forme — deux personnes seules ne peuvent pas composer un duo." },
     { label: "Tracte / Simulateur", detail: "Waterstart & equilibre en traction douce sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
@@ -36,7 +36,7 @@ const kiteLoyaltyRates = [
 ];
 
 const options = [
-  { label: "Navigation guidee", detail: "Session accompagnee sur le spot", note: "Incluse avec le cours collectif" },
+  { label: "Navigation integree", detail: "Session accompagnee sur le spot", price: "85 €", note: "Incluse avec le cours collectif" },
   { label: "Depart de plage", detail: "Technique de lancement autonome", price: "85 €" },
   { label: "Coaching perfection", detail: "Tricks & progression avancee" },
 ];
