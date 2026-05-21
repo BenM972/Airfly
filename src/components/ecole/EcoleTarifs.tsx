@@ -8,28 +8,33 @@ import Link from "next/link";
 const tabs = ["Kitesurf", "Wingfoil", "Kitefoil"] as const;
 type Tab = typeof tabs[number];
 
-const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?: string }[]> = {
+const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?: string; note?: string }[]> = {
   Kitesurf: [
-    { label: "Cours en groupe", detail: "3h · 3 élèves max", price: "115 €", badge: "Populaire" },
+    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire", note: "Navigation encadree incluse sur le meme creneau" },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
-    { label: "Cours duo", detail: "2h · 2 élèves", price: "135 € / pers." },
-    { label: "À partir du 4ème cours", detail: "2h · groupe", price: "100 €" },
+    { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers.", note: "Uniquement pour un groupe deja forme — deux personnes seules ne peuvent pas composer un duo." },
   ],
   Wingfoil: [
-    { label: "Cours duo", detail: "2h · 2 élèves max", price: "135 € / pers.", badge: "Populaire" },
-    { label: "Cours trio", detail: "3h · 3 élèves", price: "100 € / pers." },
+    { label: "Cours duo", detail: "2h · 2 eleves max", price: "135 € / pers.", badge: "Populaire" },
+    { label: "Cours trio", detail: "3h · 3 eleves", price: "100 € / pers." },
     { label: "Initiation paddle", detail: "1h30 · tous niveaux", price: "90 € / pers." },
   ],
   Kitefoil: [
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €", badge: "Recommande" },
-    { label: "Cours duo", detail: "2h · 2 élèves", price: "135 € / pers." },
+    { label: "Cours duo", detail: "2h · 2 eleves", price: "135 € / pers." },
   ],
 };
 
+const kiteLoalyaltyRates = [
+  { label: "Cours collectif", before: "115 €", after: "100 €" },
+  { label: "Cours solo", before: "200 €", after: "175 €" },
+  { label: "Cours duo", before: "135 € / pers.", after: "115 € / pers." },
+];
+
 const options = [
-  { label: "Navigation guidée", detail: "Session accompagnée sur le spot", price: "85 €" },
-  { label: "Départ de plage", detail: "Technique de lancement autonome", price: "85 €" },
-  { label: "Coaching perfection", detail: "Tricks & progression avancée", price: "100 €" },
+  { label: "Navigation guidee", detail: "Session accompagnee sur le spot", note: "Incluse avec le cours collectif" },
+  { label: "Depart de plage", detail: "Technique de lancement autonome" },
+  { label: "Coaching perfection", detail: "Tricks & progression avancee" },
 ];
 
 export default function EcoleTarifs() {
@@ -70,7 +75,7 @@ export default function EcoleTarifs() {
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
-            className="grid gap-4 mb-10"
+            className="grid gap-4 mb-6"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
@@ -79,44 +84,98 @@ export default function EcoleTarifs() {
             {tarifs[activeTab].map((t) => (
               <div
                 key={t.label}
-                className="flex items-center justify-between bg-gray-900 px-6 py-5 border border-gray-800 hover:border-[#FF0080]/40 transition-colors duration-300"
+                className="bg-gray-900 px-6 py-5 border border-gray-800 hover:border-[#FF0080]/40 transition-colors duration-300"
               >
-                <div>
-                  <div className="flex items-center gap-3 mb-1">
-                    <p
-                      className="text-white uppercase tracking-widest text-sm"
-                      style={{ fontFamily: "Mirloanne, serif" }}
-                    >
-                      {t.label}
-                    </p>
-                    {t.badge && (
-                      <span
-                        className="text-[10px] uppercase tracking-widest bg-[#FF0080] text-white px-2 py-0.5"
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="flex items-center gap-3 mb-1">
+                      <p
+                        className="text-white uppercase tracking-widest text-sm"
                         style={{ fontFamily: "Mirloanne, serif" }}
                       >
-                        {t.badge}
-                      </span>
-                    )}
+                        {t.label}
+                      </p>
+                      {t.badge && (
+                        <span
+                          className="text-[10px] uppercase tracking-widest bg-[#FF0080] text-white px-2 py-0.5"
+                          style={{ fontFamily: "Mirloanne, serif" }}
+                        >
+                          {t.badge}
+                        </span>
+                      )}
+                    </div>
+                    <p
+                      className="text-gray-400 text-sm"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {t.detail}
+                    </p>
                   </div>
                   <p
-                    className="text-gray-400 text-sm"
+                    className="text-white text-xl font-light whitespace-nowrap ml-6"
                     style={{ fontFamily: "var(--font-cormorant)" }}
                   >
-                    {t.detail}
+                    {t.price}
                   </p>
                 </div>
-                <p
-                  className="text-white text-xl font-light whitespace-nowrap ml-6"
-                  style={{ fontFamily: "var(--font-cormorant)" }}
-                >
-                  {t.price}
-                </p>
+                {t.note && (
+                  <p
+                    className="mt-3 text-gray-500 text-xs border-t border-gray-800 pt-3 italic"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    {t.note}
+                  </p>
+                )}
               </div>
             ))}
           </motion.div>
         </AnimatePresence>
 
-        {/* Options avancées */}
+        {/* Bloc fidelite Kitesurf */}
+        <AnimatePresence>
+          {activeTab === "Kitesurf" && (
+            <motion.div
+              key="fidelite"
+              className="mb-10 border border-[#FF0080]/20 bg-gray-900/60 px-6 py-5"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[#FF0080] text-xs">◆</span>
+                <p
+                  className="uppercase tracking-widest text-xs text-[#FF0080]"
+                  style={{ fontFamily: "Mirloanne, serif" }}
+                >
+                  Tarifs fidelite — a partir du 4eme cours
+                </p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-3">
+                {kiteLoalyaltyRates.map((r) => (
+                  <div key={r.label} className="flex flex-col gap-1">
+                    <p
+                      className="text-gray-400 text-xs uppercase tracking-widest"
+                      style={{ fontFamily: "Mirloanne, serif" }}
+                    >
+                      {r.label}
+                    </p>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-white text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
+                        {r.after}
+                      </p>
+                      <p className="text-gray-600 text-sm line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
+                        {r.before}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Options perfectionnement */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -143,12 +202,21 @@ export default function EcoleTarifs() {
                 >
                   {o.detail}
                 </p>
-                <p
-                  className="text-[#FF0080] text-lg"
-                  style={{ fontFamily: "var(--font-cormorant)" }}
-                >
-                  {o.price}
-                </p>
+                {o.note ? (
+                  <p
+                    className="text-[#FF0080]/70 text-xs italic"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    {o.note}
+                  </p>
+                ) : (
+                  <p
+                    className="text-gray-500 text-sm italic"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    Prix sur demande
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -159,7 +227,7 @@ export default function EcoleTarifs() {
           className="text-gray-600 text-xs text-center mb-10"
           style={{ fontFamily: "var(--font-cormorant)" }}
         >
-          * Licence FFVL ou FFV requise (assurance RC incluse). Renseignez-vous lors de votre réservation.
+          * Licence FFVL ou FFV requise (assurance RC incluse). Une assurance personnelle couvrant la pratique du kitesurf est également acceptée. Renseignez-vous lors de votre réservation.
         </p>
 
         {/* CTA */}

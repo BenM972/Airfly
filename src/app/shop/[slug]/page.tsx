@@ -257,19 +257,6 @@ export default function ProductPage() {
               {product.name}
             </h1>
 
-            {/* Prix */}
-            {displayPrice && (
-              <div className="flex items-center gap-3 mb-8">
-                <p className="text-gray-900 text-2xl" style={{ fontFamily: "var(--font-cormorant)" }}>
-                  {displayPrice} €
-                </p>
-                {isOnSale && displayRegularPrice && (
-                  <p className="text-gray-400 text-lg line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
-                    {displayRegularPrice} €
-                  </p>
-                )}
-              </div>
-            )}
 
             {/* Description courte */}
             {product.short_description && (

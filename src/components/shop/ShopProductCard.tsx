@@ -74,18 +74,6 @@ export default function ShopProductCard({ product, index }: Props) {
           >
             {product.name}
           </p>
-          {price && (
-            <div className="flex items-baseline gap-2 shrink-0">
-              <p className="text-gray-900 text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
-                {product.on_sale && product.sale_price ? product.sale_price : price} €
-              </p>
-              {product.on_sale && product.sale_price && (
-                <p className="text-gray-400 text-sm line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
-                  {product.regular_price} €
-                </p>
-              )}
-            </div>
-          )}
         </div>
       </motion.div>
     </Link>

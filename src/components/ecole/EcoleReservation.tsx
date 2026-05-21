@@ -8,10 +8,9 @@ const niveaux = ["Débutant", "Intermédiaire", "Avancé"];
 
 const prestations: Record<string, { label: string; detail: string; price: string }[]> = {
   Kitesurf: [
-    { label: "Cours en groupe", detail: "3h · 3 élèves max", price: "115 €" },
+    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €" },
     { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
-    { label: "Cours duo", detail: "2h · 2 élèves", price: "135 € / pers." },
-    { label: "À partir du 4ème cours", detail: "2h · groupe", price: "100 €" },
+    { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers." },
   ],
   Wingfoil: [
     { label: "Cours duo", detail: "2h · 2 élèves max", price: "135 € / pers." },
