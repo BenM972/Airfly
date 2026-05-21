@@ -41,7 +41,7 @@ export default function Footer() {
           <a href="https://www.facebook.com/airfly972" target="_blank" rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-colors text-xs uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}>Facebook</a>
-          <a href="https://wa.me/596596762531" target="_blank" rel="noopener noreferrer"
+          <a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer"
             className="text-gray-400 hover:text-white transition-colors text-xs uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}>WhatsApp</a>
         </div>
@@ -112,7 +112,7 @@ export default function Footer() {
             <ul className="space-y-3">
               <li><a href="tel:+596596762531" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>+596 596 76 25 31</a></li>
               <li><a href="mailto:info@airfly972.com" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>info@airfly972.com</a></li>
-              <li><a href="https://wa.me/596596762531" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>WhatsApp</a></li>
+              <li><a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors duration-200" style={{ fontFamily: "var(--font-cormorant)" }}>WhatsApp</a></li>
               <li className="pt-2"><p className="text-gray-500 text-sm leading-relaxed" style={{ fontFamily: "var(--font-cormorant)" }}>Plage de Pointe Faula<br />Le Vauclin, Martinique</p></li>
             </ul>
           </div>

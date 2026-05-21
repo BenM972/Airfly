@@ -10,12 +10,14 @@ type Message = {
   content: string;
 };
 
-const SUGGESTIONS = [
-  "Je veux apprendre le kitesurf",
-  "Quels sont vos tarifs ?",
-  "Trouver mon matos",
-  "C'est quoi le spot ?",
-  { label: "Y'a til du vent sur le spot ? 🌬️", meteo: true },
+type Suggestion =
+  | { label: string; text: string }
+  | { label: string; nav: string };
+
+const QUICK_CHOICES: Suggestion[] = [
+  { label: "L'ecole de glisse", nav: "/ecole" },
+  { label: "Le matos & la boutique", nav: "/shop" },
+  { label: "La meteo du spot", nav: "/#meteo" },
 ];
 
 export default function ChatBot() {
@@ -31,7 +33,7 @@ export default function ChatBot() {
     if (open && messages.length === 0) {
       setMessages([{
         role: "assistant",
-        content: "Salut ! Je suis l'assistant Airfly 🤙 Je peux t'aider à trouver le bon matos, répondre à tes questions sur l'école ou le spot. C'est parti ?",
+        content: "Bonjour ! Bienvenue chez Airfly. Sur quoi puis-je vous renseigner ?",
       }]);
     }
     if (open) setTimeout(() => inputRef.current?.focus(), 300);
@@ -169,30 +171,29 @@ export default function ChatBot() {
                 </motion.div>
               ))}
 
-              {/* Suggestions (après le premier message assistant) */}
+              {/* Choix rapides (après le premier message assistant) */}
               {messages.length === 1 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {SUGGESTIONS.map((s) => {
-                    const isMeteo = typeof s === "object";
-                    const label = isMeteo ? s.label : s;
-                    return (
-                      <button
-                        key={label}
-                        onClick={() => {
-                          if (isMeteo) {
-                            setOpen(false);
-                            router.push("/#meteo");
-                          } else {
-                            send(label);
-                          }
-                        }}
-                        className="text-xs border border-gray-200 px-3 py-1.5 text-gray-500 hover:border-[#FF0080] hover:text-[#FF0080] transition-colors duration-200"
-                        style={{ fontFamily: "var(--font-cormorant)" }}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
+                <div className="flex flex-col gap-2 mt-2">
+                  {QUICK_CHOICES.map((s) => (
+                    <button
+                      key={s.label}
+                      onClick={() => {
+                        setOpen(false);
+                        router.push("nav" in s ? s.nav : "/");
+                      }}
+                      className="w-full text-left text-sm border border-gray-200 px-4 py-3 text-gray-700 hover:border-[#FF0080] hover:text-[#FF0080] transition-colors duration-200 flex items-center justify-between group"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {s.label}
+                      <span className="text-gray-300 group-hover:text-[#FF0080] transition-colors duration-200">›</span>
+                    </button>
+                  ))}
+                  <p
+                    className="text-gray-400 text-xs text-center mt-1"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    ou posez directement votre question ci-dessous
+                  </p>
                 </div>
               )}
 
