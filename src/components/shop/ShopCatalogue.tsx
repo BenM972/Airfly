@@ -51,9 +51,12 @@ function decodeHTML(str: string) {
 }
 
 const CATEGORY_MAP: Record<Category, string[]> = {
-  textile: ["textile", "tee-shirts", "hoodies", "shorts", "lycras", "tops-techniques", "casquettes-chapeaux"],
+  textile: ["textile", "tee-shirts", "hoodies", "shorts", "lycras", "tops-techniques", "casquettes-chapeaux", "homme", "femme"],
   materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
 };
+
+const GENRE_SLUGS = ["homme", "femme"];
+type Genre = "homme" | "femme" | null;
 
 // Catégories intermédiaires (groupes) dans l'arborescence matériel
 const GROUP_SLUGS = ["kitesurf", "kite-wing-foil"];
@@ -65,6 +68,7 @@ type Props = {
 export default function ShopCatalogue({ initialCategory }: Props) {
   const [activeCategory, setActiveCategory] = useState<Category>(initialCategory ?? "textile");
   const [activeSub, setActiveSub] = useState<string | null>(null);
+  const [activeGenre, setActiveGenre] = useState<Genre>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [products, setProducts] = useState<WCProduct[]>([]);
   const [categories, setCategories] = useState<WCCategory[]>([]);
@@ -120,11 +124,15 @@ export default function ShopCatalogue({ initialCategory }: Props) {
   // Pour textile : toutes les sous-cats directement
   const directCats = visibleCats.filter((c) => !GROUP_SLUGS.includes(c.slug) && groups.length === 0);
 
+  // Catégories genre pour la sidebar (hors filtres principaux)
+  const genreCats = categories.filter((c) => GENRE_SLUGS.includes(c.slug));
+
   // Filtrage produits
   const filtered = products.filter((p) => {
     const catSlugs = p.categories.map((c) => c.slug);
     const inUniverse = catSlugs.some((s) => slugs.includes(s));
     if (!inUniverse) return false;
+    if (activeGenre && !catSlugs.includes(activeGenre)) return false;
     if (activeSub) return catSlugs.includes(activeSub);
     return true;
   });
@@ -132,6 +140,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
   const switchCategory = (cat: Category) => {
     setActiveCategory(cat);
     setActiveSub(null);
+    setActiveGenre(null);
   };
 
   const navButtonClass = (slug: string | null) =>
@@ -174,7 +183,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
               <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/>
             </svg>
             Filtrer
-            {activeSub && <span className="w-1.5 h-1.5 bg-[#FF0080] rounded-full" />}
+            {(activeSub || activeGenre) && <span className="w-1.5 h-1.5 bg-[#FF0080] rounded-full" />}
           </button>
         </div>
 
@@ -199,6 +208,29 @@ export default function ShopCatalogue({ initialCategory }: Props) {
               >
                 Tout
               </button>
+
+              {/* Toggle Homme / Femme (textile uniquement) */}
+              {activeCategory === "textile" && genreCats.length > 0 && (
+                <div className="flex mb-5 border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => setActiveGenre(null)}
+                    className={`flex-1 text-xs uppercase tracking-widest py-1.5 transition-colors duration-200 ${activeGenre === null ? "bg-gray-900 text-white" : "text-gray-400 hover:text-gray-700"}`}
+                    style={{ fontFamily: "Mirloanne, serif" }}
+                  >
+                    Tous
+                  </button>
+                  {genreCats.map((g) => (
+                    <button
+                      key={g.slug}
+                      onClick={() => setActiveGenre(activeGenre === g.slug ? null : g.slug as Genre)}
+                      className={`flex-1 text-xs uppercase tracking-widest py-1.5 border-l border-gray-200 transition-colors duration-200 ${activeGenre === g.slug ? "bg-gray-900 text-white" : "text-gray-400 hover:text-gray-700"}`}
+                      style={{ fontFamily: "Mirloanne, serif" }}
+                    >
+                      {decodeHTML(g.name)}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Textile : liste plate */}
               {directCats.map((cat) => (
@@ -300,7 +332,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
                 <p className="text-xs uppercase tracking-widest text-gray-900" style={{ fontFamily: "Mirloanne, serif" }}>Filtres</p>
                 {activeSub && (
                   <button
-                    onClick={() => { setActiveSub(null); setFilterOpen(false); }}
+                    onClick={() => { setActiveSub(null); setActiveGenre(null); setFilterOpen(false); }}
                     className="text-xs text-[#FF0080] uppercase tracking-widest"
                     style={{ fontFamily: "Mirloanne, serif" }}
                   >
@@ -317,6 +349,29 @@ export default function ShopCatalogue({ initialCategory }: Props) {
               >
                 Tout
               </button>
+
+              {/* Toggle Homme / Femme mobile (textile uniquement) */}
+              {activeCategory === "textile" && genreCats.length > 0 && (
+                <div className="flex my-4 border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => setActiveGenre(null)}
+                    className={`flex-1 text-xs uppercase tracking-widest py-2.5 transition-colors duration-200 ${activeGenre === null ? "bg-gray-900 text-white" : "text-gray-400"}`}
+                    style={{ fontFamily: "Mirloanne, serif" }}
+                  >
+                    Tous
+                  </button>
+                  {genreCats.map((g) => (
+                    <button
+                      key={g.slug}
+                      onClick={() => setActiveGenre(activeGenre === g.slug ? null : g.slug as Genre)}
+                      className={`flex-1 text-xs uppercase tracking-widest py-2.5 border-l border-gray-200 transition-colors duration-200 ${activeGenre === g.slug ? "bg-gray-900 text-white" : "text-gray-400"}`}
+                      style={{ fontFamily: "Mirloanne, serif" }}
+                    >
+                      {decodeHTML(g.name)}
+                    </button>
+                  ))}
+                </div>
+              )}
 
               {/* Textile : liste plate */}
               {directCats.map((cat) => (
