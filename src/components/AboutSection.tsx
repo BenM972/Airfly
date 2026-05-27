@@ -64,7 +64,7 @@ export default function AboutSection() {
               transition={{ duration: 1.4, delay: 0.4, ease: [0.4, 0, 0.2, 1] }}
             >
               <Image
-                src="/about-placeholder.jpg"
+                src="/about.jpg"
                 alt="Airfly — ambiance"
                 fill
                 className="object-cover"
