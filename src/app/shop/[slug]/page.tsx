@@ -359,9 +359,22 @@ export default function ProductPage() {
                 );
               })()}
 
-              <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
-                Retrait en boutique a Pointe Faula · Sans prepaiement
-              </p>
+              {(() => {
+                const qty = activeVariation ? activeVariation.stock_quantity : product.stock_quantity ?? null;
+                const status = activeVariation ? activeVariation.stock_status : product.stock_status;
+                if (status === "instock" && qty !== null && qty > 0) {
+                  return (
+                    <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      {qty} en stock · Retrait a Pointe Faula · Sans prepaiement
+                    </p>
+                  );
+                }
+                return (
+                  <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    Retrait en boutique a Pointe Faula · Sans prepaiement
+                  </p>
+                );
+              })()}
 
               <button
                 onClick={() => window.open("/shop/guide-des-tailles.jpg", "_blank")}
