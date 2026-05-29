@@ -363,6 +363,13 @@ export default function ProductPage() {
               {(() => {
                 const qty = activeVariation ? activeVariation.stock_quantity : product.stock_quantity ?? null;
                 const status = activeVariation ? activeVariation.stock_status : product.stock_status;
+                if (status === "outofstock") {
+                  return (
+                    <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      Ce produit est en rupture de stock — n&apos;hesitez pas a passer en magasin, nous avons peut-etre un equivalent pour vous.
+                    </p>
+                  );
+                }
                 if (status === "instock" && qty !== null && qty > 0) {
                   return (
                     <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
