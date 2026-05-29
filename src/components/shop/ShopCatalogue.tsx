@@ -13,6 +13,7 @@ export type WCVariation = {
   sale_price: string;
   on_sale: boolean;
   stock_status: string;
+  stock_quantity: number | null;
   image: { src: string; alt: string } | null;
   attributes: { name: string; option: string }[];
 };
@@ -27,6 +28,7 @@ export type WCProduct = {
   sale_price: string;
   on_sale: boolean;
   stock_status: string;
+  stock_quantity: number | null;
   short_description: string;
   description: string;
   categories: { id: number; name: string; slug: string }[];
