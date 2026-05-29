@@ -103,6 +103,7 @@ export default function ProductPage() {
       name: product.name,
       variante: varianteLabel,
       image: images[0]?.src ?? "",
+      price: displayPrice ?? "",
     });
     setAddedFeedback(true);
     setTimeout(() => setAddedFeedback(false), 1500);

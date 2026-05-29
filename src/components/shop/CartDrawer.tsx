@@ -106,6 +106,11 @@ export default function CartDrawer() {
                                 {item.variante}
                               </p>
                             )}
+                            {item.price && (
+                              <p className="text-gray-900 text-sm mt-1" style={{ fontFamily: "var(--font-cormorant)" }}>
+                                {item.price} €
+                              </p>
+                            )}
 
                             {/* Quantité */}
                             <div className="flex items-center gap-3 mt-3">
@@ -223,6 +228,17 @@ export default function CartDrawer() {
                 </div>
               )}
             </div>
+
+            {/* Total */}
+            {!success && step === "cart" && items.length > 0 && (() => {
+              const totalPrice = items.reduce((acc, i) => acc + (parseFloat(i.price) || 0) * i.qty, 0);
+              return (
+                <div className="border-t border-gray-100 px-6 py-4 flex justify-between items-center">
+                  <span className="text-xs uppercase tracking-widest text-gray-500" style={{ fontFamily: "Mirloanne, serif" }}>Total</span>
+                  <span className="text-gray-900 text-base" style={{ fontFamily: "var(--font-cormorant)" }}>{totalPrice.toFixed(2)} €</span>
+                </div>
+              );
+            })()}
 
             {/* Footer — actions */}
             {!success && (

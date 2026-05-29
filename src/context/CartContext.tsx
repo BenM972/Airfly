@@ -9,6 +9,7 @@ export type CartItem = {
   name: string;
   variante: string | null; // "M / Rouge"
   image: string;
+  price: string;
   qty: number;
 };
 
