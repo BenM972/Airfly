@@ -88,13 +88,11 @@ export default function MeteoSection() {
       readWindAndSetPhrase();
     }, 5 * 60 * 1000);
 
-    // --- Prévisions : charge puis refresh toutes les 30 min ---
+    // --- Prévisions : charge une seule fois (pas de refresh — évite les duplications) ---
     loadForecastWidget();
-    const forecastInterval = setInterval(loadForecastWidget, 30 * 60 * 1000);
 
     return () => {
       clearInterval(currInterval);
-      clearInterval(forecastInterval);
     };
   }, []);
 
