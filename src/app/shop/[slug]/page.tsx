@@ -186,35 +186,36 @@ export default function ProductPage() {
 
           {/* Galerie */}
           <motion.div
-            className="flex gap-3"
+            className="flex flex-col gap-3"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
-            {/* Miniatures colonne gauche */}
-            {images.length > 1 && (
-              <div className="flex flex-col gap-2 w-16 shrink-0">
-                {images.map((img, i) => (
-                  <button
-                    key={i}
-                    onClick={() => { setActiveImage(i); startInterval(images.length); }}
-                    onMouseEnter={() => { isHovering.current = true; }}
-                    onMouseLeave={() => { isHovering.current = false; }}
-                    className={`relative w-16 h-20 overflow-hidden border-2 transition-colors duration-200 shrink-0 ${
-                      activeImage === i ? "border-[#FF0080]" : "border-transparent hover:border-gray-300"
-                    }`}
-                  >
-                    <Image src={img.src} alt={img.alt || ""} fill className="object-cover" sizes="64px" />
-                  </button>
-                ))}
-              </div>
-            )}
-
             {/* Image principale */}
+            <div className="flex md:gap-3">
+              {/* Miniatures colonne gauche — desktop uniquement */}
+              {images.length > 1 && (
+                <div className="hidden md:flex flex-col gap-2 w-16 shrink-0">
+                  {images.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => { setActiveImage(i); startInterval(images.length); }}
+                      onMouseEnter={() => { isHovering.current = true; }}
+                      onMouseLeave={() => { isHovering.current = false; }}
+                      className={`relative w-16 h-20 overflow-hidden border-2 transition-colors duration-200 shrink-0 ${
+                        activeImage === i ? "border-[#FF0080]" : "border-transparent hover:border-gray-300"
+                      }`}
+                    >
+                      <Image src={img.src} alt={img.alt || ""} fill className="object-cover" sizes="64px" />
+                    </button>
+                  ))}
+                </div>
+              )}
+
             <div className="flex-1">
               <div
-                className={`relative aspect-[3/4] overflow-hidden bg-gray-100 ${zoomed ? "cursor-zoom-out" : "cursor-zoom-in"}`}
-                onClick={() => setZoomed((z) => !z)}
+                className={`relative aspect-[3/4] overflow-hidden bg-gray-100 md:cursor-zoom-in ${zoomed ? "md:cursor-zoom-out" : ""}`}
+                onClick={() => { if (window.innerWidth >= 768) setZoomed((z) => !z); }}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => { isHovering.current = true; }}
                 onMouseLeave={() => { isHovering.current = false; setZoomed(false); }}
@@ -257,6 +258,25 @@ export default function ProductPage() {
                 )}
               </div>
             </div>
+            </div>
+
+            {/* Miniatures en bas — mobile uniquement */}
+            {images.length > 1 && (
+              <div className="flex md:hidden gap-2 overflow-x-auto pb-1">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setActiveImage(i); startInterval(images.length); }}
+                    className={`relative w-14 h-18 shrink-0 overflow-hidden border-2 transition-colors duration-200 ${
+                      activeImage === i ? "border-[#FF0080]" : "border-transparent"
+                    }`}
+                    style={{ height: "72px" }}
+                  >
+                    <Image src={img.src} alt={img.alt || ""} fill className="object-cover" sizes="56px" />
+                  </button>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           {/* Infos produit */}

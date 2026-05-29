@@ -108,10 +108,10 @@ export default function CartDrawer() {
                             )}
 
                             {/* Quantité */}
-                            <div className="flex items-center gap-2 mt-3">
+                            <div className="flex items-center gap-3 mt-3">
                               <button
                                 onClick={() => updateQty(item.id, item.qty - 1)}
-                                className="w-7 h-7 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 flex items-center justify-center text-sm transition-colors"
+                                className="w-10 h-10 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 flex items-center justify-center text-base transition-colors"
                               >
                                 −
                               </button>
@@ -120,13 +120,13 @@ export default function CartDrawer() {
                               </span>
                               <button
                                 onClick={() => updateQty(item.id, item.qty + 1)}
-                                className="w-7 h-7 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 flex items-center justify-center text-sm transition-colors"
+                                className="w-10 h-10 border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 flex items-center justify-center text-base transition-colors"
                               >
                                 +
                               </button>
                               <button
                                 onClick={() => remove(item.id)}
-                                className="ml-auto text-gray-300 hover:text-red-400 transition-colors text-xs uppercase tracking-widest"
+                                className="ml-auto text-gray-300 hover:text-red-400 transition-colors text-xs uppercase tracking-widest py-2 px-1"
                                 style={{ fontFamily: "Mirloanne, serif" }}
                               >
                                 Retirer
@@ -152,28 +152,22 @@ export default function CartDrawer() {
                     ))}
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Prenom *</label>
-                      <input required value={formData.prenom} onChange={e => setFormData(f => ({ ...f, prenom: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
-                    </div>
-                    <div>
-                      <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Nom *</label>
-                      <input required value={formData.nom} onChange={e => setFormData(f => ({ ...f, nom: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
-                    </div>
+                  <div>
+                    <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Prenom *</label>
+                    <input required value={formData.prenom} onChange={e => setFormData(f => ({ ...f, prenom: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Email *</label>
-                      <input required type="email" value={formData.email} onChange={e => setFormData(f => ({ ...f, email: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
-                    </div>
-                    <div>
-                      <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Telephone</label>
-                      <input type="tel" value={formData.telephone} onChange={e => setFormData(f => ({ ...f, telephone: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
-                    </div>
+                  <div>
+                    <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Nom *</label>
+                    <input required value={formData.nom} onChange={e => setFormData(f => ({ ...f, nom: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
                   </div>
-
+                  <div>
+                    <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Email *</label>
+                    <input required type="email" autoComplete="email" value={formData.email} onChange={e => setFormData(f => ({ ...f, email: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
+                  </div>
+                  <div>
+                    <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Telephone</label>
+                    <input type="tel" autoComplete="tel" value={formData.telephone} onChange={e => setFormData(f => ({ ...f, telephone: e.target.value }))} className={inputCls} style={{ fontFamily: "var(--font-cormorant)" }} />
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
@@ -181,7 +175,7 @@ export default function CartDrawer() {
                     </div>
                     <div>
                       <label className={labelCls} style={{ fontFamily: "Mirloanne, serif" }}>Creneau</label>
-                      <div className="flex h-[42px]">
+                      <div className="flex h-[46px]">
                         {(["Matin", "Apres-midi"] as const).map((slot) => (
                           <label
                             key={slot}
@@ -232,7 +226,7 @@ export default function CartDrawer() {
 
             {/* Footer — actions */}
             {!success && (
-              <div className="border-t border-gray-100 px-6 py-5">
+              <div className="border-t border-gray-100 px-6 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
                 {step === "cart" ? (
                   <button
                     onClick={() => setStep("form")}
