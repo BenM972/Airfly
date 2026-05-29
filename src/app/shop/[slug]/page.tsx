@@ -343,18 +343,21 @@ export default function ProductPage() {
 
             {/* CTA Panier */}
             <div className="mt-auto">
-              <button
-                onClick={handleAddToCart}
-                disabled={product.type === "variable" && !activeVariation}
-                className="w-full bg-gray-900 text-white uppercase tracking-widest text-sm py-4 hover:bg-[#FF0080] transition-colors duration-300 disabled:opacity-40"
-                style={{ fontFamily: "Mirloanne, serif" }}
-              >
-                {product.type === "variable" && !activeVariation
-                  ? "Choisir une option"
-                  : addedFeedback
-                    ? "Ajoute !"
-                    : "Ajouter au panier"}
-              </button>
+              {(() => {
+                const stockStatus = activeVariation ? activeVariation.stock_status : product.stock_status;
+                const outOfStock = stockStatus === "outofstock";
+                const needsOption = product.type === "variable" && !activeVariation;
+                return (
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={needsOption || outOfStock}
+                    className="w-full bg-gray-900 text-white uppercase tracking-widest text-sm py-4 hover:bg-[#FF0080] transition-colors duration-300 disabled:opacity-40"
+                    style={{ fontFamily: "Mirloanne, serif" }}
+                  >
+                    {needsOption ? "Choisir une option" : outOfStock ? "Rupture de stock" : addedFeedback ? "Ajoute !" : "Ajouter au panier"}
+                  </button>
+                );
+              })()}
 
               <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
                 Retrait en boutique a Pointe Faula · Sans prepaiement
