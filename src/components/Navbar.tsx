@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { useCart } from "@/context/CartContext";
 
 const links = [
   { label: "A propos", href: "/#apropos" },
@@ -18,6 +19,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { total, setDrawerOpen } = useCart();
   const hasHero = pathname === "/" || pathname === "/ecole" || pathname === "/shop";
   const solidNav = !hasHero || scrolled;
 
@@ -112,6 +114,22 @@ export default function Navbar() {
             </a>
           </div>
 
+          {/* Panier desktop */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="hidden md:flex items-center justify-center relative w-9 h-9 text-white/70 hover:text-white transition-colors duration-200"
+            aria-label="Panier"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            {total > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#FF0080] text-white text-[9px] rounded-full flex items-center justify-center" style={{ fontFamily: "Mirloanne, serif" }}>
+                {total > 9 ? "9+" : total}
+              </span>
+            )}
+          </button>
+
           {/* CTA desktop */}
           <div className="hidden md:block">
             <Link
@@ -122,6 +140,22 @@ export default function Navbar() {
               Reserver un cours
             </Link>
           </div>
+
+          {/* Panier mobile */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="md:hidden relative flex items-center justify-center w-8 h-8 text-white/70"
+            aria-label="Panier"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            {total > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-[#FF0080] text-white text-[9px] rounded-full flex items-center justify-center" style={{ fontFamily: "Mirloanne, serif" }}>
+                {total > 9 ? "9+" : total}
+              </span>
+            )}
+          </button>
 
           {/* Hamburger mobile */}
           <button

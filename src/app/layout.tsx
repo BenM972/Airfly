@@ -4,6 +4,8 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/shop/CartDrawer";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -26,10 +28,13 @@ export default function RootLayout({
   return (
     <html lang="fr" className={cormorant.variable}>
       <body>
-        <Preloader />
-        <Navbar />
-        {children}
-        <Footer />
+        <CartProvider>
+          <Preloader />
+          <Navbar />
+          <CartDrawer />
+          {children}
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

@@ -4,13 +4,23 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+type CartItem = { name: string; variante: string | null; qty: number };
+
 export async function POST(req: NextRequest) {
   const data = await req.json();
-  const { prenom, nom, email, telephone, date_retrait, creneau, produit, variante } = data;
+  const { prenom, nom, email, telephone, date_retrait, creneau, items } = data;
 
-  if (!prenom || !nom || !email || !produit) {
+  if (!prenom || !nom || !email || !items?.length) {
     return NextResponse.json({ error: "Champs obligatoires manquants" }, { status: 400 });
   }
+
+  const articlesText = (items as CartItem[])
+    .map((i) => `${i.qty}× ${i.name}${i.variante ? ` — ${i.variante}` : ""}`)
+    .join("\n");
+
+  const articlesHTML = (items as CartItem[])
+    .map((i) => `<li><strong>${i.qty}×</strong> ${i.name}${i.variante ? ` — <em>${i.variante}</em>` : ""}</li>`)
+    .join("");
 
   try {
     const supabase = getSupabase();
@@ -20,25 +30,25 @@ export async function POST(req: NextRequest) {
       nom,
       email,
       telephone: telephone ?? null,
-      produit,
-      variante: variante ?? null,
-      date_retrait: date_retrait ?? null,
-      creneau: creneau ?? null,
+      articles: articlesText,
+      date_retrait: date_retrait || null,
+      creneau: creneau || null,
     });
 
     await resend.emails.send({
       from: "Airfly <onboarding@resend.dev>",
       to: "contact@bmconsultingfwi.fr",
-      subject: `Nouvelle reservation click & collect — ${produit}`,
+      subject: `Nouvelle reservation click & collect — ${prenom} ${nom}`,
       html: `
         <h2>Nouvelle reservation click &amp; collect</h2>
-        <p><strong>Produit :</strong> ${produit}${variante ? ` — ${variante}` : ""}</p>
+        <h3>Articles :</h3>
+        <ul>${articlesHTML}</ul>
         <hr/>
         <p><strong>Client :</strong> ${prenom} ${nom}</p>
         <p><strong>Email :</strong> ${email}</p>
         <p><strong>Tel :</strong> ${telephone ?? "—"}</p>
-        <p><strong>Date souhaitee :</strong> ${date_retrait ?? "—"}</p>
-        <p><strong>Creneau :</strong> ${creneau ?? "—"}</p>
+        <p><strong>Date souhaitee :</strong> ${date_retrait || "—"}</p>
+        <p><strong>Creneau :</strong> ${creneau || "—"}</p>
       `,
     });
 
