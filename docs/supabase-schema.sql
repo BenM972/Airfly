@@ -54,3 +54,17 @@ CREATE INDEX IF NOT EXISTS idx_clients_tags        ON clients USING GIN(tags);
 CREATE INDEX IF NOT EXISTS idx_clients_disciplines ON clients USING GIN(disciplines);
 CREATE INDEX IF NOT EXISTS idx_reservations_client ON reservations(client_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_email   ON submissions(email);
+
+-- Table : réservations click & collect boutique
+CREATE TABLE IF NOT EXISTS shop_reservations (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  prenom        TEXT NOT NULL,
+  nom           TEXT NOT NULL,
+  email         TEXT NOT NULL,
+  telephone     TEXT,
+  produit       TEXT NOT NULL,
+  variante      TEXT,
+  date_retrait  DATE,
+  creneau       TEXT
+);

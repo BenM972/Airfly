@@ -20,6 +20,13 @@ export default function ProductPage() {
   const isHovering = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Click & collect form
+  const [formOpen, setFormOpen] = useState(false);
+  const [formData, setFormData] = useState({ prenom: "", nom: "", email: "", telephone: "", date_retrait: "", creneau: "" });
+  const [formLoading, setFormLoading] = useState(false);
+  const [formSuccess, setFormSuccess] = useState(false);
+  const [formError, setFormError] = useState("");
+
   useEffect(() => {
     fetch("/api/products")
       .then((r) => r.json())
@@ -84,6 +91,33 @@ export default function ProductPage() {
     startInterval(images.length);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [images.length, startInterval]);
+
+  const varianteLabel = activeVariation
+    ? activeVariation.attributes.map((a) => a.option).join(" / ")
+    : null;
+
+  const handleReservation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormLoading(true);
+    setFormError("");
+    try {
+      const res = await fetch("/api/shop/reservation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          produit: product?.name,
+          variante: varianteLabel,
+        }),
+      });
+      if (!res.ok) throw new Error();
+      setFormSuccess(true);
+    } catch {
+      setFormError("Une erreur est survenue, veuillez reessayer.");
+    } finally {
+      setFormLoading(false);
+    }
+  };
 
   const handleAttrChange = (attrName: string, value: string | null) => {
     setSelectedAttrs((prev) => {
@@ -298,25 +332,150 @@ export default function ProductPage() {
               </div>
             ))}
 
-            {/* CTA */}
-            <button
-              className="w-full bg-gray-900 text-white uppercase tracking-widest text-sm py-4 hover:bg-[#FF0080] transition-colors duration-300 mt-auto disabled:opacity-40"
-              style={{ fontFamily: "Mirloanne, serif" }}
-              disabled={product.type === "variable" && !activeVariation}
-            >
-              {product.type === "variable" && !activeVariation
-                ? "Choisir une option"
-                : "Ajouter au panier"}
-            </button>
+            {/* CTA Click & Collect */}
+            <div className="mt-auto">
+              <button
+                onClick={() => { setFormOpen(true); setFormSuccess(false); setFormError(""); }}
+                disabled={product.type === "variable" && !activeVariation}
+                className="w-full bg-gray-900 text-white uppercase tracking-widest text-sm py-4 hover:bg-[#FF0080] transition-colors duration-300 disabled:opacity-40"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                {product.type === "variable" && !activeVariation
+                  ? "Choisir une option"
+                  : "Reserver — Click & Collect"}
+              </button>
 
-            {/* Guide des tailles */}
-            <button
-              onClick={() => window.open("/shop/guide-des-tailles.jpg", "_blank")}
-              className="mt-4 text-xs uppercase tracking-widest text-gray-400 hover:text-[#FF0080] transition-colors duration-200 text-left"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              Guide des tailles →
-            </button>
+              <p className="mt-2 text-center text-gray-400 text-xs" style={{ fontFamily: "var(--font-cormorant)" }}>
+                Retrait en boutique a Pointe Faula · Sans prepaiement
+              </p>
+
+              {/* Guide des tailles */}
+              <button
+                onClick={() => window.open("/shop/guide-des-tailles.jpg", "_blank")}
+                className="mt-4 text-xs uppercase tracking-widest text-gray-400 hover:text-[#FF0080] transition-colors duration-200"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                Guide des tailles →
+              </button>
+            </div>
+
+            {/* Formulaire click & collect */}
+            <AnimatePresence>
+              {formOpen && (
+                <motion.div
+                  className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/50 px-0 sm:px-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={(e) => { if (e.target === e.currentTarget) setFormOpen(false); }}
+                >
+                  <motion.div
+                    className="bg-white w-full sm:max-w-lg max-h-[90vh] overflow-y-auto"
+                    initial={{ y: 60, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    exit={{ y: 60, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Header modal */}
+                    <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+                      <div>
+                        <p className="text-xs uppercase tracking-widest text-[#FF0080]" style={{ fontFamily: "Mirloanne, serif" }}>
+                          Click & Collect
+                        </p>
+                        <p className="text-gray-900 text-sm mt-0.5" style={{ fontFamily: "var(--font-cormorant)" }}>
+                          {product.name}{varianteLabel ? ` — ${varianteLabel}` : ""}
+                        </p>
+                      </div>
+                      <button onClick={() => setFormOpen(false)} className="text-gray-400 hover:text-gray-900 text-xl leading-none">×</button>
+                    </div>
+
+                    {formSuccess ? (
+                      <div className="px-6 py-12 text-center">
+                        <p className="text-[#FF0080] text-3xl mb-4">◆</p>
+                        <p className="text-gray-900 text-lg uppercase tracking-widest mb-2" style={{ fontFamily: "Mirloanne, serif" }}>
+                          Reservation enregistree !
+                        </p>
+                        <p className="text-gray-500" style={{ fontFamily: "var(--font-cormorant)" }}>
+                          On vous confirme la disponibilite et le creneau de retrait tres prochainement.
+                        </p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleReservation} className="px-6 py-6 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Prenom *</label>
+                            <input required value={formData.prenom} onChange={e => setFormData(f => ({ ...f, prenom: e.target.value }))}
+                              className="w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm"
+                              style={{ fontFamily: "var(--font-cormorant)" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Nom *</label>
+                            <input required value={formData.nom} onChange={e => setFormData(f => ({ ...f, nom: e.target.value }))}
+                              className="w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm"
+                              style={{ fontFamily: "var(--font-cormorant)" }} />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Email *</label>
+                            <input required type="email" value={formData.email} onChange={e => setFormData(f => ({ ...f, email: e.target.value }))}
+                              className="w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm"
+                              style={{ fontFamily: "var(--font-cormorant)" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Telephone</label>
+                            <input type="tel" value={formData.telephone} onChange={e => setFormData(f => ({ ...f, telephone: e.target.value }))}
+                              className="w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm"
+                              style={{ fontFamily: "var(--font-cormorant)" }} />
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Date souhaitee</label>
+                            <input type="date" value={formData.date_retrait} onChange={e => setFormData(f => ({ ...f, date_retrait: e.target.value }))}
+                              className="w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm"
+                              style={{ fontFamily: "var(--font-cormorant)" }} />
+                          </div>
+                          <div>
+                            <label className="block text-xs uppercase tracking-widest text-gray-500 mb-1.5" style={{ fontFamily: "Mirloanne, serif" }}>Creneau</label>
+                            <div className="flex h-[42px]">
+                              {(["Matin", "Apres-midi"] as const).map((slot) => (
+                                <label
+                                  key={slot}
+                                  className="flex-1 flex items-center justify-center border border-gray-200 bg-[#f5f0e8] cursor-pointer text-xs text-gray-700 transition-colors duration-200 has-[:checked]:bg-gray-900 has-[:checked]:text-white has-[:checked]:border-gray-900 first:border-r-0"
+                                  style={{ fontFamily: "var(--font-cormorant)" }}
+                                >
+                                  <input type="radio" name="creneau_retrait" value={slot} className="sr-only"
+                                    onChange={() => setFormData(f => ({ ...f, creneau: slot }))} />
+                                  {slot}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {formError && <p className="text-red-500 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{formError}</p>}
+
+                        <button
+                          type="submit"
+                          disabled={formLoading}
+                          className="w-full bg-gray-900 text-white uppercase tracking-widest text-sm py-4 hover:bg-[#FF0080] transition-colors duration-300 disabled:opacity-50 mt-2"
+                          style={{ fontFamily: "Mirloanne, serif" }}
+                        >
+                          {formLoading ? "Envoi..." : "Confirmer la reservation"}
+                        </button>
+
+                        <p className="text-center text-gray-400 text-xs pb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
+                          Sans prepaiement — nous vous confirmons la disponibilite par retour.
+                        </p>
+                      </form>
+                    )}
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Description longue */}
             {product.description && (
