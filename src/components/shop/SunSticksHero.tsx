@@ -7,73 +7,69 @@ type Props = {
 };
 
 const STICKS = [
-  { color: "#F5F0E8", border: "#D4C9B0" },
-  { color: "#1B4F6A", border: "#1B4F6A" },
-  { color: "#F4827A", border: "#F4827A" },
-  { color: "#C4924A", border: "#C4924A" },
+  { color: "#F5F0E8", border: "#D4C9B0", label: "Blanc" },
+  { color: "#1B4F6A", border: "#1B4F6A", label: "Ocean Blue" },
+  { color: "#F4827A", border: "#F4827A", label: "Sunset" },
+  { color: "#C4924A", border: "#C4924A", label: "Pacha Mama" },
 ];
 
 export default function SunSticksHero({ onShopSoins }: Props) {
   return (
-    <section className="bg-[#FFF060] px-6 md:px-16 py-6">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-6 flex-wrap md:flex-nowrap">
+    <section className="relative bg-[#FFF060] overflow-hidden" style={{ height: "40vh" }}>
+      <div className="h-full max-w-7xl mx-auto px-6 md:px-16 flex items-center justify-between gap-8">
 
-        {/* Gauche : marque + titre */}
+        {/* Gauche : texte */}
         <motion.div
-          className="flex items-center gap-4"
-          initial={{ opacity: 0, x: -16 }}
+          className="flex flex-col justify-center gap-3 flex-1"
+          initial={{ opacity: 0, x: -20 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <div>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-black/40 leading-none mb-1" style={{ fontFamily: "Mirloanne, serif" }}>
-              seventy — one percent
-            </p>
-            <h2 className="text-black text-2xl md:text-3xl font-light leading-none" style={{ fontFamily: "Mirloanne, serif" }}>
-              Sun Sticks <span className="text-black/40 text-lg">SPF 50+</span>
-            </h2>
-          </div>
-        </motion.div>
-
-        {/* Centre : sticks */}
-        <motion.div
-          className="flex items-end gap-2"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          {STICKS.map((s, i) => (
-            <div
-              key={i}
-              className="w-5 rounded-2xl border"
-              style={{ height: 40 + i * 6, backgroundColor: s.color, borderColor: s.border }}
-            />
-          ))}
-        </motion.div>
-
-        {/* Droite : claims + CTA */}
-        <motion.div
-          className="flex items-center gap-6 flex-wrap"
-          initial={{ opacity: 0, x: 16 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-        >
-          <p className="text-black/60 text-sm hidden md:block" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Made in France · 1% for the Planet · Eco Label
+          <p className="text-[10px] uppercase tracking-[0.3em] text-black/40" style={{ fontFamily: "Mirloanne, serif" }}>
+            seventy — one percent
+          </p>
+          <h2 className="text-black text-3xl md:text-5xl font-light leading-tight" style={{ fontFamily: "Mirloanne, serif" }}>
+            Sun Sticks
+          </h2>
+          <p className="text-black/50 text-sm md:text-base" style={{ fontFamily: "var(--font-cormorant)" }}>
+            SPF 50+ · Made in France · 1% for the Planet
           </p>
           <button
             onClick={onShopSoins}
-            className="bg-black text-[#FFF060] uppercase tracking-widest text-xs px-6 py-3 hover:bg-[#FF0080] hover:text-white transition-colors duration-300 whitespace-nowrap"
+            className="mt-2 self-start bg-black text-[#FFF060] uppercase tracking-widest text-xs px-6 py-3 hover:bg-[#FF0080] hover:text-white transition-colors duration-300"
             style={{ fontFamily: "Mirloanne, serif" }}
           >
-            Découvrir →
+            Découvrir la gamme →
           </button>
         </motion.div>
 
+        {/* Droite : sticks */}
+        <motion.div
+          className="flex items-end gap-3 h-3/4"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.15 }}
+        >
+          {STICKS.map((s, i) => (
+            <div key={i} className="flex flex-col items-center gap-2 h-full">
+              <div
+                className="flex-1 w-8 md:w-11 rounded-3xl border-2 shadow-md"
+                style={{ backgroundColor: s.color, borderColor: s.border }}
+              />
+              <span className="text-[9px] uppercase tracking-wider text-black/50 hidden md:block" style={{ fontFamily: "Mirloanne, serif" }}>
+                {s.label}
+              </span>
+            </div>
+          ))}
+        </motion.div>
+
       </div>
+
+      {/* Cercle déco fond */}
+      <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full opacity-20 pointer-events-none"
+        style={{ background: "radial-gradient(circle, #FF6B35 0%, transparent 70%)" }} />
     </section>
   );
 }
