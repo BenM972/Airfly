@@ -22,7 +22,7 @@ const BADGES = [
 
 export default function SunSticksHero({ onShopSoins }: Props) {
   return (
-    <section className="relative overflow-hidden bg-[#FFF060] py-16 md:py-24 px-6 md:px-16">
+    <section className="relative overflow-hidden bg-[#FFF060] min-h-[50vh] flex items-center px-6 md:px-16 py-10">
 
       {/* Cercle décoratif fond */}
       <div
