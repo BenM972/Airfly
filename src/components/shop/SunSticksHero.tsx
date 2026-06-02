@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 type Props = {
   onShopSoins: () => void;
@@ -16,6 +17,7 @@ const STICKS = [
 export default function SunSticksHero({ onShopSoins }: Props) {
   return (
     <section className="relative bg-[#FFF060] overflow-hidden" style={{ height: "40vh" }}>
+      <Image src="/shop/hero-suncream.jpg" alt="SeventyOne Percent Sun Sticks" fill className="object-cover" priority />
       <div className="h-full max-w-7xl mx-auto px-6 md:px-16 flex items-center justify-between gap-8">
 
         {/* Gauche : texte */}
