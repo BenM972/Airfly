@@ -7,10 +7,9 @@ type Props = {
 };
 
 const STICKS = [
-  { color: "#F5F0E8", border: "#D4C9B0", label: "Blanc" },
-  { color: "#1B4F6A", border: "#1B4F6A", label: "Ocean Blue" },
-  { color: "#F4827A", border: "#F4827A", label: "Sunset" },
-  { color: "#C4924A", border: "#C4924A", label: "Pacha Mama" },
+  { src: "/shop/stick-1.png", label: "Blanc" },
+  { src: "/shop/stick-2.png", label: "Ocean Blue" },
+  { src: "/shop/stick-3.png", label: "Sunset" },
 ];
 
 export default function SunSticksHero({ onShopSoins }: Props) {
@@ -59,10 +58,8 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         >
           {STICKS.map((s, i) => (
             <div key={i} className="flex flex-col items-center gap-2 h-full">
-              <div
-                className="flex-1 w-8 md:w-11 rounded-3xl border-2 shadow-md"
-                style={{ backgroundColor: s.color, borderColor: s.border }}
-              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={s.src} alt={s.label} className="flex-1 w-14 md:w-20 object-contain drop-shadow-lg" />
               <span className="text-[9px] uppercase tracking-wider text-white/50 hidden md:block" style={{ fontFamily: "Mirloanne, serif" }}>
                 {s.label}
               </span>
