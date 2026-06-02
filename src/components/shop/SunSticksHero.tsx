@@ -29,8 +29,7 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         <motion.div
           className="flex flex-col justify-center gap-3 flex-1"
           initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
           <p className="text-[10px] uppercase tracking-[0.3em] text-white/50" style={{ fontFamily: "Mirloanne, serif" }}>
@@ -55,8 +54,7 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         <motion.div
           className="flex items-end gap-3 h-3/4"
           initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.15 }}
         >
           {STICKS.map((s, i) => (
