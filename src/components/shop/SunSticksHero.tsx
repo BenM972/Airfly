@@ -15,11 +15,15 @@ const STICKS = [
 
 export default function SunSticksHero({ onShopSoins }: Props) {
   return (
-    <section className="relative bg-[#FFF060] overflow-hidden" style={{ height: "40vh" }}>
+    <section className="relative overflow-hidden" style={{ height: "40vh" }}>
+      {/* Background image */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/banner-suncream.jpg" alt="SeventyOne Percent Sun Sticks" className="absolute inset-0 w-full h-full object-cover" />
+      <img src="/banner-suncream.jpg" alt="" className="absolute inset-0 w-full h-full object-cover" />
+      {/* Overlay */}
       <div className="absolute inset-0 bg-black/50" />
-      <div className="h-full max-w-7xl mx-auto px-6 md:px-16 flex items-center justify-between gap-8">
+
+      {/* Contenu */}
+      <div className="relative z-10 h-full max-w-7xl mx-auto px-6 md:px-16 flex items-center justify-between gap-8">
 
         {/* Gauche : texte */}
         <motion.div
@@ -29,18 +33,18 @@ export default function SunSticksHero({ onShopSoins }: Props) {
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <p className="text-[10px] uppercase tracking-[0.3em] text-black/40" style={{ fontFamily: "Mirloanne, serif" }}>
+          <p className="text-[10px] uppercase tracking-[0.3em] text-white/50" style={{ fontFamily: "Mirloanne, serif" }}>
             seventy — one percent
           </p>
-          <h2 className="text-black text-3xl md:text-5xl font-light leading-tight" style={{ fontFamily: "Mirloanne, serif" }}>
+          <h2 className="text-white text-3xl md:text-5xl font-light leading-tight" style={{ fontFamily: "Mirloanne, serif" }}>
             Sun Sticks
           </h2>
-          <p className="text-black/50 text-sm md:text-base" style={{ fontFamily: "var(--font-cormorant)" }}>
+          <p className="text-white/60 text-sm md:text-base" style={{ fontFamily: "var(--font-cormorant)" }}>
             SPF 50+ · Made in France · 1% for the Planet
           </p>
           <button
             onClick={onShopSoins}
-            className="mt-2 self-start bg-black text-[#FFF060] uppercase tracking-widest text-xs px-6 py-3 hover:bg-[#FF0080] hover:text-white transition-colors duration-300"
+            className="mt-2 self-start bg-white text-black uppercase tracking-widest text-xs px-6 py-3 hover:bg-[#FFF060] transition-colors duration-300"
             style={{ fontFamily: "Mirloanne, serif" }}
           >
             Découvrir la gamme →
@@ -61,7 +65,7 @@ export default function SunSticksHero({ onShopSoins }: Props) {
                 className="flex-1 w-8 md:w-11 rounded-3xl border-2 shadow-md"
                 style={{ backgroundColor: s.color, borderColor: s.border }}
               />
-              <span className="text-[9px] uppercase tracking-wider text-black/50 hidden md:block" style={{ fontFamily: "Mirloanne, serif" }}>
+              <span className="text-[9px] uppercase tracking-wider text-white/50 hidden md:block" style={{ fontFamily: "Mirloanne, serif" }}>
                 {s.label}
               </span>
             </div>
@@ -69,10 +73,6 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         </motion.div>
 
       </div>
-
-      {/* Cercle déco fond */}
-      <div className="absolute -bottom-16 -right-16 w-64 h-64 rounded-full opacity-20 pointer-events-none"
-        style={{ background: "radial-gradient(circle, #FF6B35 0%, transparent 70%)" }} />
     </section>
   );
 }
