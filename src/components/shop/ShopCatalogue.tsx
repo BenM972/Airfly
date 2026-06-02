@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShopProductCard from "./ShopProductCard";
 
-type Category = "textile" | "materiel";
+type Category = "textile" | "materiel" | "soins";
 
 export type WCVariation = {
   id: number;
@@ -55,6 +55,7 @@ function decodeHTML(str: string) {
 const CATEGORY_MAP: Record<Category, string[]> = {
   textile: ["textile", "tee-shirts", "hoodies", "shorts", "lycras", "tops-techniques", "casquettes-chapeaux", "homme", "femme"],
   materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
+  soins: ["soins-solaires", "go-wild", "sun-kissed", "feel-good"],
 };
 
 const GENRE_SLUGS = ["homme", "femme"];
@@ -156,9 +157,9 @@ export default function ShopCatalogue({ initialCategory }: Props) {
     <section id="catalogue" ref={ref} className="bg-white py-16 px-6 md:px-16">
       <div className="max-w-7xl mx-auto">
 
-        {/* Toggle Textile / Matériel */}
+        {/* Toggle Textile / Matériel / Soins */}
         <div className="flex justify-center gap-0 mb-12">
-          {(["textile", "materiel"] as Category[]).map((cat) => (
+          {(["textile", "materiel", "soins"] as Category[]).map((cat) => (
             <button
               key={cat}
               onClick={() => switchCategory(cat)}

@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 
 type Props = {
-  onSelect: (cat: "textile" | "materiel") => void;
+  onSelect: (cat: "textile" | "materiel" | "soins") => void;
 };
 
 const panels = [
@@ -14,6 +14,7 @@ const panels = [
     sub: "T-shirts · Hoodies · Shorts · Casquettes",
     image: "/hero_textile.jpg",
     cta: "Voir la collection",
+    gradient: null,
   },
   {
     id: "materiel" as const,
@@ -21,6 +22,15 @@ const panels = [
     sub: "Kites · Planches · Ailes · Harnais",
     image: "/shop/entry-materiel.jpg",
     cta: "Shoper mon matos",
+    gradient: null,
+  },
+  {
+    id: "soins" as const,
+    label: "Soins",
+    sub: "Solaires · Après-surf · Visage · Corps",
+    image: null,
+    cta: "Découvrir la gamme",
+    gradient: "linear-gradient(135deg, #FFF060 0%, #FF6B35 50%, #FF0080 100%)",
   },
 ];
 
@@ -36,16 +46,23 @@ export default function ShopEntry({ onSelect }: Props) {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: i * 0.15 }}
         >
-          {/* Image */}
-          <Image
-            src={panel.image}
-            alt={panel.label}
-            fill
-            className="object-cover transition-transform duration-700 scale-100 group-hover:scale-105"
-          />
+          {/* Image ou gradient */}
+          {panel.image ? (
+            <Image
+              src={panel.image}
+              alt={panel.label}
+              fill
+              className="object-cover transition-transform duration-700 scale-100 group-hover:scale-105"
+            />
+          ) : (
+            <div
+              className="absolute inset-0 transition-opacity duration-500"
+              style={{ background: panel.gradient ?? undefined }}
+            />
+          )}
 
           {/* Overlay */}
-          <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors duration-500" />
+          <div className={`absolute inset-0 transition-colors duration-500 ${panel.image ? "bg-black/50 group-hover:bg-black/40" : "bg-black/10 group-hover:bg-black/5"}`} />
 
           {/* Separator line */}
           {i === 0 && (
