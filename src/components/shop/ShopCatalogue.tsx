@@ -124,8 +124,8 @@ export default function ShopCatalogue({ initialCategory }: Props) {
       : !GROUP_SLUGS.includes(c.slug) && groups.length === 0
   );
 
-  // Pour textile : toutes les sous-cats directement
-  const directCats = visibleCats.filter((c) => !GROUP_SLUGS.includes(c.slug) && groups.length === 0);
+  // Pour textile : toutes les sous-cats directement (hors genre homme/femme)
+  const directCats = visibleCats.filter((c) => !GROUP_SLUGS.includes(c.slug) && !GENRE_SLUGS.includes(c.slug) && groups.length === 0);
 
   // Catégories genre pour la sidebar (hors filtres principaux)
   const genreCats = categories.filter((c) => GENRE_SLUGS.includes(c.slug));
