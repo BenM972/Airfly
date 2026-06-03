@@ -50,22 +50,24 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         </motion.div>
 
         {/* Droite : sticks */}
-        <motion.div
-          className="flex items-end gap-3 h-3/4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
-        >
+        <div className="flex items-end gap-4 md:gap-6 h-4/5">
           {STICKS.map((s, i) => (
-            <div key={i} className="flex flex-col items-center gap-2 h-full">
+            <motion.div
+              key={i}
+              className="flex flex-col items-center gap-2 h-full"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 + i * 0.12, ease: "easeOut" }}
+              whileHover={{ y: -8, scale: 1.05, transition: { duration: 0.25 } }}
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt={s.label} className="flex-1 w-14 md:w-20 object-contain drop-shadow-lg" />
+              <img src={s.src} alt={s.label} className="h-full w-auto object-contain drop-shadow-2xl" />
               <span className="text-[9px] uppercase tracking-wider text-white/50 hidden md:block" style={{ fontFamily: "Mirloanne, serif" }}>
                 {s.label}
               </span>
-            </div>
+            </motion.div>
           ))}
-        </motion.div>
+        </div>
 
       </div>
     </section>
