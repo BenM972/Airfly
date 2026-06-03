@@ -50,7 +50,7 @@ export default function SunSticksHero({ onShopSoins }: Props) {
         </motion.div>
 
         {/* Droite : sticks */}
-        <div className="flex items-end gap-4 md:gap-6 h-4/5">
+        <div className="flex items-end gap-4 md:gap-6 h-[72%]">
           {STICKS.map((s, i) => (
             <motion.div
               key={i}
