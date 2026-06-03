@@ -33,7 +33,7 @@ export default function ShopProductCard({ product, index }: Props) {
                 alt={image.alt || product.name}
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
-                className={`object-cover transition-opacity duration-500 ${imageHover ? "group-hover:opacity-0" : "group-hover:scale-105 transition-transform"}`}
+                className={`object-contain transition-opacity duration-500 ${imageHover ? "group-hover:opacity-0" : "group-hover:scale-105 transition-transform"}`}
               />
               {imageHover && (
                 <Image
@@ -41,7 +41,7 @@ export default function ShopProductCard({ product, index }: Props) {
                   alt={imageHover.alt || product.name}
                   fill
                   sizes="(max-width: 768px) 50vw, 25vw"
-                  className="object-cover opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                  className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 />
               )}
             </>
