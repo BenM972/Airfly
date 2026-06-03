@@ -35,7 +35,7 @@ export default function SunSticksHero({ onShopSoins }: Props) {
             seventy — one percent
           </p>
           <h2 className="text-white text-3xl md:text-5xl font-light leading-tight" style={{ fontFamily: "Mirloanne, serif" }}>
-            Sun Sticks
+            SUN STICKS
           </h2>
           <p className="text-white/60 text-sm md:text-base" style={{ fontFamily: "var(--font-cormorant)" }}>
             SPF 50+ · Made in France · 1% for the Planet
