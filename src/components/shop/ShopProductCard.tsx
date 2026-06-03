@@ -74,6 +74,14 @@ export default function ShopProductCard({ product, index }: Props) {
           >
             {product.name}
           </p>
+          {price && (
+            <p
+              className="text-gray-900 text-sm shrink-0"
+              style={{ fontFamily: "Mirloanne, serif" }}
+            >
+              {parseFloat(price).toFixed(2).replace(".", ",")} €
+            </p>
+          )}
         </div>
       </motion.div>
     </Link>
