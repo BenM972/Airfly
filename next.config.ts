@@ -1,4 +1,3 @@
-// Keep-alive: 2026-06-09
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
