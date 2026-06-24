@@ -21,6 +21,7 @@ const COLOR_MAP: Record<string, string> = {
   bordeaux: "#7f1d1d",
   kaki: "#78716c", khaki: "#78716c",
   camo: "#6b7c49", camouflage: "#6b7c49",
+  sable: "#D1AF8A", sand: "#D1AF8A",
 };
 
 function isColorAttr(name: string) {
