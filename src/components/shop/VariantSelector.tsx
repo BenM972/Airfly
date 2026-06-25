@@ -19,7 +19,7 @@ const COLOR_MAP: Record<string, string> = {
   violet: "#7c3aed", purple: "#7c3aed",
   marron: "#92400e", brown: "#92400e",
   bordeaux: "#7f1d1d",
-  kaki: "#78716c", khaki: "#78716c",
+  kaki: "#585D30", khaki: "#585D30",
   camo: "#6b7c49", camouflage: "#6b7c49",
   sable: "#D1AF8A", sand: "#D1AF8A",
 };
