@@ -23,6 +23,7 @@ const COLOR_MAP: Record<string, string> = {
   camo: "#6b7c49", camouflage: "#6b7c49",
   sable: "#D1AF8A", sand: "#D1AF8A",
   sage: "#90A4A3",
+  sierra: "#B5543D",
 };
 
 function isColorAttr(name: string) {
