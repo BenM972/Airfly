@@ -9,8 +9,8 @@ import HeroTicker from "./HeroTicker";
 
 const panels = [
   { id: "ecole", label: "Ecole de glisse", image: "/hero_ecole.jpg", cta: "Reserver un cours", href: "/ecole" },
-  { id: "textile", label: "Textile", image: "/hero_textile.jpg", cta: "Voir les collections", href: "/textile" },
-  { id: "materiel", label: "Materiel", image: "/hero_materiel.jpg", cta: "Voir le matos technique", href: "/materiel" },
+  { id: "textile", label: "Textile", image: "/hero_textile.jpg", cta: "Voir les collections", href: "/shop?cat=textile" },
+  { id: "materiel", label: "Materiel", image: "/hero_materiel.jpg", cta: "Voir le matos technique", href: "/shop?cat=materiel" },
 ];
 
 export default function Hero() {
