@@ -27,6 +27,7 @@ const COLOR_MAP: Record<string, string> = {
   abricot: "#E4BDA5",
   turquoise: "#34B8C0",
   taupe: "#9F8C80",
+  orchid: "#C79AC6",
 };
 
 function isColorAttr(name: string) {
