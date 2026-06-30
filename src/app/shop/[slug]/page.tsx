@@ -19,6 +19,11 @@ export default function ProductPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lbZoom, setLbZoom] = useState(1);
+  const [lbPan, setLbPan] = useState({ x: 0, y: 0 });
+  const lbDragging = useRef(false);
+  const lbLastPos = useRef({ x: 0, y: 0 });
   const isHovering = useRef(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { add } = useCart();
@@ -127,6 +132,57 @@ export default function ProductPage() {
     });
   };
 
+  const openLightbox = () => {
+    setLightboxOpen(true);
+    setLbZoom(1);
+    setLbPan({ x: 0, y: 0 });
+  };
+
+  const closeLightbox = () => {
+    setLightboxOpen(false);
+    setLbZoom(1);
+    setLbPan({ x: 0, y: 0 });
+  };
+
+  const handleLbWheel = (e: React.WheelEvent) => {
+    e.preventDefault();
+    setLbZoom((z) => {
+      const next = Math.min(4, Math.max(1, z - e.deltaY * 0.002));
+      if (next === 1) setLbPan({ x: 0, y: 0 });
+      return next;
+    });
+  };
+
+  const handleLbPointerDown = (e: React.PointerEvent) => {
+    if (lbZoom <= 1) return;
+    lbDragging.current = true;
+    lbLastPos.current = { x: e.clientX, y: e.clientY };
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  };
+
+  const handleLbPointerMove = (e: React.PointerEvent) => {
+    if (!lbDragging.current) return;
+    setLbPan((p) => ({
+      x: p.x + (e.clientX - lbLastPos.current.x),
+      y: p.y + (e.clientY - lbLastPos.current.y),
+    }));
+    lbLastPos.current = { x: e.clientX, y: e.clientY };
+  };
+
+  const handleLbPointerUp = () => { lbDragging.current = false; };
+
+  const lbPrev = () => {
+    setActiveImage((i) => (i - 1 + images.length) % images.length);
+    setLbZoom(1);
+    setLbPan({ x: 0, y: 0 });
+  };
+
+  const lbNext = () => {
+    setActiveImage((i) => (i + 1) % images.length);
+    setLbZoom(1);
+    setLbPan({ x: 0, y: 0 });
+  };
+
   // Prix affiché
   const displayPrice = activeVariation
     ? activeVariation.on_sale && activeVariation.sale_price
@@ -180,7 +236,7 @@ export default function ProductPage() {
         >
           <Link href="/shop" className="hover:text-[#FF0080] transition-colors">Shop</Link>
           <span>›</span>
-          <span className="text-gray-600">{category}</span>
+          <span className="text-gray-600" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</span>
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
@@ -215,10 +271,10 @@ export default function ProductPage() {
 
             <div className="flex-1">
               <div
-                className={`relative aspect-[3/4] overflow-hidden bg-gray-100 md:cursor-zoom-in ${zoomed ? "md:cursor-zoom-out" : ""}`}
-                onClick={() => { if (window.innerWidth >= 768) setZoomed((z) => !z); }}
+                className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:cursor-zoom-in"
+                onClick={() => { if (window.innerWidth >= 768) openLightbox(); }}
                 onMouseMove={handleMouseMove}
-                onMouseEnter={() => { isHovering.current = true; }}
+                onMouseEnter={() => { isHovering.current = true; setZoomed(true); }}
                 onMouseLeave={() => { isHovering.current = false; setZoomed(false); }}
               >
                 <AnimatePresence mode="wait">
@@ -289,7 +345,7 @@ export default function ProductPage() {
           >
             <p
               className="text-[#FF0080] text-xs uppercase tracking-widest mb-3"
-              style={{ fontFamily: "Mirloanne, serif" }}
+              style={{ fontFamily: "var(--font-cormorant)" }}
             >
               {category}
             </p>
@@ -413,6 +469,97 @@ export default function ProductPage() {
 
         </div>
       </div>
+
+      {/* Lightbox */}
+      <AnimatePresence>
+        {lightboxOpen && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+            onClick={(e) => { if (e.target === e.currentTarget) closeLightbox(); }}
+          >
+            {/* Close */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 z-50 text-white/70 hover:text-white text-3xl leading-none w-10 h-10 flex items-center justify-center transition-colors"
+              aria-label="Fermer"
+            >
+              ✕
+            </button>
+
+            {/* Counter */}
+            {images.length > 1 && (
+              <span className="absolute top-5 left-1/2 -translate-x-1/2 text-white/50 text-xs tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
+                {activeImage + 1} / {images.length}
+              </span>
+            )}
+
+            {/* Prev / Next */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={lbPrev}
+                  className="absolute left-3 md:left-6 top-1/2 -translate-y-1/2 z-50 text-white/60 hover:text-white text-2xl w-10 h-10 flex items-center justify-center transition-colors"
+                  aria-label="Precedent"
+                >
+                  ‹
+                </button>
+                <button
+                  onClick={lbNext}
+                  className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 z-50 text-white/60 hover:text-white text-2xl w-10 h-10 flex items-center justify-center transition-colors"
+                  aria-label="Suivant"
+                >
+                  ›
+                </button>
+              </>
+            )}
+
+            {/* Image container */}
+            <div
+              className="relative w-full h-full flex items-center justify-center overflow-hidden select-none"
+              onWheel={handleLbWheel}
+              onPointerDown={handleLbPointerDown}
+              onPointerMove={handleLbPointerMove}
+              onPointerUp={handleLbPointerUp}
+              style={{ cursor: lbZoom > 1 ? "grab" : "default", touchAction: "none" }}
+            >
+              {images[activeImage] && (
+                <Image
+                  src={images[activeImage].src}
+                  alt={images[activeImage].alt || product.name}
+                  fill
+                  sizes="100vw"
+                  className="object-contain pointer-events-none transition-transform duration-100"
+                  style={{
+                    transform: `scale(${lbZoom}) translate(${lbPan.x / lbZoom}px, ${lbPan.y / lbZoom}px)`,
+                  }}
+                  priority
+                />
+              )}
+            </div>
+
+            {/* Thumbnails */}
+            {images.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-50">
+                {images.map((img, i) => (
+                  <button
+                    key={i}
+                    onClick={() => { setActiveImage(i); setLbZoom(1); setLbPan({ x: 0, y: 0 }); }}
+                    className={`relative w-12 h-14 overflow-hidden border-2 transition-colors duration-200 ${
+                      activeImage === i ? "border-white" : "border-transparent opacity-50 hover:opacity-80"
+                    }`}
+                  >
+                    <Image src={img.src} alt="" fill className="object-cover" sizes="48px" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </main>
   );
 }
