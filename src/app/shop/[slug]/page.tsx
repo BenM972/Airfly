@@ -222,6 +222,17 @@ export default function ProductPage() {
 
   const category = product.categories?.[product.categories.length - 1]?.name ?? "";
 
+  // Map product category slugs to shop ?cat= param
+  const BREADCRUMB_MAP: Record<string, string[]> = {
+    textile: ["textile", "tee-shirts", "hoodies", "shorts", "pantalons", "lycras", "casquettes-chapeaux", "homme", "femme"],
+    materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
+    soins: ["soins-solaires", "go-wild", "sun-kissed", "feel-good"],
+  };
+  const productSlugs = product.categories?.map((c) => c.slug) ?? [];
+  const shopCat = (Object.entries(BREADCRUMB_MAP).find(([, slugs]) =>
+    productSlugs.some((s) => slugs.includes(s))
+  ) ?? [])[0] ?? null;
+
   return (
     <main className="bg-white min-h-screen pt-24 pb-24 px-6 md:px-16">
       <div className="max-w-6xl mx-auto">
@@ -236,7 +247,11 @@ export default function ProductPage() {
         >
           <Link href="/shop" className="hover:text-[#FF0080] transition-colors">Shop</Link>
           <span>›</span>
-          <span className="text-gray-600" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</span>
+          {shopCat ? (
+            <Link href={`/shop?cat=${shopCat}`} className="text-gray-600 hover:text-[#FF0080] transition-colors" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</Link>
+          ) : (
+            <span className="text-gray-600" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</span>
+          )}
         </motion.div>
 
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
