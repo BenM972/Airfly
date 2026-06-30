@@ -220,7 +220,9 @@ export default function ProductPage() {
     );
   }
 
-  const category = product.categories?.[product.categories.length - 1]?.name ?? "";
+  const categoryRaw = product.categories?.[product.categories.length - 1]?.name ?? "";
+  // Strip accents for Mirloanne font compatibility
+  const category = categoryRaw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 
   // Map product category slugs to shop ?cat= param
   const BREADCRUMB_MAP: Record<string, string[]> = {
@@ -248,9 +250,9 @@ export default function ProductPage() {
           <Link href="/shop" className="hover:text-[#FF0080] transition-colors">Shop</Link>
           <span>›</span>
           {shopCat ? (
-            <Link href={`/shop?cat=${shopCat}`} className="text-gray-600 hover:text-[#FF0080] transition-colors" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</Link>
+            <Link href={`/shop?cat=${shopCat}`} className="text-gray-600 hover:text-[#FF0080] transition-colors">{category}</Link>
           ) : (
-            <span className="text-gray-600" style={{ fontFamily: "var(--font-cormorant)" }}>{category}</span>
+            <span className="text-gray-600">{category}</span>
           )}
         </motion.div>
 
@@ -360,7 +362,7 @@ export default function ProductPage() {
           >
             <p
               className="text-[#FF0080] text-xs uppercase tracking-widest mb-3"
-              style={{ fontFamily: "var(--font-cormorant)" }}
+              style={{ fontFamily: "Mirloanne, serif" }}
             >
               {category}
             </p>
