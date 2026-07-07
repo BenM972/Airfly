@@ -62,11 +62,14 @@ function loadForecastWidget() {
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
 
-  function readWindAndSetPhrase() {
+  function readWindAndSetPhrase(retries = 0) {
     setTimeout(() => {
       const el = document.getElementById("wgs-wind_avg");
-      if (!el) return;
-      const kts = parseFloat(el.textContent ?? "");
+      if (!el || !el.textContent?.trim()) {
+        if (retries < 10) readWindAndSetPhrase(retries + 1);
+        return;
+      }
+      const kts = parseFloat(el.textContent);
       if (!isNaN(kts)) setWindPhrase(getWindPhrase(kts));
     }, 2000);
   }
