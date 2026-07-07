@@ -300,7 +300,7 @@ export default function ShopCatalogue({ initialCategory }: Props) {
 
             {!loading && filtered.length === 0 && (
               <p className="text-gray-400 py-24" style={{ fontFamily: "var(--font-cormorant)" }}>
-                Aucun produit dans cette catégorie.
+                Les produits de cette categorie seront bientot ajoutes. Si vous avez une demande urgente, n&apos;hesitez pas a nous contacter ou a passer au shop.
               </p>
             )}
           </div>
