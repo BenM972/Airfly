@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SectionTitle from "./SectionTitle";
 
 const WIND_PHRASES: { max: number; text: string }[] = [
@@ -38,32 +38,25 @@ const FORECAST_ARGS = [
   "p=WINDSPD,GUST,SMER,TMPE,APCP1s",
 ];
 
-function initCurrWidget() {
-  const win = window as unknown as Record<string, unknown>;
-  const div = document.getElementById(CURR_DIV_ID);
-  if (!div) return;
-  div.innerHTML = "";
-  if (typeof win["WgsWidget"] === "function") {
-    (win["WgsWidget"] as (opts: unknown) => void)(CURR_OPTS);
-  }
-}
-
-function loadForecastWidget() {
-  const old = document.getElementById("wg-forecast-script");
-  if (old) old.remove();
-  const div = document.getElementById(FORECAST_DIV_ID);
-  if (div) div.innerHTML = "";
-  const script = document.createElement("script");
-  script.id = "wg-forecast-script";
-  script.src = "https://www.windguru.cz/js/widget.php?" + FORECAST_ARGS.join("&");
-  document.body.appendChild(script);
-}
-
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
+  const initialized = useRef(false);
 
   useEffect(() => {
-    // --- Relevés actuels : charge le script une seule fois ---
+    if (initialized.current) return;
+    initialized.current = true;
+
+    // --- Relevés actuels ---
+    function initCurrWidget() {
+      const win = window as unknown as Record<string, unknown>;
+      const div = document.getElementById(CURR_DIV_ID);
+      if (!div) return;
+      div.innerHTML = "";
+      if (typeof win["WgsWidget"] === "function") {
+        (win["WgsWidget"] as (opts: unknown) => void)(CURR_OPTS);
+      }
+    }
+
     if (!document.getElementById("wg-curr-script")) {
       const script = document.createElement("script");
       script.id = "wg-curr-script";
@@ -74,27 +67,25 @@ export default function MeteoSection() {
       initCurrWidget();
     }
 
-    // Poll widget DOM for wind value (widget loads async)
-    let attempts = 0;
-    const poll = setInterval(() => {
-      attempts++;
-      const container = document.getElementById(CURR_DIV_ID);
-      if (!container) return;
-      const match = container.textContent?.match(/([\d.]+)\s*kts/i);
-      if (match) {
-        const kts = parseFloat(match[1]);
-        if (!isNaN(kts)) setWindPhrase(getWindPhrase(kts));
-        clearInterval(poll);
-      }
-      if (attempts > 30) clearInterval(poll);
-    }, 1000);
+    // Fetch wind via our API proxy
+    fetch("/api/wind")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.kts != null && !isNaN(data.kts)) {
+          setWindPhrase(getWindPhrase(data.kts));
+        }
+      })
+      .catch(() => {});
 
-    // --- Prévisions : charge une seule fois ---
-    loadForecastWidget();
-
-    return () => {
-      clearInterval(poll);
-    };
+    // --- Prévisions ---
+    if (!document.getElementById("wg-forecast-script")) {
+      const div = document.getElementById(FORECAST_DIV_ID);
+      if (div) div.innerHTML = "";
+      const script = document.createElement("script");
+      script.id = "wg-forecast-script";
+      script.src = "https://www.windguru.cz/js/widget.php?" + FORECAST_ARGS.join("&");
+      document.body.appendChild(script);
+    }
   }, []);
 
   return (
