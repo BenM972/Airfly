@@ -32,13 +32,13 @@ export default function Navbar() {
   return (
     <>
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed left-0 right-0 z-50 transition-all duration-500 ${
           solidNav
-            ? "bg-black/80 backdrop-blur-md"
-            : "bg-transparent backdrop-blur-none"
+            ? "top-3 mx-3 md:mx-6 rounded-2xl bg-black/50 backdrop-blur-xl border border-white/15 shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+            : "top-0 mx-0 rounded-none bg-transparent backdrop-blur-none border border-transparent shadow-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0">
             <Image
