@@ -19,7 +19,8 @@ export async function GET() {
     // wind_avg is already in knots
     const windAvgKts = data?.wind_avg != null ? Math.round(parseFloat(data.wind_avg) * 10) / 10 : null;
     return NextResponse.json({ wind_avg_kts: windAvgKts });
-  } catch {
+  } catch (e) {
+    console.error("Wind API error:", e);
     return NextResponse.json({ error: "Failed to fetch wind data" }, { status: 500 });
   }
 }
