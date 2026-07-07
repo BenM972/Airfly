@@ -62,18 +62,6 @@ function loadForecastWidget() {
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
 
-  function fetchWindData() {
-    fetch("/api/wind")
-      .then((r) => r.json())
-      .then((data) => {
-        const kts = data?.wind_avg_kts;
-        if (kts !== null && kts !== undefined && !isNaN(kts)) {
-          setWindPhrase(getWindPhrase(kts));
-        }
-      })
-      .catch(() => {});
-  }
-
   useEffect(() => {
     // --- Relevés actuels : charge le script une seule fois ---
     if (!document.getElementById("wg-curr-script")) {
@@ -86,17 +74,26 @@ export default function MeteoSection() {
       initCurrWidget();
     }
 
-    // Fetch wind data via our API for the phrase
-    fetchWindData();
-
-    // Refresh wind phrase every 5 min (without re-init widget to avoid it disappearing)
-    const phraseInterval = setInterval(fetchWindData, 5 * 60 * 1000);
+    // Poll widget DOM for wind value (widget loads async)
+    let attempts = 0;
+    const poll = setInterval(() => {
+      attempts++;
+      const container = document.getElementById(CURR_DIV_ID);
+      if (!container) return;
+      const match = container.textContent?.match(/([\d.]+)\s*kts/i);
+      if (match) {
+        const kts = parseFloat(match[1]);
+        if (!isNaN(kts)) setWindPhrase(getWindPhrase(kts));
+        clearInterval(poll);
+      }
+      if (attempts > 30) clearInterval(poll);
+    }, 1000);
 
     // --- Prévisions : charge une seule fois ---
     loadForecastWidget();
 
     return () => {
-      clearInterval(phraseInterval);
+      clearInterval(poll);
     };
   }, []);
 
