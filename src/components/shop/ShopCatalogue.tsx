@@ -53,7 +53,7 @@ function decodeHTML(str: string) {
 }
 
 const CATEGORY_MAP: Record<Category, string[]> = {
-  textile: ["textile", "tee-shirts", "hoodies", "shorts", "pantalons", "lycras", "casquettes-chapeaux", "homme", "femme"],
+  textile: ["textile", "tee-shirts", "hoodies", "shorts", "pantalons", "lycras", "casquettes-chapeaux", "chaussures", "homme", "femme"],
   materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
   soins: ["soins-solaires", "go-wild", "sun-kissed", "feel-good"],
 };

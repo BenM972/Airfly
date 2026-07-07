@@ -34,6 +34,14 @@ function isColorAttr(name: string) {
   return ["couleur", "color", "colour"].includes(name.toLowerCase());
 }
 
+function isSizeAttr(name: string) {
+  return ["taille", "size", "pointure"].includes(name.toLowerCase());
+}
+
+function isShoeProduct(product: WCProduct) {
+  return product.categories?.some((c) => c.slug === "chaussures");
+}
+
 function getColor(value: string): string | null {
   return COLOR_MAP[value.toLowerCase()] ?? null;
 }
@@ -74,6 +82,8 @@ export default function VariantSelector({ product, variations, selected, onChang
     <div className="space-y-6 mb-8">
       {variantAttrs.map((attr, attrIdx) => {
         const isColor = isColorAttr(attr.name);
+        const isSize = isSizeAttr(attr.name);
+        const useSelect = isSize && isShoeProduct(product);
         const showPrice = priceSlot && attrIdx === lastNonColorIdx;
         return (
           <div key={attr.id}>
@@ -84,7 +94,7 @@ export default function VariantSelector({ product, variations, selected, onChang
               >
                 {attr.name}
               </p>
-              {selected[attr.name] && (
+              {!useSelect && selected[attr.name] && (
                 <p
                   className="text-xs text-gray-400 italic"
                   style={{ fontFamily: "var(--font-cormorant)" }}
@@ -94,54 +104,83 @@ export default function VariantSelector({ product, variations, selected, onChang
               )}
             </div>
 
-            <div className="flex gap-2 flex-wrap items-center">
-              {attr.options.map((opt) => {
-                const isSelected = selected[attr.name] === opt;
-                const available = isOptionAvailable(attr.name, opt);
-                const hexColor = isColor ? getColor(opt) : null;
+            {useSelect ? (
+              <div className="flex gap-2 flex-wrap items-center">
+                <select
+                  value={selected[attr.name] ?? ""}
+                  onChange={(e) => onChange(attr.name, e.target.value || null)}
+                  className="border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-700 appearance-none pr-10 cursor-pointer hover:border-gray-900 transition-colors duration-200"
+                  style={{
+                    fontFamily: "var(--font-cormorant)",
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "right 12px center",
+                  }}
+                >
+                  <option value="">Choisir une taille</option>
+                  {attr.options.map((opt) => {
+                    const available = isOptionAvailable(attr.name, opt);
+                    return (
+                      <option key={opt} value={opt} disabled={!available}>
+                        {opt}{!available ? " — Indisponible" : ""}
+                      </option>
+                    );
+                  })}
+                </select>
+                {showPrice && (
+                  <div className="ml-auto">{priceSlot}</div>
+                )}
+              </div>
+            ) : (
+              <div className="flex gap-2 flex-wrap items-center">
+                {attr.options.map((opt) => {
+                  const isSelected = selected[attr.name] === opt;
+                  const available = isOptionAvailable(attr.name, opt);
+                  const hexColor = isColor ? getColor(opt) : null;
 
-                const handleClick = () => {
-                  if (!available) return;
-                  onChange(attr.name, isSelected ? null : opt);
-                };
+                  const handleClick = () => {
+                    if (!available) return;
+                    onChange(attr.name, isSelected ? null : opt);
+                  };
 
-                if (isColor && hexColor) {
+                  if (isColor && hexColor) {
+                    return (
+                      <button
+                        key={opt}
+                        onClick={handleClick}
+                        title={opt}
+                        disabled={!available}
+                        className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+                          isSelected
+                            ? "border-[#FF0080] scale-110"
+                            : "border-transparent hover:border-gray-400"
+                        } ${!available ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}
+                        style={{ backgroundColor: hexColor }}
+                      />
+                    );
+                  }
+
                   return (
                     <button
                       key={opt}
                       onClick={handleClick}
-                      title={opt}
                       disabled={!available}
-                      className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+                      className={`px-4 py-2 text-sm border transition-colors duration-200 ${
                         isSelected
-                          ? "border-[#FF0080] scale-110"
-                          : "border-transparent hover:border-gray-400"
-                      } ${!available ? "opacity-30 cursor-not-allowed" : "cursor-pointer"}`}
-                      style={{ backgroundColor: hexColor }}
-                    />
+                          ? "border-gray-900 bg-gray-900 text-white"
+                          : "border-gray-200 text-gray-700 hover:border-gray-900"
+                      } ${!available ? "opacity-30 cursor-not-allowed line-through" : "cursor-pointer"}`}
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {opt}
+                    </button>
                   );
-                }
-
-                return (
-                  <button
-                    key={opt}
-                    onClick={handleClick}
-                    disabled={!available}
-                    className={`px-4 py-2 text-sm border transition-colors duration-200 ${
-                      isSelected
-                        ? "border-gray-900 bg-gray-900 text-white"
-                        : "border-gray-200 text-gray-700 hover:border-gray-900"
-                    } ${!available ? "opacity-30 cursor-not-allowed line-through" : "cursor-pointer"}`}
-                    style={{ fontFamily: "var(--font-cormorant)" }}
-                  >
-                    {opt}
-                  </button>
-                );
-              })}
-              {showPrice && (
-                <div className="ml-auto">{priceSlot}</div>
-              )}
-            </div>
+                })}
+                {showPrice && (
+                  <div className="ml-auto">{priceSlot}</div>
+                )}
+              </div>
+            )}
           </div>
         );
       })}
