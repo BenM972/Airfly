@@ -44,9 +44,10 @@ type Props = {
   selected: Record<string, string>;
   onChange: (attrName: string, value: string | null) => void;
   activeVariation: WCVariation | null;
+  priceSlot?: React.ReactNode;
 };
 
-export default function VariantSelector({ product, variations, selected, onChange, activeVariation }: Props) {
+export default function VariantSelector({ product, variations, selected, onChange, activeVariation, priceSlot }: Props) {
   const variantAttrs = product.attributes.filter((a) => a.variation);
 
   if (variantAttrs.length === 0) return null;
@@ -61,10 +62,19 @@ export default function VariantSelector({ product, variations, selected, onChang
     );
   };
 
+  // Find the last non-color attribute index to place price next to it
+  const lastNonColorIdx = (() => {
+    for (let i = variantAttrs.length - 1; i >= 0; i--) {
+      if (!isColorAttr(variantAttrs[i].name)) return i;
+    }
+    return variantAttrs.length - 1;
+  })();
+
   return (
     <div className="space-y-6 mb-8">
-      {variantAttrs.map((attr) => {
+      {variantAttrs.map((attr, attrIdx) => {
         const isColor = isColorAttr(attr.name);
+        const showPrice = priceSlot && attrIdx === lastNonColorIdx;
         return (
           <div key={attr.id}>
             <div className="flex items-center gap-2 mb-3">
@@ -84,7 +94,7 @@ export default function VariantSelector({ product, variations, selected, onChang
               )}
             </div>
 
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap items-center">
               {attr.options.map((opt) => {
                 const isSelected = selected[attr.name] === opt;
                 const available = isOptionAvailable(attr.name, opt);
@@ -128,6 +138,9 @@ export default function VariantSelector({ product, variations, selected, onChang
                   </button>
                 );
               })}
+              {showPrice && (
+                <div className="ml-auto">{priceSlot}</div>
+              )}
             </div>
           </div>
         );

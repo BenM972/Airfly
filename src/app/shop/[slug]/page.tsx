@@ -392,6 +392,18 @@ export default function ProductPage() {
                 selected={selectedAttrs}
                 onChange={handleAttrChange}
                 activeVariation={activeVariation}
+                priceSlot={displayPrice ? (
+                  <span className="flex items-baseline gap-2">
+                    <span className="text-2xl text-gray-900" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      {displayPrice}&nbsp;€
+                    </span>
+                    {isOnSale && displayRegularPrice && (
+                      <span className="text-base text-gray-400 line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
+                        {displayRegularPrice}&nbsp;€
+                      </span>
+                    )}
+                  </span>
+                ) : undefined}
               />
             )}
 
@@ -415,9 +427,9 @@ export default function ProductPage() {
               </div>
             ))}
 
-            {/* Prix + CTA Panier */}
+            {/* Prix (produits simples uniquement) + CTA Panier */}
             <div className="mt-auto">
-              {displayPrice && (
+              {product.type !== "variable" && displayPrice && (
                 <div className="mb-4 flex items-baseline gap-3">
                   <span
                     className="text-2xl text-gray-900"
