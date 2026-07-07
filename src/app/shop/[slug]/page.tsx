@@ -415,8 +415,27 @@ export default function ProductPage() {
               </div>
             ))}
 
-            {/* CTA Panier */}
+            {/* Prix + CTA Panier */}
             <div className="mt-auto">
+              {displayPrice && (
+                <div className="mb-4 flex items-baseline gap-3">
+                  <span
+                    className="text-2xl text-gray-900"
+                    style={{ fontFamily: "var(--font-cormorant)" }}
+                  >
+                    {displayPrice}&nbsp;€
+                  </span>
+                  {isOnSale && displayRegularPrice && (
+                    <span
+                      className="text-base text-gray-400 line-through"
+                      style={{ fontFamily: "var(--font-cormorant)" }}
+                    >
+                      {displayRegularPrice}&nbsp;€
+                    </span>
+                  )}
+                </div>
+              )}
+
               {(() => {
                 const stockStatus = activeVariation ? activeVariation.stock_status : product.stock_status;
                 const outOfStock = stockStatus === "outofstock";
