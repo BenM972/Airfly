@@ -68,14 +68,18 @@ export default function MeteoSection() {
     }
 
     // Fetch wind via our API proxy
-    fetch("/api/wind")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data?.kts != null && !isNaN(data.kts)) {
-          setWindPhrase(getWindPhrase(data.kts));
-        }
-      })
-      .catch(() => {});
+    function fetchWind() {
+      fetch("/api/wind")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data?.kts != null && !isNaN(data.kts)) {
+            setWindPhrase(getWindPhrase(data.kts));
+          }
+        })
+        .catch(() => {});
+    }
+    fetchWind();
+    const windInterval = setInterval(fetchWind, 5 * 60 * 1000);
 
     // --- Prévisions ---
     if (!document.getElementById("wg-forecast-script")) {
@@ -86,6 +90,8 @@ export default function MeteoSection() {
       script.src = "https://www.windguru.cz/js/widget.php?" + FORECAST_ARGS.join("&");
       document.body.appendChild(script);
     }
+
+    return () => clearInterval(windInterval);
   }, []);
 
   return (
