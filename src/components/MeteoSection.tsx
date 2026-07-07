@@ -62,33 +62,59 @@ function loadForecastWidget() {
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
 
-  function readWindAndSetPhrase(retries = 0) {
-    setTimeout(() => {
-      const el = document.getElementById("wgs-wind_avg");
-      if (!el || !el.textContent?.trim()) {
-        if (retries < 10) readWindAndSetPhrase(retries + 1);
-        return;
-      }
-      const kts = parseFloat(el.textContent);
-      if (!isNaN(kts)) setWindPhrase(getWindPhrase(kts));
-    }, 2000);
+  function extractWindFromWidget(): number | null {
+    const container = document.getElementById(CURR_DIV_ID);
+    if (!container) return null;
+    // Try specific windguru element first
+    const el = document.getElementById("wgs-wind_avg");
+    if (el?.textContent?.trim()) {
+      const v = parseFloat(el.textContent);
+      if (!isNaN(v)) return v;
+    }
+    // Fallback: parse "XX kts" from widget text
+    const match = container.textContent?.match(/([\d.]+)\s*kts/i);
+    if (match) return parseFloat(match[1]);
+    return null;
   }
 
   useEffect(() => {
+    let observer: MutationObserver | null = null;
+
+    function tryReadWind() {
+      const kts = extractWindFromWidget();
+      if (kts !== null) {
+        setWindPhrase(getWindPhrase(kts));
+        return true;
+      }
+      return false;
+    }
+
+    function observeWidget() {
+      const container = document.getElementById(CURR_DIV_ID);
+      if (!container) return;
+      observer = new MutationObserver(() => {
+        if (tryReadWind() && observer) {
+          observer.disconnect();
+          observer = null;
+        }
+      });
+      observer.observe(container, { childList: true, subtree: true, characterData: true });
+    }
+
     // --- Relevés actuels : charge le script une fois, refresh toutes les 5 min ---
     if (!document.getElementById("wg-curr-script")) {
       const script = document.createElement("script");
       script.id = "wg-curr-script";
       script.src = "https://www.windguru.cz/js/wgs_widget.php";
-      script.onload = () => { initCurrWidget(); readWindAndSetPhrase(); };
+      script.onload = () => { initCurrWidget(); observeWidget(); };
       document.body.appendChild(script);
     } else {
       initCurrWidget();
-      readWindAndSetPhrase();
+      observeWidget();
     }
     const currInterval = setInterval(() => {
       initCurrWidget();
-      readWindAndSetPhrase();
+      setTimeout(tryReadWind, 3000);
     }, 5 * 60 * 1000);
 
     // --- Prévisions : charge une seule fois (pas de refresh — évite les duplications) ---
@@ -96,6 +122,7 @@ export default function MeteoSection() {
 
     return () => {
       clearInterval(currInterval);
+      if (observer) observer.disconnect();
     };
   }, []);
 
