@@ -288,8 +288,8 @@ export default function ProductPage() {
 
             <div className="flex-1">
               <div
-                className="relative aspect-[3/4] overflow-hidden bg-gray-100 md:cursor-zoom-in"
-                onClick={() => { if (window.innerWidth >= 768) openLightbox(); }}
+                className="relative aspect-[3/4] overflow-hidden bg-gray-100 cursor-zoom-in"
+                onClick={openLightbox}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => { isHovering.current = true; setZoomed(true); }}
                 onMouseLeave={() => { isHovering.current = false; setZoomed(false); }}
