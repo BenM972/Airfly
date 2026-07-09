@@ -16,7 +16,7 @@
 
 ### Catégories Matériel
 - **Kitesurf** : ailes de kitesurf, planches de kitesurf, harnais, accessoires
-- **Kite / Wing Foil** : foils, planches de kite wing foil, accessoires kite wing foil
+- **Kite / Wing Foil** : ailes de wing, foils, planches de kite wing foil, accessoires kite wing foil
 
 ---
 
