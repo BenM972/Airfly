@@ -17,41 +17,108 @@ export default function Footer() {
   return (
     <footer className="bg-gray-950 text-white">
 
-      {/* Mobile footer — épuré */}
-      <div className="md:hidden px-6 py-10 flex flex-col items-center gap-7 text-center">
-        <Image src="/logo-airfly.webp" alt="Airfly" width={70} height={28} className="object-contain" />
-
-        <div className="grid grid-cols-2 gap-3 w-full">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-gray-400 hover:text-white transition-colors duration-200 uppercase tracking-widest text-sm py-2"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              {link.label}
-            </Link>
-          ))}
+      {/* Mobile footer */}
+      <div className="md:hidden px-6 py-12">
+        {/* Logo + tagline */}
+        <div className="text-center mb-8">
+          <Image src="/logo-airfly.webp" alt="Airfly" width={80} height={32} className="object-contain mx-auto" />
+          <p className="text-gray-400 text-base mt-4 leading-relaxed" style={{ fontFamily: "var(--font-cormorant)" }}>
+            Ecole de glisse & surf shop<br />Pointe Faula, Vauclin, Martinique
+          </p>
         </div>
 
-        <div className="flex gap-6">
+        {/* CTA */}
+        <Link
+          href="/ecole#reservation"
+          className="block w-full text-center bg-[#FF0080] text-white uppercase tracking-widest text-sm py-3.5 mb-10 transition-colors duration-300"
+          style={{ fontFamily: "Mirloanne, serif" }}
+        >
+          Reserver un cours
+        </Link>
+
+        <div className="space-y-8">
+          {/* Navigation */}
+          <div>
+            <p className="uppercase tracking-widest text-xs text-[#FF0080] mb-4" style={{ fontFamily: "Mirloanne, serif" }}>Navigation</p>
+            <div className="grid grid-cols-2 gap-y-3">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-gray-400 hover:text-white transition-colors duration-200 uppercase tracking-widest text-sm"
+                  style={{ fontFamily: "Mirloanne, serif" }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Horaires */}
+          <div>
+            <p className="uppercase tracking-widest text-xs text-[#FF0080] mb-4" style={{ fontFamily: "Mirloanne, serif" }}>Horaires</p>
+            <div className="space-y-3">
+              {hours.map((h) => (
+                <div key={h.day}>
+                  <p className="text-white text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.day}</p>
+                  <p className="text-gray-400 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.time}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Contact */}
+          <div>
+            <p className="uppercase tracking-widest text-xs text-[#FF0080] mb-4" style={{ fontFamily: "Mirloanne, serif" }}>Contact</p>
+            <div className="space-y-2.5">
+              <a href="tel:+596596762531" className="block text-gray-400 hover:text-white transition-colors duration-200 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                +596 596 76 25 31
+              </a>
+              <a href="mailto:info@airfly972.com" className="block text-gray-400 hover:text-white transition-colors duration-200 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                info@airfly972.com
+              </a>
+              <a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer" className="block text-gray-400 hover:text-white transition-colors duration-200 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                WhatsApp
+              </a>
+              <p className="text-gray-500 text-sm pt-1" style={{ fontFamily: "var(--font-cormorant)" }}>
+                Plage de Pointe Faula, Le Vauclin
+              </p>
+              <a
+                href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-gray-500 hover:text-[#FF0080] transition-colors duration-200 text-xs uppercase tracking-widest pt-1"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                </svg>
+                Itineraire
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Social */}
+        <div className="flex justify-center gap-6 mt-10 pb-8 border-b border-gray-800">
           <a href="https://www.instagram.com/airfly972" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
+            className="text-gray-400 hover:text-white transition-colors duration-200 text-sm uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}>Instagram</a>
           <a href="https://www.facebook.com/airfly972" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
+            className="text-gray-400 hover:text-white transition-colors duration-200 text-sm uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}>Facebook</a>
           <a href="https://wa.me/596696416727" target="_blank" rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-sm uppercase tracking-widest py-2 px-1"
+            className="text-gray-400 hover:text-white transition-colors duration-200 text-sm uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}>WhatsApp</a>
         </div>
 
-        <div className="border-t border-gray-800 w-full pt-6 flex flex-col gap-2">
+        {/* Copyright */}
+        <div className="pt-6 text-center space-y-2">
           <p className="text-gray-600 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
             © {new Date().getFullYear()} Airfly
           </p>
           <a href="https://www.bmconsultingfwi.fr" target="_blank" rel="noopener noreferrer"
-            className="text-gray-700 hover:text-white transition-colors text-xs"
+            className="text-gray-700 hover:text-white transition-colors duration-200 text-xs"
             style={{ fontFamily: "var(--font-cormorant)" }}>
             Développé avec ♥️ par BM Consulting FWI
           </a>

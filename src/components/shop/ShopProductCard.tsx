@@ -25,7 +25,8 @@ export default function ShopProductCard({ product, index }: Props) {
         transition={{ duration: 0.4, delay: index * 0.05 }}
       >
         {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4">
+        <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4 p-3">
+          <div className="relative w-full h-full">
           {image ? (
             <>
               <Image
@@ -48,6 +49,7 @@ export default function ShopProductCard({ product, index }: Props) {
           ) : (
             <div className="w-full h-full bg-gray-200" />
           )}
+          </div>
           {product.on_sale && (
             <span
               className="absolute top-3 left-3 bg-[#FF0080] text-white text-[10px] uppercase tracking-widest px-2 py-1"

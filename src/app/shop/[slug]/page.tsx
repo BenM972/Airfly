@@ -309,7 +309,7 @@ export default function ProductPage() {
                         alt={images[activeImage].alt || product.name}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover transition-transform duration-200"
+                        className="object-contain transition-transform duration-200"
                         style={zoomed ? {
                           transform: "scale(2)",
                           transformOrigin: `${zoomPos.x}% ${zoomPos.y}%`,

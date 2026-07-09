@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import Script from "next/script";
 import SectionTitle from "./SectionTitle";
 
 const WIND_PHRASES: { max: number; text: string }[] = [
@@ -40,34 +41,10 @@ const FORECAST_ARGS = [
 
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
-  const initialized = useRef(false);
+  const [showFallback, setShowFallback] = useState(false);
 
+  // Wind phrase from API proxy
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    // --- Relevés actuels ---
-    function initCurrWidget() {
-      const win = window as unknown as Record<string, unknown>;
-      const div = document.getElementById(CURR_DIV_ID);
-      if (!div) return;
-      div.innerHTML = "";
-      if (typeof win["WgsWidget"] === "function") {
-        (win["WgsWidget"] as (opts: unknown) => void)(CURR_OPTS);
-      }
-    }
-
-    if (!document.getElementById("wg-curr-script")) {
-      const script = document.createElement("script");
-      script.id = "wg-curr-script";
-      script.src = "https://www.windguru.cz/js/wgs_widget.php";
-      script.onload = () => initCurrWidget();
-      document.body.appendChild(script);
-    } else {
-      initCurrWidget();
-    }
-
-    // Fetch wind via our API proxy
     function fetchWind() {
       fetch("/api/wind")
         .then((r) => r.json())
@@ -79,19 +56,32 @@ export default function MeteoSection() {
         .catch(() => {});
     }
     fetchWind();
-    const windInterval = setInterval(fetchWind, 5 * 60 * 1000);
+    const interval = setInterval(fetchWind, 5 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
-    // --- Prévisions ---
-    if (!document.getElementById("wg-forecast-script")) {
-      const div = document.getElementById(FORECAST_DIV_ID);
-      if (div) div.innerHTML = "";
-      const script = document.createElement("script");
-      script.id = "wg-forecast-script";
-      script.src = "https://www.windguru.cz/js/widget.php?" + FORECAST_ARGS.join("&");
-      document.body.appendChild(script);
+  // Fallback: if widgets don't load after 10s, show link
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const forecast = document.getElementById(FORECAST_DIV_ID);
+      const curr = document.getElementById(CURR_DIV_ID);
+      if (
+        (!forecast || !forecast.hasChildNodes()) &&
+        (!curr || !curr.hasChildNodes())
+      ) {
+        setShowFallback(true);
+      }
+    }, 10000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const initCurrWidget = useCallback(() => {
+    const win = window as unknown as Record<string, unknown>;
+    const div = document.getElementById(CURR_DIV_ID);
+    if (div && typeof win["WgsWidget"] === "function") {
+      div.innerHTML = "";
+      (win["WgsWidget"] as (opts: unknown) => void)(CURR_OPTS);
     }
-
-    return () => clearInterval(windInterval);
   }, []);
 
   return (
@@ -117,7 +107,7 @@ export default function MeteoSection() {
               Previsions
             </p>
             <div className="overflow-x-auto">
-              <div id="wg_fwdg_1206002_100_1777735567467" />
+              <div id={FORECAST_DIV_ID} />
             </div>
           </div>
 
@@ -130,7 +120,7 @@ export default function MeteoSection() {
               Releves en temps reel
             </p>
             <div className="flex justify-center overflow-x-auto">
-              <div id="wgs_widget_4164_1704756029749" />
+              <div id={CURR_DIV_ID} />
             </div>
             {windPhrase && (
               <p
@@ -141,9 +131,38 @@ export default function MeteoSection() {
               </p>
             )}
           </div>
-        </div>
 
+          {/* Fallback if widgets fail to load */}
+          {showFallback && (
+            <div className="text-center py-6">
+              <a
+                href="https://www.windguru.cz/1206002"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[#FF0080] hover:text-gray-900 transition-colors duration-200 text-sm uppercase tracking-widest"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                Voir les previsions sur Windguru
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+              </a>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Windguru widget scripts via next/script */}
+      <Script
+        src={`https://www.windguru.cz/js/widget.php?${FORECAST_ARGS.join("&")}`}
+        strategy="afterInteractive"
+        onLoad={() => setShowFallback(false)}
+      />
+      <Script
+        src="https://www.windguru.cz/js/wgs_widget.php"
+        strategy="afterInteractive"
+        onReady={initCurrWidget}
+      />
     </section>
   );
 }
