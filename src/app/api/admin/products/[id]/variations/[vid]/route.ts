@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const wcBase = () => `${process.env.WC_URL}/wp-json/wc/v3`;
 const wcParams = (extra: Record<string, string> = {}) =>
@@ -9,6 +10,9 @@ const wcParams = (extra: Record<string, string> = {}) =>
   }).toString();
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string; vid: string }> }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { id, vid } = await params;
   const body = await req.json();
   const res = await fetch(`${wcBase()}/products/${id}/variations/${vid}?${wcParams()}`, {
@@ -19,7 +23,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(await res.json(), { status: res.status });
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string; vid: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string; vid: string }> }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { id, vid } = await params;
   const res = await fetch(`${wcBase()}/products/${id}/variations/${vid}?${wcParams({ force: "true" })}`, {
     method: "DELETE",

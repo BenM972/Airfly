@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const wcBase = () => `${process.env.WC_URL}/wp-json/wc/v3`;
 const wcAuth = () => ({
@@ -12,6 +13,9 @@ function wcParams(extra: Record<string, string> = {}) {
 }
 
 export async function GET(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { searchParams } = new URL(req.url);
   const page = searchParams.get("page") ?? "1";
   const per_page = searchParams.get("per_page") ?? "20";
@@ -27,6 +31,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const body = await req.json();
   const res = await fetch(`${wcBase()}/products?${wcParams()}`, {
     method: "POST",

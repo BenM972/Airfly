@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/adminAuth";
 
 const wcBase = () => `${process.env.WC_URL}/wp-json/wc/v3`;
 const wcParams = (extra: Record<string, string> = {}) =>
@@ -8,13 +9,19 @@ const wcParams = (extra: Record<string, string> = {}) =>
     ...extra,
   }).toString();
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { id } = await params;
   const res = await fetch(`${wcBase()}/products/${id}?${wcParams()}`, { cache: "no-store" });
   return NextResponse.json(await res.json());
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { id } = await params;
   const body = await req.json();
   const res = await fetch(`${wcBase()}/products/${id}?${wcParams()}`, {
@@ -25,7 +32,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json(await res.json(), { status: res.status });
 }
 
-export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   const { id } = await params;
   const res = await fetch(`${wcBase()}/products/${id}?${wcParams({ force: "true" })}`, {
     method: "DELETE",
