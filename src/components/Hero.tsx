@@ -51,6 +51,12 @@ export default function Hero() {
 
   return (
     <section className="relative w-full h-screen min-h-[500px]">
+      {/* Le hero est un montage plein ecran sans titre visible : ce h1 donne a la
+          page son titre pour les moteurs et les lecteurs d'ecran, qui n'en avaient aucun. */}
+      <h1 className="sr-only">
+        Airfly — école de kitesurf, wingfoil et kitefoil, et surf shop à Pointe Faula, Le Vauclin (Martinique)
+      </h1>
+
       {/* Panels desktop — côte à côte */}
       <div className="hidden md:flex w-full h-full">
         {panels.map((panel) => (
