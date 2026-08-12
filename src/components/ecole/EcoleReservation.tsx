@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import SectionTitle from "../SectionTitle";
+import HoneypotField from "../HoneypotField";
 
 
 const niveaux = ["Débutant", "Intermédiaire", "Avancé"];
@@ -227,6 +228,9 @@ export default function EcoleReservation() {
             >
               {loading ? "Envoi en cours..." : "Envoyer ma demande"}
             </button>
+
+            {/* En dernier : hors de l'ecran, et n'ajoute donc aucune marge aux vrais champs (space-y-5) */}
+            <HoneypotField />
 
           </motion.form>
         )}

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { guardFormSubmission } from "@/lib/formGuard";
+import { isHoneypotFilled } from "@/lib/honeypot";
 import { Resend } from "resend";
 
 const NOTIFY_EMAIL = "contact@bmconsultingfwi.fr";
@@ -33,8 +35,19 @@ function generateId(): string {
 
 // ─── Handler POST ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const blocked = guardFormSubmission(req, "reservation");
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
+
+    // Champ leurre rempli : on renvoie la meme reponse qu'un succes, sans rien
+    // enregistrer. Un bot a qui l'on repond "erreur" adapte son prochain envoi.
+    if (isHoneypotFilled(body)) {
+      console.warn("[reservation] honeypot declenche, soumission ignoree");
+      return NextResponse.json({ success: true, id: generateId() });
+    }
+
     const { prenom, nom, email, telephone, discipline, prestation, niveau, date_souhaitee, creneau, message } = body;
 
     // Validation

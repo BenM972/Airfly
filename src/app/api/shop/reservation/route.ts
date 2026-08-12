@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
+import { guardFormSubmission } from "@/lib/formGuard";
+import { isHoneypotFilled } from "@/lib/honeypot";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -7,7 +9,17 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 type CartItem = { name: string; variante: string | null; qty: number };
 
 export async function POST(req: NextRequest) {
+  const blocked = guardFormSubmission(req, "shop-reservation");
+  if (blocked) return blocked;
+
   const data = await req.json();
+
+  // Champ leurre rempli : reponse identique a un succes, aucune ecriture.
+  if (isHoneypotFilled(data)) {
+    console.warn("[shop-reservation] honeypot declenche, soumission ignoree");
+    return NextResponse.json({ ok: true });
+  }
+
   const { prenom, nom, email, telephone, date_retrait, creneau, items } = data;
 
   if (!prenom || !nom || !email || !items?.length) {

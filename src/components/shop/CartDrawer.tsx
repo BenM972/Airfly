@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
+import HoneypotField from "@/components/HoneypotField";
 
 const inputCls = "w-full border border-gray-200 bg-[#f5f0e8] px-4 py-2.5 text-gray-900 focus:outline-none focus:border-[#FF0080] transition-colors text-sm";
 const labelCls = "block text-xs uppercase tracking-widest text-gray-500 mb-1.5";
@@ -12,7 +13,7 @@ export default function CartDrawer() {
   const { items, remove, updateQty, clear, drawerOpen, setDrawerOpen } = useCart();
 
   const [step, setStep] = useState<"cart" | "form">("cart");
-  const [formData, setFormData] = useState({ prenom: "", nom: "", email: "", telephone: "", date_retrait: "", creneau: "" });
+  const [formData, setFormData] = useState({ prenom: "", nom: "", email: "", telephone: "", date_retrait: "", creneau: "", site_web: "" });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -209,6 +210,12 @@ export default function CartDrawer() {
                   <p className="text-center text-gray-400 text-xs pb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
                     Sans prepaiement — nous confirmons la disponibilite par retour.
                   </p>
+
+                  {/* En dernier : hors de l'ecran, et n'ajoute donc aucune marge aux vrais champs (space-y-4) */}
+                  <HoneypotField
+                    value={formData.site_web}
+                    onChange={(v) => setFormData((f) => ({ ...f, site_web: v }))}
+                  />
                 </form>
               )}
 
