@@ -68,3 +68,14 @@ CREATE TABLE IF NOT EXISTS shop_reservations (
   date_retrait  DATE,
   creneau       TEXT
 );
+
+-- ─── Clics sortants vers les partenaires ─────────────────────────────────────
+-- Aucune donnee personnelle : slug et date, rien d'autre.
+CREATE TABLE IF NOT EXISTS partner_clicks (
+  id           uuid PRIMARY KEY,
+  partner_slug text NOT NULL,
+  created_at   timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_partner_clicks_slug_date
+  ON partner_clicks(partner_slug, created_at DESC);
