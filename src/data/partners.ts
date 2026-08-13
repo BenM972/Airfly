@@ -17,6 +17,8 @@ export type Partner = {
   description: string;
   /** Chemin sous /public, ex "/partners/salty-lodge.jpg". Vide = pas de photo. */
   image: string;
+  /** Texte alternatif decrivant ce que montre la photo, ex "Villa avec piscine, vue sur le lagon". Obligatoire des qu'`image` est renseigne. */
+  imageAlt: string;
   /** Chemin sous /public. Vide = pas de logo, le nom sert de repli. */
   logo: string;
   href: string;

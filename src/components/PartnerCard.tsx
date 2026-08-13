@@ -11,6 +11,11 @@ type Props = {
   index: number;
 };
 
+/** Mirloanne n'a pas de glyphes accentues : on retire les accents du texte rendu avec cette police. */
+function stripAccents(value: string) {
+  return value.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
 export default function PartnerCard({ partner, index }: Props) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -33,7 +38,7 @@ export default function PartnerCard({ partner, index }: Props) {
         >
           <Image
             src={partner.image}
-            alt={`${partner.name}, ${partner.location}`}
+            alt={partner.imageAlt}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
@@ -41,7 +46,7 @@ export default function PartnerCard({ partner, index }: Props) {
         </div>
       )}
 
-      <div>
+      <div className={!partner.image ? "md:col-span-2" : ""}>
         {/* Hauteur fixe : n'importe quel ratio de logo s'y insere sans
             deformer ni decaler les cartes entre elles */}
         {partner.logo && (
@@ -90,7 +95,7 @@ export default function PartnerCard({ partner, index }: Props) {
           className="inline-block border border-gray-900 text-gray-900 uppercase tracking-widest text-xs px-8 py-3 hover:bg-gray-900 hover:text-white transition-colors duration-300"
           style={{ fontFamily: "Mirloanne, serif" }}
         >
-          Decouvrir {partner.name}
+          Decouvrir {stripAccents(partner.name)}
         </a>
       </div>
     </motion.article>
