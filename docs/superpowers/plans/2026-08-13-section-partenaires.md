@@ -65,7 +65,7 @@ export type Partner = {
   /**
    * Photo du partenaire. Optionnelle, mais indissociable de son texte
    * alternatif : le type interdit d'en fournir une sans l'autre.
-   * `src` est un chemin sous /public, ex "/partners/salty-lodge.jpg".
+   * `src` est un chemin sous /public, ex "/partners/salty-lodge.webp".
    * `alt` decrit ce que montre la photo, il ne repete pas le nom du
    * partenaire, deja porte par le titre juste a cote.
    */
@@ -330,7 +330,7 @@ git commit -m "feat(partenaires): section sur la page d'accueil"
 **Bloquée** tant que les visuels ne sont pas reçus de Salty Lodge.
 
 **Fichiers :**
-- Créer : `public/partners/salty-lodge.jpg`, `public/partners/salty-lodge-logo.png`
+- Créer : `public/partners/salty-lodge.webp`, `public/partners/salty-lodge-logo.webp`
 - Modifier : `src/data/partners.ts`
 
 **Interfaces :**
@@ -342,8 +342,8 @@ Placer les fichiers reçus dans `public/partners/`. Contrat à respecter :
 
 | Fichier | Format | Dimensions | Poids |
 |---|---|---|---|
-| `salty-lodge.jpg` | JPEG ou WebP, paysage | ~1600 × 1200 | < 400 Ko |
-| `salty-lodge-logo.png` | PNG transparent ou SVG | hauteur ≥ 200 px | < 100 Ko |
+| `salty-lodge.webp` | JPEG ou WebP, paysage | ~1600 × 1200 | < 400 Ko |
+| `salty-lodge-logo.webp` | PNG transparent ou SVG | hauteur ≥ 200 px | < 100 Ko |
 
 Contrôler le poids :
 
@@ -366,10 +366,10 @@ export const partners: Partner[] = [
     description:
       "À deux cents mètres du lagon de Pointe Faula, Salty Lodge propose des villas avec piscine privée et des bungalows neufs. De quoi poser ses sacs à cinq minutes du spot, et n'avoir plus qu'à traverser la plage le matin.",
     image: {
-      src: "/partners/salty-lodge.jpg",
+      src: "/partners/salty-lodge.webp",
       alt: "Villa avec piscine privée, Salty Lodge, Pointe Faula",
     },
-    logo: "/partners/salty-lodge-logo.png",
+    logo: "/partners/salty-lodge-logo.webp",
     href: "https://saltylodge.fr/",
     location: "Pointe Faula, Le Vauclin",
   },

@@ -38,7 +38,7 @@ export type Partner = {
   tagline: string;     // "Villas & bungalows à 200 m du lagon"
   description: string; // 2 à 3 phrases
   image?: { src: string; alt: string }; // photo optionnelle, indissociable de son alt
-  logo?: string;       // "/partners/salty-lodge-logo.png", absent = pas de logo
+  logo?: string;       // "/partners/salty-lodge-logo.webp", absent = pas de logo
   href: string;        // "https://saltylodge.fr/"
   location: string;    // "Pointe Faula, Le Vauclin"
 };
@@ -87,8 +87,8 @@ Le gain SEO vient d'ailleurs : contenu unique supplémentaire sur l'accueil, et 
 
 | Fichier | Format | Dimensions | Poids |
 |---|---|---|---|
-| `public/partners/salty-lodge.jpg` | JPEG ou WebP, paysage | ~1600 × 1200 | < 400 Ko |
-| `public/partners/salty-lodge-logo.png` | PNG transparent ou SVG | hauteur ≥ 200 px | < 100 Ko |
+| `public/partners/salty-lodge.webp` | WebP (livré en 1600 × 1200) | ~1600 × 1200 | 192 Ko |
+| `public/partners/salty-lodge-logo.webp` | WebP à fond transparent (converti depuis un PNG de 152 Ko) | 400 × 312 | 27 Ko |
 
 Les fichiers sont hébergés localement, pas appelés chez le partenaire : `next.config.mjs` restreint désormais `remotePatterns`, et un lien direct vers leurs serveurs casserait à la première réorganisation de leur site.
 

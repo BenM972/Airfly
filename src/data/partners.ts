@@ -30,4 +30,19 @@ export type Partner = {
   location: string;
 };
 
-export const partners: Partner[] = [];
+export const partners: Partner[] = [
+  {
+    slug: "salty-lodge",
+    name: "Salty Lodge",
+    tagline: "Villas et bungalows à deux pas du lagon",
+    description:
+      "À deux cents mètres du lagon de Pointe Faula, Salty Lodge propose des villas avec piscine privée et des bungalows neufs, tout équipés. De quoi poser ses sacs à cinq minutes du spot, et n'avoir plus qu'à traverser la plage le matin.",
+    image: {
+      src: "/partners/salty-lodge.webp",
+      alt: "Bungalow en bois bleu avec terrasse couverte, deux transats sur la pelouse et palmiers",
+    },
+    logo: "/partners/salty-lodge-logo.webp",
+    href: "https://saltylodge.fr/",
+    location: "Pointe Faula, Le Vauclin",
+  },
+];
