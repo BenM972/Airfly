@@ -19,7 +19,7 @@ export type Partner = {
   image: string;
   /** Texte alternatif decrivant ce que montre la photo, ex "Villa avec piscine, vue sur le lagon". Obligatoire des qu'`image` est renseigne. */
   imageAlt: string;
-  /** Chemin sous /public. Vide = pas de logo, le nom sert de repli. */
+  /** Chemin sous /public. Vide = pas de logo, seul le nom en titre est affiche. */
   logo: string;
   href: string;
   /** Affiche en Mirloanne : ecrire sans accent. */

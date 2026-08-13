@@ -79,7 +79,7 @@ Le gain SEO vient d'ailleurs : contenu unique supplémentaire sur l'accueil, et 
 
 ## Accessibilité
 
-- `alt` descriptif sur la photo (« Villa avec piscine, Salty Lodge, Pointe Faula ») et sur le logo (« Salty Lodge »).
+- `alt` descriptif sur la photo (« Villa avec piscine, Salty Lodge, Pointe Faula »). Le logo est décoratif : son `alt` est vide, le nom étant déjà porté par le `<h3>`.
 - Le lien sortant annonce sa destination dans son libellé, pas un « en savoir plus » nu.
 - Contraste vérifié sur le fond `#f5f0e8`.
 

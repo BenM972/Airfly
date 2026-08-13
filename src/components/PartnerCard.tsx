@@ -4,17 +4,13 @@ import { useRef } from "react";
 import Image from "next/image";
 import { motion, useInView } from "framer-motion";
 import type { Partner } from "@/data/partners";
+import { stripAccents } from "@/lib/text";
 
 type Props = {
   partner: Partner;
   /** Position dans la liste : les index impairs inversent le sens de la grille. */
   index: number;
 };
-
-/** Mirloanne n'a pas de glyphes accentues : on retire les accents du texte rendu avec cette police. */
-function stripAccents(value: string) {
-  return value.normalize("NFD").replace(/[̀-ͯ]/g, "");
-}
 
 export default function PartnerCard({ partner, index }: Props) {
   const ref = useRef(null);
@@ -53,7 +49,7 @@ export default function PartnerCard({ partner, index }: Props) {
           <div className="relative h-12 w-40 mb-6">
             <Image
               src={partner.logo}
-              alt={partner.name}
+              alt=""
               fill
               sizes="160px"
               className="object-contain object-left"
@@ -80,10 +76,13 @@ export default function PartnerCard({ partner, index }: Props) {
           className="text-xs uppercase tracking-widest text-gray-500 mb-6"
           style={{ fontFamily: "Mirloanne, serif" }}
         >
-          {partner.location}
+          {stripAccents(partner.location)}
         </p>
 
-        <p className="text-gray-700 text-base leading-relaxed mb-8">
+        <p
+          className="text-gray-700 text-base leading-relaxed mb-8"
+          style={{ fontFamily: "var(--font-cormorant)" }}
+        >
           {partner.description}
         </p>
 

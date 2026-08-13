@@ -356,7 +356,7 @@ export const partners: Partner[] = [
   {
     slug: "salty-lodge",
     name: "Salty Lodge",
-    tagline: "Villas et bungalows a deux pas du lagon",
+    tagline: "Villas et bungalows à deux pas du lagon",
     description:
       "À deux cents mètres du lagon de Pointe Faula, Salty Lodge propose des villas avec piscine privée et des bungalows neufs. De quoi poser ses sacs à cinq minutes du spot, et n'avoir plus qu'à traverser la plage le matin.",
     image: "/partners/salty-lodge.jpg",
@@ -368,7 +368,7 @@ export const partners: Partner[] = [
 ];
 ```
 
-`tagline` et `location` sont affichés en Mirloanne : ils restent sans accent. `description` et `imageAlt` utilisent la police du corps de texte et gardent leurs accents.
+`location` est affiché en Mirloanne : il reste sans accent. `tagline`, `description` et `imageAlt` utilisent la police du corps de texte et gardent leurs accents.
 
 `imageAlt` doit décrire **ce que montre la photo**, pas répéter le nom du partenaire — celui-ci est déjà lu juste à côté par un lecteur d'écran. Ajuster le texte à la photo réellement reçue.
 

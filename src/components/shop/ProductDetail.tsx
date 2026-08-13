@@ -8,6 +8,7 @@ import Link from "next/link";
 import type { WCProduct, WCVariation } from "@/lib/woocommerce";
 import VariantSelector from "@/components/shop/VariantSelector";
 import { useCart } from "@/context/CartContext";
+import { stripAccents } from "@/lib/text";
 
 type Props = {
   product: WCProduct;
@@ -187,7 +188,7 @@ export default function ProductDetail({ product, variations }: Props) {
 
   const categoryRaw = product.categories?.[product.categories.length - 1]?.name ?? "";
   // Strip accents for Mirloanne font compatibility
-  const category = categoryRaw.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const category = stripAccents(categoryRaw);
 
   // Map product category slugs to shop ?cat= param
   const BREADCRUMB_MAP: Record<string, string[]> = {
