@@ -18,6 +18,21 @@ export default function PartnerCard({ partner, index }: Props) {
   const reversed = index % 2 === 1;
   const image = partner.image;
 
+  // Le depart du visiteur prime : ni preventDefault, ni await avant la
+  // navigation. keepalive assure l'envoi pendant l'ouverture du nouvel onglet.
+  const compterLeClic = () => {
+    try {
+      fetch("/api/partners/click", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: partner.slug }),
+        keepalive: true,
+      }).catch(() => {});
+    } catch {
+      // Un echec de comptage ne doit jamais remonter au visiteur.
+    }
+  };
+
   return (
     <motion.article
       ref={ref}
@@ -90,6 +105,7 @@ export default function PartnerCard({ partner, index }: Props) {
         {/* Libelle en Mirloanne : sans accent, d'ou "Decouvrir" */}
         <a
           href={partner.href}
+          onClick={compterLeClic}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block border border-gray-900 text-gray-900 uppercase tracking-widest text-xs px-8 py-3 hover:bg-gray-900 hover:text-white transition-colors duration-300"
