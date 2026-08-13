@@ -32,11 +32,14 @@ export async function getPartnerClickStats(): Promise<PartnerClickStats> {
 
       const [total, mois] = await Promise.all([base(), base().gte("created_at", debut)]);
 
-      if (total.error || mois.error) {
-        console.error(`[partner-clicks] lecture impossible pour ${partenaire.slug}:`, total.error ?? mois.error);
+      if (total.error || mois.error || total.count === null || mois.count === null) {
+        console.error(
+          `[partner-clicks] lecture impossible pour ${partenaire.slug}:`,
+          total.error ?? mois.error ?? "count absent (table introuvable ?)"
+        );
         continue;
       }
-      stats[partenaire.slug] = { total: total.count ?? 0, mois: mois.count ?? 0 };
+      stats[partenaire.slug] = { total: total.count, mois: mois.count };
     } catch (err) {
       console.error(`[partner-clicks] lecture impossible pour ${partenaire.slug}:`, err);
     }
