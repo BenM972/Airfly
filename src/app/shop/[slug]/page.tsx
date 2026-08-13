@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getProducts, getProductBySlug, getVariations, toPlainText } from "@/lib/woocommerce";
 import ProductDetail from "@/components/shop/ProductDetail";
+import JsonLd from "@/components/JsonLd";
+import { breadcrumbSchema, productSchema } from "@/lib/schema";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -54,5 +56,19 @@ export default async function ProductPage({ params }: Props) {
 
   const variations = product.type === "variable" ? await getVariations(product.id) : [];
 
-  return <ProductDetail product={product} variations={variations} />;
+  const category = product.categories?.[product.categories.length - 1];
+
+  return (
+    <>
+      <JsonLd data={productSchema(product, variations)} />
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Shop", url: "/shop" },
+          ...(category ? [{ name: toPlainText(category.name, 60), url: `/shop?cat=${category.slug}` }] : []),
+          { name: toPlainText(product.name, 90), url: `/shop/${product.slug}` },
+        ])}
+      />
+      <ProductDetail product={product} variations={variations} />
+    </>
+  );
 }

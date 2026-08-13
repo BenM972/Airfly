@@ -56,6 +56,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={cormorant.variable}>
+      <head>
+        {/* Mirloanne porte tous les titres : la precharger evite le saut de
+            rendu que provoquait sa decouverte tardive via la feuille de style. */}
+        <link rel="preload" href="/Mirloanne.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body>
         <CartProvider>
           <Preloader />

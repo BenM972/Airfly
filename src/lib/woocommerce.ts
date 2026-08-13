@@ -79,12 +79,19 @@ export function getCategories(): Promise<WCCategory[]> {
 }
 
 /**
- * La grille du catalogue n'affiche ni description courte ni description longue,
- * mais WooCommerce les renvoie en HTML volumineux. Les retirer avant de passer
- * les produits au composant client allege d'autant le payload envoye au navigateur.
+ * Reduit chaque produit a ce que la grille du catalogue affiche reellement :
+ * vignette, vignette de survol, nom, prix, categories. Les descriptions HTML,
+ * les attributs et les images au-dela de la deuxieme sont ecartes — ils
+ * pesaient lourd dans le payload serialise vers le navigateur sans etre lus.
  */
-export function stripDescriptions(products: WCProduct[]): WCProduct[] {
-  return products.map((p) => ({ ...p, description: "", short_description: "" }));
+export function toCatalogueProduct(products: WCProduct[]): WCProduct[] {
+  return products.map((p) => ({
+    ...p,
+    description: "",
+    short_description: "",
+    attributes: [],
+    images: p.images?.slice(0, 2) ?? [],
+  }));
 }
 
 /** Un seul produit, au lieu des 100 que chargeait la page avant. */

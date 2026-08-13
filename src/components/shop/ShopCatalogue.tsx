@@ -67,13 +67,6 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
   const childrenOf = (parentId: number) =>
     visibleCats.filter((c) => c.parent === parentId && !GROUP_SLUGS.includes(c.slug));
 
-  // Catégories "à plat" (textile n'a pas de groupes intermédiaires)
-  const flatCats = visibleCats.filter(
-    (c) => !GROUP_SLUGS.includes(c.slug) && groups.every((g) => c.parent !== g.id) === false
-      ? false
-      : !GROUP_SLUGS.includes(c.slug) && groups.length === 0
-  );
-
   // Pour textile : toutes les sous-cats directement (hors genre homme/femme)
   const directCats = visibleCats.filter((c) => !GROUP_SLUGS.includes(c.slug) && !GENRE_SLUGS.includes(c.slug) && groups.length === 0);
 

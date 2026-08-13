@@ -59,7 +59,7 @@ export default function Hero() {
 
       {/* Panels desktop — côte à côte */}
       <div className="hidden md:flex w-full h-full">
-        {panels.map((panel) => (
+        {panels.map((panel, i) => (
           <HeroPanel
             key={panel.id}
             label={panel.label}
@@ -68,6 +68,7 @@ export default function Hero() {
             href={panel.href}
             isHovered={activePanel === panel.id}
             isAnyHovered={true}
+            priority={i === 0}
             onMouseEnter={() => handleMouseEnter(panel.id)}
             onMouseLeave={handleMouseLeave}
           />
@@ -78,8 +79,10 @@ export default function Hero() {
 
       {/* Panels mobile — empilés verticalement */}
       <div className="flex flex-col md:hidden w-full h-full">
-        {panels.map((panel) => (
-          <MobilePanelItem key={panel.id} panel={panel} />
+        {panels.map((panel, i) => (
+          // Seul le premier panneau est prioritaire : marquer les trois les
+          // faisait se disputer la bande passante, sans qu'aucun ne le soit.
+          <MobilePanelItem key={panel.id} panel={panel} priority={i === 0} />
         ))}
       </div>
     </section>
@@ -88,8 +91,10 @@ export default function Hero() {
 
 function MobilePanelItem({
   panel,
+  priority,
 }: {
   panel: { id: string; label: string; image: string; cta: string; href: string };
+  priority: boolean;
 }) {
   return (
     <div className="relative flex-1 overflow-hidden">
@@ -99,7 +104,8 @@ function MobilePanelItem({
         fill
         sizes="100vw"
         className="object-cover"
-        priority
+        priority={priority}
+        loading={priority ? undefined : "lazy"}
       />
       <div className="absolute inset-0 bg-black/40" />
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-5">

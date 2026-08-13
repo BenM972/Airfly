@@ -33,6 +33,9 @@ const securityHeaders = [
 
 const nextConfig = {
   images: {
+    // AVIF en premier : ~20 a 30 % de moins que le WebP, repli automatique
+    // pour les navigateurs qui ne l'annoncent pas.
+    formats: ["image/avif", "image/webp"],
     remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
   async headers() {

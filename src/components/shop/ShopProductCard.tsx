@@ -13,7 +13,6 @@ type Props = {
 export default function ShopProductCard({ product, index }: Props) {
   const image = product.images?.[0];
   const imageHover = product.images?.[1];
-  const subcategory = product.categories?.[product.categories.length - 1]?.name ?? "";
   const price = product.regular_price || product.price;
 
   return (

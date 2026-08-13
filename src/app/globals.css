@@ -2,7 +2,9 @@
 
 @font-face {
   font-family: "Mirloanne";
-  src: url("/Mirloanne.ttf") format("truetype");
+  /* WOFF2 d'abord (25 Ko contre 63 Ko), TTF en repli pour les navigateurs anciens */
+  src: url("/Mirloanne.woff2") format("woff2"),
+       url("/Mirloanne.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;

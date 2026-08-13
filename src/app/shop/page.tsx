@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { getCategories, getProducts, stripDescriptions } from "@/lib/woocommerce";
+import { getCategories, getProducts, toCatalogueProduct } from "@/lib/woocommerce";
 import ShopClient from "@/components/shop/ShopClient";
+import JsonLd from "@/components/JsonLd";
+import { shopCollectionSchema } from "@/lib/schema";
 
 type Category = "textile" | "materiel" | "soins";
 const VALID_CATS: Category[] = ["textile", "materiel", "soins"];
@@ -64,10 +66,13 @@ export default async function ShopPage({ searchParams }: Props) {
   const [products, categories] = await Promise.all([getProducts(), getCategories()]);
 
   return (
-    <ShopClient
+    <>
+      <JsonLd data={shopCollectionSchema(products)} />
+      <ShopClient
       initialCategory={category}
-      products={stripDescriptions(products)}
-      categories={categories}
-    />
+      products={toCatalogueProduct(products)}
+        categories={categories}
+      />
+    </>
   );
 }

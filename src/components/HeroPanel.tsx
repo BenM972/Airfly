@@ -13,6 +13,7 @@ interface HeroPanelProps {
   isAnyHovered: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  priority: boolean;
 }
 
 export default function HeroPanel({
@@ -23,6 +24,7 @@ export default function HeroPanel({
   isHovered,
   onMouseEnter,
   onMouseLeave,
+  priority,
 }: HeroPanelProps) {
   const flex = isHovered ? 3 : 0.5;
 
@@ -46,7 +48,8 @@ export default function HeroPanel({
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
           className="object-cover"
-          priority
+          priority={priority}
+          loading={priority ? undefined : "lazy"}
         />
       </motion.div>
 

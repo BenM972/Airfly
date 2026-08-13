@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { WCCategory, WCProduct } from "@/lib/woocommerce";
 import ShopEntry from "./ShopEntry";
 import ShopCatalogue from "./ShopCatalogue";
@@ -19,11 +19,16 @@ type Props = {
  * donc rendu, grille produits comprise, dans le HTML initial.
  */
 export default function ShopClient({ initialCategory, products, categories }: Props) {
+  // initialCategory vient de l'URL ; une navigation vers /shop?cat=... remonte
+  // ici avec une nouvelle valeur. On resynchronise pendant le rendu plutot que
+  // dans un effet, ce qui evite un rendu intermediaire avec l'ancienne categorie.
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(initialCategory);
+  const [lastUrlCategory, setLastUrlCategory] = useState<Category | null>(initialCategory);
 
-  useEffect(() => {
+  if (initialCategory !== lastUrlCategory) {
+    setLastUrlCategory(initialCategory);
     if (initialCategory) setSelectedCategory(initialCategory);
-  }, [initialCategory]);
+  }
 
   return (
     <main>

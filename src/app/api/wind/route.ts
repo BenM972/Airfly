@@ -17,7 +17,7 @@ export async function GET() {
     const data = await res.json();
     const kts = data?.wind_avg != null ? Math.round(parseFloat(data.wind_avg) * 10) / 10 : null;
     return NextResponse.json({ kts });
-  } catch (_e) {
+  } catch {
     return NextResponse.json({ kts: null });
   }
 }

@@ -5,6 +5,8 @@ import EcoleAvis from "@/components/ecole/EcoleAvis";
 import EcoleReservation from "@/components/ecole/EcoleReservation";
 
 import type { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+import { schoolServiceSchema } from "@/lib/schema";
 
 // Titre court : le suffixe "| Airfly Martinique" vient du template de layout.tsx
 const title = "École de glisse — Cours de kitesurf, wingfoil et kitefoil";
@@ -21,6 +23,7 @@ export const metadata: Metadata = {
 export default function EcolePage() {
   return (
     <main>
+      <JsonLd data={schoolServiceSchema()} />
       <EcoleHero />
       <EcoleIntro />
       <EcoleTarifs />

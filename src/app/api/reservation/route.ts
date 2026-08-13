@@ -22,8 +22,10 @@ interface SubmissionRow {
   ip: string;
 }
 
+// Ces identifiants servent de cles primaires Supabase : Date.now()+Math.random()
+// n'offre aucune garantie d'unicite, randomUUID en donne une.
 function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  return crypto.randomUUID();
 }
 
 // ─── Handler POST ─────────────────────────────────────────────────────────────
