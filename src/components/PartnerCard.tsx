@@ -19,7 +19,8 @@ export default function PartnerCard({ partner, index }: Props) {
   const image = partner.image;
 
   // Le depart du visiteur prime : ni preventDefault, ni await avant la
-  // navigation. keepalive assure l'envoi pendant l'ouverture du nouvel onglet.
+  // navigation. keepalive couvre le cas ou la page serait tout de meme
+  // dechargee, par exemple si le clic est fait avec le bouton du milieu.
   const compterLeClic = () => {
     try {
       fetch("/api/partners/click", {

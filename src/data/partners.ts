@@ -8,7 +8,11 @@
  * de leur site.
  */
 export type Partner = {
-  /** Identifiant stable, sert de cle React */
+  /**
+   * Identifiant stable, sert de cle React.
+   * Sert aussi de cle d'historique dans la table `partner_clicks` :
+   * le renommer remet le compteur de ce partenaire a zero, sans erreur visible.
+   */
   slug: string;
   name: string;
   /** Accroche courte, une ligne */

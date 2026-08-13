@@ -71,7 +71,6 @@ export default async function AdminDashboard() {
 
               {partners.map((partenaire) => {
                 const compteur = stats[partenaire.slug];
-                const valeur = (n: number | undefined) => (compteur ? String(n) : "—");
                 return (
                   <div key={partenaire.slug} className="mb-4 last:mb-0">
                     <p className="text-gray-400 text-sm mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
@@ -79,11 +78,11 @@ export default async function AdminDashboard() {
                     </p>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500" style={{ fontFamily: "var(--font-cormorant)" }}>Clics ce mois</span>
-                      <span className="text-white tabular-nums">{valeur(compteur?.mois)}</span>
+                      <span className="text-white tabular-nums">{compteur ? compteur.mois : "—"}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500" style={{ fontFamily: "var(--font-cormorant)" }}>Clics totaux</span>
-                      <span className="text-white tabular-nums">{valeur(compteur?.total)}</span>
+                      <span className="text-white tabular-nums">{compteur ? compteur.total : "—"}</span>
                     </div>
                   </div>
                 );

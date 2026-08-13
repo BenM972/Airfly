@@ -571,4 +571,6 @@ Ne pas implémenter, même si l'occasion semble se présenter :
 
 Le `CREATE TABLE` ajouté à `docs/supabase-schema.sql` doit être exécuté dans l'éditeur SQL de Supabase. Tant que ce n'est pas fait, la carte affiche `—` et les clics ne sont pas enregistrés.
 
-Si la table existait déjà au moment de l'implémentation, la vérification bout en bout de la tâche 2 y a laissé **une ligne de test** avec le slug `salty-lodge`. La supprimer avant la mise en service : `DELETE FROM partner_clicks;` dans l'éditeur SQL.
+Aucune ligne de test n'a été insérée : la table n'existait pas au moment de la vérification.
+
+Après exécution du `CREATE TABLE`, PostgREST doit recharger son cache de schéma. C'est normalement automatique en une seconde, mais si la carte affiche encore `—` quelques minutes après la création de la table, ce n'est ni un bug ni une erreur de DDL : forcer le rechargement depuis le tableau de bord Supabase (Settings → API → Reload schema cache), ou exécuter `NOTIFY pgrst, 'reload schema';` dans l'éditeur SQL.

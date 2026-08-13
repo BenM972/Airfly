@@ -70,12 +70,16 @@ CREATE TABLE IF NOT EXISTS shop_reservations (
 );
 
 -- ─── Clics sortants vers les partenaires ─────────────────────────────────────
--- Aucune donnee personnelle : slug et date, rien d'autre.
+-- Aucune donnée personnelle : slug et date, rien d'autre.
 CREATE TABLE IF NOT EXISTS partner_clicks (
-  id           uuid PRIMARY KEY,
-  partner_slug text NOT NULL,
-  created_at   timestamptz NOT NULL DEFAULT now()
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  partner_slug TEXT NOT NULL,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_partner_clicks_slug_date
   ON partner_clicks(partner_slug, created_at DESC);
+
+-- La cle service_role contourne la RLS : aucune politique n'est necessaire
+-- pour que l'application fonctionne, mais l'activer ferme la table a la cle anon.
+ALTER TABLE partner_clicks ENABLE ROW LEVEL SECURITY;
