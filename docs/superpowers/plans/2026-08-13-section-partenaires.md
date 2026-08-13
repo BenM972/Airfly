@@ -360,6 +360,7 @@ export const partners: Partner[] = [
     description:
       "À deux cents mètres du lagon de Pointe Faula, Salty Lodge propose des villas avec piscine privée et des bungalows neufs. De quoi poser ses sacs à cinq minutes du spot, et n'avoir plus qu'à traverser la plage le matin.",
     image: "/partners/salty-lodge.jpg",
+    imageAlt: "Villa avec piscine privée, Salty Lodge, Pointe Faula",
     logo: "/partners/salty-lodge-logo.png",
     href: "https://saltylodge.fr/",
     location: "Pointe Faula, Le Vauclin",
@@ -367,7 +368,9 @@ export const partners: Partner[] = [
 ];
 ```
 
-`tagline` et `location` sont affichés en Mirloanne : ils restent sans accent. `description` utilise la police du corps de texte et garde ses accents.
+`tagline` et `location` sont affichés en Mirloanne : ils restent sans accent. `description` et `imageAlt` utilisent la police du corps de texte et gardent leurs accents.
+
+`imageAlt` doit décrire **ce que montre la photo**, pas répéter le nom du partenaire — celui-ci est déjà lu juste à côté par un lecteur d'écran. Ajuster le texte à la photo réellement reçue.
 
 Ce texte est une proposition rédigée dans le ton du site. Le faire relire par le client et par Salty Lodge avant mise en ligne.
 
