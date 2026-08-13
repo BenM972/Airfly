@@ -1,16 +1,12 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
+import { partners } from "@/data/partners";
+import { getPartnerClickStats } from "@/lib/partnerClicks";
 
-export default function AdminDashboard() {
-  const router = useRouter();
-
-  const logout = async () => {
-    await fetch("/api/admin/auth", { method: "DELETE" });
-    router.push("/admin/login");
-  };
+export default async function AdminDashboard() {
+  // Lecture directe depuis le serveur : aucune route n'expose ces chiffres.
+  const stats = await getPartnerClickStats();
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
@@ -22,13 +18,7 @@ export default function AdminDashboard() {
             Back office
           </span>
         </div>
-        <button
-          onClick={logout}
-          className="text-gray-500 hover:text-white text-xs uppercase tracking-widest transition-colors"
-          style={{ fontFamily: "Mirloanne, serif" }}
-        >
-          Deconnexion
-        </button>
+        <AdminLogoutButton />
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-16">
@@ -65,6 +55,36 @@ export default function AdminDashboard() {
               Creer un nouveau produit simple ou variable avec photos, prix et categories.
             </p>
           </Link>
+
+          {/* Pas de Link : il n'y a nulle part ou aller */}
+          {partners.length > 0 && (
+            <div className="bg-gray-900 border border-gray-800 p-8">
+              <div className="text-[#FF0080] text-2xl mb-3">↗</div>
+              <p className="text-white uppercase tracking-widest text-sm mb-4" style={{ fontFamily: "Mirloanne, serif" }}>
+                Clics partenaires
+              </p>
+
+              {partners.map((partenaire) => {
+                const compteur = stats[partenaire.slug];
+                const valeur = (n: number | undefined) => (compteur ? String(n) : "—");
+                return (
+                  <div key={partenaire.slug} className="mb-4 last:mb-0">
+                    <p className="text-gray-400 text-sm mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>
+                      {partenaire.name}
+                    </p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500" style={{ fontFamily: "var(--font-cormorant)" }}>Clics ce mois</span>
+                      <span className="text-white tabular-nums">{valeur(compteur?.mois)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500" style={{ fontFamily: "var(--font-cormorant)" }}>Clics totaux</span>
+                      <span className="text-white tabular-nums">{valeur(compteur?.total)}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </main>
     </div>
