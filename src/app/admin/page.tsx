@@ -4,6 +4,11 @@ import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import { partners } from "@/data/partners";
 import { getPartnerClickStats } from "@/lib/partnerClicks";
 
+// Le tableau de bord lit des compteurs qui changent en continu : il doit etre
+// rendu a chaque requete. Sans cette directive Next le prerend au build et les
+// chiffres restent figes a la valeur du dernier deploiement.
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboard() {
   // Lecture directe depuis le serveur : aucune route n'expose ces chiffres.
   const stats = await getPartnerClickStats();
