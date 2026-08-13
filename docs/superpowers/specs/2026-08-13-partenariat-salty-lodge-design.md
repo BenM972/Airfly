@@ -37,8 +37,8 @@ export type Partner = {
   name: string;        // "Salty Lodge"
   tagline: string;     // "Villas & bungalows à 200 m du lagon"
   description: string; // 2 à 3 phrases
-  image: string;       // "/partners/salty-lodge.jpg"
-  logo: string;        // "/partners/salty-lodge-logo.png"
+  image?: { src: string; alt: string }; // photo optionnelle, indissociable de son alt
+  logo?: string;       // "/partners/salty-lodge-logo.png", absent = pas de logo
   href: string;        // "https://saltylodge.fr/"
   location: string;    // "Pointe Faula, Le Vauclin"
 };
@@ -100,7 +100,7 @@ Les fichiers sont hébergés localement, pas appelés chez le partenaire : `next
 |---|---|
 | `partners` vide | La section ne se rend pas. Le code peut donc être mergé avant réception des visuels. |
 | Photo manquante | La carte se rend sans la colonne visuelle plutôt que d'afficher une image cassée. |
-| Logo manquant | Le nom en `<h3>` sert de repli. |
+| Logo manquant | Absent = pas de logo, seul le nom en titre est affiché. |
 
 ## Vérifications
 

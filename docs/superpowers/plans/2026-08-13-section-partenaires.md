@@ -36,7 +36,7 @@
 - Créer : `src/data/partners.ts`
 
 **Interfaces :**
-- Produit : le type `Partner` (champs `slug`, `name`, `tagline`, `description`, `image`, `logo`, `href`, `location`, tous `string`) et la constante `partners: Partner[]`, consommés par les tâches 2 et 3.
+- Produit : le type `Partner` (champs `slug`, `name`, `tagline`, `description`, `href`, `location` en `string` ; `image` optionnel sous la forme `{ src: string; alt: string }`, indissociable de son texte alternatif ; `logo` en `string` optionnel) et la constante `partners: Partner[]`, consommés par les tâches 2 et 3.
 
 La liste démarre **vide**. Elle sera garnie en tâche 4, à réception des visuels. C'est ce qui permet de livrer les tâches 1 à 3 sans rien afficher de cassé en production.
 
@@ -62,10 +62,16 @@ export type Partner = {
   tagline: string;
   /** 2 a 3 phrases */
   description: string;
-  /** Chemin sous /public, ex "/partners/salty-lodge.jpg". Vide = pas de photo. */
-  image: string;
-  /** Chemin sous /public. Vide = pas de logo, le nom sert de repli. */
-  logo: string;
+  /**
+   * Photo du partenaire. Optionnelle, mais indissociable de son texte
+   * alternatif : le type interdit d'en fournir une sans l'autre.
+   * `src` est un chemin sous /public, ex "/partners/salty-lodge.jpg".
+   * `alt` decrit ce que montre la photo, il ne repete pas le nom du
+   * partenaire, deja porte par le titre juste a cote.
+   */
+  image?: { src: string; alt: string };
+  /** Chemin sous /public. Absent = pas de logo, seul le nom en titre est affiche. */
+  logo?: string;
   href: string;
   /** Affiche en Mirloanne : ecrire sans accent. */
   location: string;
@@ -359,8 +365,10 @@ export const partners: Partner[] = [
     tagline: "Villas et bungalows à deux pas du lagon",
     description:
       "À deux cents mètres du lagon de Pointe Faula, Salty Lodge propose des villas avec piscine privée et des bungalows neufs. De quoi poser ses sacs à cinq minutes du spot, et n'avoir plus qu'à traverser la plage le matin.",
-    image: "/partners/salty-lodge.jpg",
-    imageAlt: "Villa avec piscine privée, Salty Lodge, Pointe Faula",
+    image: {
+      src: "/partners/salty-lodge.jpg",
+      alt: "Villa avec piscine privée, Salty Lodge, Pointe Faula",
+    },
     logo: "/partners/salty-lodge-logo.png",
     href: "https://saltylodge.fr/",
     location: "Pointe Faula, Le Vauclin",
@@ -368,9 +376,9 @@ export const partners: Partner[] = [
 ];
 ```
 
-`location` est affiché en Mirloanne : il reste sans accent. `tagline`, `description` et `imageAlt` utilisent la police du corps de texte et gardent leurs accents.
+`location` est affiché en Mirloanne : il reste sans accent. `tagline`, `description` et `image.alt` utilisent la police du corps de texte et gardent leurs accents.
 
-`imageAlt` doit décrire **ce que montre la photo**, pas répéter le nom du partenaire — celui-ci est déjà lu juste à côté par un lecteur d'écran. Ajuster le texte à la photo réellement reçue.
+`image.alt` doit décrire **ce que montre la photo**, pas répéter le nom du partenaire — celui-ci est déjà lu juste à côté par un lecteur d'écran. Ajuster le texte à la photo réellement reçue.
 
 Ce texte est une proposition rédigée dans le ton du site. Le faire relire par le client et par Salty Lodge avant mise en ligne.
 

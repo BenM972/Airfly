@@ -16,6 +16,7 @@ export default function PartnerCard({ partner, index }: Props) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const reversed = index % 2 === 1;
+  const image = partner.image;
 
   return (
     <motion.article
@@ -26,15 +27,15 @@ export default function PartnerCard({ partner, index }: Props) {
       transition={{ duration: 0.6 }}
     >
       {/* Photo — le ratio explicite evite tout decalage de mise en page */}
-      {partner.image && (
+      {image && (
         <div
           className={`relative aspect-[4/3] overflow-hidden shadow-xl mb-8 md:mb-0 ${
             reversed ? "md:order-2" : ""
           }`}
         >
           <Image
-            src={partner.image}
-            alt={partner.imageAlt}
+            src={image.src}
+            alt={image.alt}
             fill
             sizes="(max-width: 768px) 100vw, 50vw"
             className="object-cover"
@@ -42,7 +43,7 @@ export default function PartnerCard({ partner, index }: Props) {
         </div>
       )}
 
-      <div className={!partner.image ? "md:col-span-2" : ""}>
+      <div className={!image ? "md:col-span-2" : ""}>
         {/* Hauteur fixe : n'importe quel ratio de logo s'y insere sans
             deformer ni decaler les cartes entre elles */}
         {partner.logo && (

@@ -15,12 +15,16 @@ export type Partner = {
   tagline: string;
   /** 2 a 3 phrases */
   description: string;
-  /** Chemin sous /public, ex "/partners/salty-lodge.jpg". Vide = pas de photo. */
-  image: string;
-  /** Texte alternatif decrivant ce que montre la photo, ex "Villa avec piscine, vue sur le lagon". Obligatoire des qu'`image` est renseigne. */
-  imageAlt: string;
-  /** Chemin sous /public. Vide = pas de logo, seul le nom en titre est affiche. */
-  logo: string;
+  /**
+   * Photo du partenaire. Optionnelle, mais indissociable de son texte
+   * alternatif : le type interdit d'en fournir une sans l'autre.
+   * `src` est un chemin sous /public, ex "/partners/salty-lodge.jpg".
+   * `alt` decrit ce que montre la photo, il ne repete pas le nom du
+   * partenaire, deja porte par le titre juste a cote.
+   */
+  image?: { src: string; alt: string };
+  /** Chemin sous /public. Absent = pas de logo, seul le nom en titre est affiche. */
+  logo?: string;
   href: string;
   /** Affiche en Mirloanne : ecrire sans accent. */
   location: string;
