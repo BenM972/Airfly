@@ -290,13 +290,15 @@ Le cas 1 utilise la clé service role sur une table existante uniquement pour pr
 cd "/Users/ben/Documents/BM CONSULTING/AIRFLY/NEW AIRFLY"
 echo "--- 'set -x' interdit (afficherait les en-tetes avec la cle) ---"
 grep -c "set -x" .github/workflows/supabase-keepalive.yml
-echo "--- la cle n'est jamais dans un echo ---"
-grep -cE 'echo.*(ANON_KEY|SUPABASE_URL)' .github/workflows/supabase-keepalive.yml
+echo "--- aucune VALEUR de secret deversee dans un echo ---"
+grep -cE 'echo[^#]*\$\{?[A-Za-z_]*(KEY|URL)' .github/workflows/supabase-keepalive.yml
 echo "--- le corps de reponse va bien dans un fichier ---"
 grep -c 'curl -s -o /tmp/reponse.txt' .github/workflows/supabase-keepalive.yml
 ```
 
 Attendu : `0`, `0`, `1`.
+
+Le deuxième motif cherche un `$` suivi du nom d'une variable — c'est-à-dire l'**interpolation d'une valeur**. Il ne doit pas se déclencher sur une phrase qui se contente de nommer les variables, comme le message d'erreur « Secret SUPABASE_URL ou SUPABASE_ANON_KEY absent du depot. » : citer un nom de secret ne le divulgue pas.
 
 - [ ] **Étape 5 : Commit**
 
