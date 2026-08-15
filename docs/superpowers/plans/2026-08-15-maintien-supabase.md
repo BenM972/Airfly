@@ -22,7 +22,7 @@
 Trois gestes du client, **après** l'implémentation :
 
 1. Exécuter le bloc SQL de la tâche 1 dans l'éditeur SQL de Supabase.
-2. Créer les secrets `SUPABASE_URL` et `SUPABASE_ANON_KEY` dans le dépôt GitHub.
+2. Créer dans le dépôt GitHub la variable `SUPABASE_URL` et le secret `SUPABASE_ANON_KEY` — deux onglets différents (Settings → Secrets and variables → Actions).
 3. Déclencher le workflow manuellement et vérifier qu'il est vert.
 
 Tant que le point 1 n'est pas fait, le workflow échouera — et c'est le comportement attendu.
@@ -129,7 +129,7 @@ git commit -m "feat(supabase): fermer les tables metier et ajouter la table hear
 - Créer : `.github/workflows/supabase-keepalive.yml`
 
 **Interfaces :**
-- Consomme : la table `heartbeat` de la tâche 1, à l'URL `/rest/v1/heartbeat?select=created_at&limit=1`, et les secrets GitHub `SUPABASE_URL` et `SUPABASE_ANON_KEY`.
+- Consomme : la table `heartbeat` de la tâche 1, à l'URL `/rest/v1/heartbeat?select=created_at&limit=1`, la variable GitHub `SUPABASE_URL` et le secret GitHub `SUPABASE_ANON_KEY`.
 - Produit : rien que d'autres tâches consomment.
 
 - [ ] **Étape 1 : Créer le workflow**
@@ -163,13 +163,13 @@ jobs:
     steps:
       - name: Interroger la table heartbeat
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           set -euo pipefail
 
           if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_ANON_KEY:-}" ]; then
-            echo "::error::Secret SUPABASE_URL ou SUPABASE_ANON_KEY absent du depot."
+            echo "::error::Variable SUPABASE_URL ou secret SUPABASE_ANON_KEY absent du depot."
             exit 1
           fi
 
@@ -302,7 +302,7 @@ grep -c 'curl -sS -o /tmp/reponse.txt' .github/workflows/supabase-keepalive.yml
 
 Attendu : `0`, `0`, `1`.
 
-Le deuxième motif cherche un `$` suivi du nom d'une variable — c'est-à-dire l'**interpolation d'une valeur**. Il ne doit pas se déclencher sur une phrase qui se contente de nommer les variables, comme le message d'erreur « Secret SUPABASE_URL ou SUPABASE_ANON_KEY absent du depot. » : citer un nom de secret ne le divulgue pas.
+Le deuxième motif cherche un `$` suivi du nom d'une variable — c'est-à-dire l'**interpolation d'une valeur**. Il ne doit pas se déclencher sur une phrase qui se contente de nommer les variables, comme le message d'erreur « Variable SUPABASE_URL ou secret SUPABASE_ANON_KEY absent du depot. » : citer un nom de variable ou de secret ne le divulgue pas.
 
 - [ ] **Étape 5 : Commit**
 
@@ -328,7 +328,7 @@ Ne pas implémenter, même si l'occasion semble se présenter :
 Trois gestes manuels, dans cet ordre :
 
 1. **Exécuter le bloc SQL** de `docs/supabase-schema.sql` dans l'éditeur SQL de Supabase — RLS des quatre tables, plus la table `heartbeat`. Si le bloc `partner_clicks` du 13 août n'a pas encore été exécuté, le faire aussi.
-2. **Créer deux secrets** dans le dépôt GitHub (Settings → Secrets and variables → Actions) : `SUPABASE_URL` et `SUPABASE_ANON_KEY`, tous deux dans Supabase, Settings → API. La clé anon est la clé **publique** — surtout pas la service role.
+2. **Créer une variable et un secret** dans le dépôt GitHub (Settings → Secrets and variables → Actions — deux onglets différents) : la variable `SUPABASE_URL` et le secret `SUPABASE_ANON_KEY`, tous deux trouvés dans Supabase, Settings → API. La clé anon est la clé **publique** — surtout pas la service role.
 3. **Déclencher le workflow manuellement** (onglet Actions → Maintien Supabase → Run workflow) et vérifier qu'il passe au vert.
 
 **Contrôle de non-régression après le point 1** : ouvrir le site, envoyer une demande de réservation depuis la page École, et vérifier qu'elle arrive bien en base. La clé service role contourne la RLS, donc rien ne doit changer — mais c'est à vérifier, pas à supposer.

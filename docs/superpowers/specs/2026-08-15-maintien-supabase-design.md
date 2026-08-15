@@ -92,12 +92,18 @@ Deux détails de ce cron méritent d'être explicités, parce qu'ils se choisiss
 
 **Pourquoi l'échec doit être bruyant** : sans cela, un maintien cassé reste invisible jusqu'à la prochaine mise en pause — exactement le scénario à éviter. GitHub envoie un mail au propriétaire du dépôt sur toute exécution rouge : l'alerte ne coûte rien de plus qu'un `exit 1` au bon endroit.
 
-**Secrets à créer par le client** dans les réglages du dépôt (Settings → Secrets and variables → Actions) :
+**À créer par le client** dans les réglages du dépôt (Settings → Secrets and variables → Actions) — attention, ce sont **deux onglets différents** :
 
-| Secret | Où le trouver |
-|---|---|
-| `SUPABASE_URL` | Supabase, Settings → API, champ *Project URL* |
-| `SUPABASE_ANON_KEY` | Supabase, Settings → API, clé publique *anon* — **pas** la service role |
+| Nom | Onglet | Où le trouver |
+|---|---|---|
+| `SUPABASE_URL` | **Variables** | Supabase, Settings → API, champ *Project URL* |
+| `SUPABASE_ANON_KEY` | **Secrets** | Supabase, Settings → API, clé publique *anon* — **pas** la service role |
+
+`SUPABASE_URL` est une variable et non un secret, délibérément : GitHub masque la
+valeur de tout secret dans les journaux. En secret, l'erreur du cas « projet en
+pause » deviendrait `Could not resolve host: ***`, ce qui annulerait le diagnostic
+que ce workflow existe pour fournir. L'URL d'un projet Supabase est publique par
+conception et ne donne accès à rien sans clé.
 
 ## Cas d'erreur
 
@@ -156,7 +162,7 @@ données personnelles de clients. C'est aussi pourquoi ce contrôle ne doit pas
    et la planification (`schedule`) ne démarre pas non plus tant que ce n'est pas
    fait. Sans cette fusion, rien de ce qui suit ne peut ni tourner ni être vérifié.
 1. Exécuter le bloc SQL de `docs/supabase-schema.sql` (RLS des quatre tables + table `heartbeat`).
-2. Créer les deux secrets GitHub.
+2. Créer dans le dépôt GitHub la variable `SUPABASE_URL` et le secret `SUPABASE_ANON_KEY` — deux onglets différents (Settings → Secrets and variables → Actions).
 3. Déclencher le workflow manuellement et vérifier qu'il est vert.
 4. Garder en tête que GitHub peut désactiver le maintien après 60 jours sans commit
    dans le dépôt : il envoie alors un mail avec un lien de réactivation, sur lequel
