@@ -38,11 +38,14 @@ jobs:
 
           # -s : pas de barre de progression. -o : le corps va dans un fichier,
           # jamais dans la sortie standard, pour ne rien deverser par accident.
-          statut=$(curl -s -o /tmp/reponse.txt -w "%{http_code}" \
+          statut=$(curl -sS -o /tmp/reponse.txt -w "%{http_code}" \
             --max-time 20 --retry 2 --retry-delay 5 \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
-            "${SUPABASE_URL%/}/rest/v1/heartbeat?select=created_at&limit=1")
+            "${SUPABASE_URL%/}/rest/v1/heartbeat?select=created_at&limit=1") || {
+              echo "::error::curl n'a obtenu aucune reponse HTTP (hote injoignable, delai depasse ou reseau). Le projet Supabase est probablement en pause : le reactiver depuis le tableau de bord."
+              exit 1
+            }
 
           if [ "$statut" != "200" ]; then
             echo "::error::Supabase a repondu $statut au lieu de 200."
