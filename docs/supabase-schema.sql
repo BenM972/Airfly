@@ -83,3 +83,32 @@ CREATE INDEX IF NOT EXISTS idx_partner_clicks_slug_date
 -- La cle service_role contourne la RLS : aucune politique n'est necessaire
 -- pour que l'application fonctionne, mais l'activer ferme la table a la cle anon.
 ALTER TABLE partner_clicks ENABLE ROW LEVEL SECURITY;
+
+-- ─── Fermeture des tables metier ─────────────────────────────────────────────
+-- Sans politique, volontairement : une table avec RLS activee et zero politique
+-- est totalement fermee a la cle anon. La cle service_role contourne la RLS,
+-- donc l'application, qui n'utilise qu'elle et cote serveur, ne voit aucune
+-- difference. Ces quatre tables contiennent des donnees personnelles.
+ALTER TABLE submissions       ENABLE ROW LEVEL SECURITY;
+ALTER TABLE clients           ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reservations      ENABLE ROW LEVEL SECURITY;
+ALTER TABLE shop_reservations ENABLE ROW LEVEL SECURITY;
+
+-- ─── Table de battement ──────────────────────────────────────────────────────
+-- Seule table lisible par la cle anon. Le maintien se contente de la LIRE :
+-- une lecture suffit a constituer une activite de base de donnees, et n'ecrire
+-- nulle part evite d'accorder le moindre droit d'ecriture a la cle publique.
+-- La colonne s'appelle created_at et non checked_at : elle enregistre la
+-- creation de la ligne, pas le dernier passage du maintien.
+CREATE TABLE IF NOT EXISTS heartbeat (
+  id         SMALLINT PRIMARY KEY DEFAULT 1,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT heartbeat_ligne_unique CHECK (id = 1)
+);
+
+INSERT INTO heartbeat (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
+
+ALTER TABLE heartbeat ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY heartbeat_lecture_publique ON heartbeat
+  FOR SELECT TO anon USING (true);
