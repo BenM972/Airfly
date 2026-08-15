@@ -173,13 +173,17 @@ jobs:
             exit 1
           fi
 
-          # -s : pas de barre de progression. -o : le corps va dans un fichier,
-          # jamais dans la sortie standard, pour ne rien deverser par accident.
-          statut=$(curl -s -o /tmp/reponse.txt -w "%{http_code}" \
+          # -sS : pas de barre de progression, mais les erreurs de curl restent visibles.
+          # -o : le corps va dans un fichier, jamais dans la sortie standard, pour ne
+          # rien deverser par accident.
+          statut=$(curl -sS -o /tmp/reponse.txt -w "%{http_code}" \
             --max-time 20 --retry 2 --retry-delay 5 \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
-            "${SUPABASE_URL%/}/rest/v1/heartbeat?select=created_at&limit=1")
+            "${SUPABASE_URL%/}/rest/v1/heartbeat?select=created_at&limit=1") || {
+              echo "::error::curl n'a obtenu aucune reponse HTTP (hote injoignable, delai depasse ou reseau). Le projet Supabase est probablement en pause : le reactiver depuis le tableau de bord."
+              exit 1
+            }
 
           if [ "$statut" != "200" ]; then
             echo "::error::Supabase a repondu $statut au lieu de 200."
@@ -196,7 +200,7 @@ jobs:
 
 Trois points à ne pas modifier :
 
-- `set -euo pipefail` fait échouer l'étape si `curl` ne peut même pas résoudre l'hôte — le cas exact d'un projet en pause.
+- `set -euo pipefail` fait échouer l'étape si `curl` ne peut même pas résoudre l'hôte — le cas exact d'un projet en pause. Mais l'échec serait muet, sans message d'orientation : c'est pourquoi le `|| { ... }` a été ajouté autour de l'appel à `curl`, pour afficher une piste avant de sortir en erreur.
 - Les secrets ne sont jamais affichés. Le corps de la réponse va dans un fichier et n'est montré qu'en cas d'échec ; les erreurs PostgREST ne contiennent pas la clé.
 - `permissions: {}` réduit le jeton du workflow au strict minimum : il n'a rien à faire dans le dépôt.
 
@@ -293,7 +297,7 @@ grep -c "set -x" .github/workflows/supabase-keepalive.yml
 echo "--- aucune VALEUR de secret deversee dans un echo ---"
 grep -cE 'echo[^#]*\$\{?[A-Za-z_]*(KEY|URL)' .github/workflows/supabase-keepalive.yml
 echo "--- le corps de reponse va bien dans un fichier ---"
-grep -c 'curl -s -o /tmp/reponse.txt' .github/workflows/supabase-keepalive.yml
+grep -c 'curl -sS -o /tmp/reponse.txt' .github/workflows/supabase-keepalive.yml
 ```
 
 Attendu : `0`, `0`, `1`.

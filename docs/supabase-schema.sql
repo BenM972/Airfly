@@ -110,5 +110,8 @@ INSERT INTO heartbeat (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 
 ALTER TABLE heartbeat ENABLE ROW LEVEL SECURITY;
 
+GRANT SELECT ON heartbeat TO anon;
+
+DROP POLICY IF EXISTS heartbeat_lecture_publique ON heartbeat;
 CREATE POLICY heartbeat_lecture_publique ON heartbeat
   FOR SELECT TO anon USING (true);

@@ -24,7 +24,7 @@ Le maintien doit s'authentifier auprès de Supabase, donc porter une clé dans l
 
 **Les quatre tables d'origine n'ont aucune sécurité au niveau ligne.** `docs/supabase-schema.sql` déclare `submissions`, `clients`, `reservations` et `shop_reservations` sans `ENABLE ROW LEVEL SECURITY` ; seule `partner_clicks`, ajoutée le 13 août, en a une.
 
-La clé **anon** de Supabase est conçue pour être publique — elle vit normalement dans le code client. Sa sûreté repose entièrement sur la RLS. Sans RLS, elle équivaut à un accès complet en lecture : noms, emails et téléphones des clients compris.
+La clé **anon** de Supabase est conçue pour être publique — elle vit normalement dans le code client. Sa sûreté repose entièrement sur la RLS. Sans RLS, elle équivaut à un accès complet en lecture, mais aussi en modification et en suppression : Supabase accorde par défaut tous les privilèges au rôle `anon` sur les tables du schéma `public`. Une clé anon publiée aurait donc permis de lire, mais aussi d'`INSERT`, d'`UPDATE` et de `DELETE` les fiches clients — noms, emails et téléphones compris.
 
 Le risque est aujourd'hui théorique : l'application n'utilise que la clé service role, côté serveur, et aucune clé anon n'a jamais figuré dans le dépôt ni dans son historique. Il deviendrait réel dès qu'une clé anon serait publiée quelque part — ce que ce maintien allait précisément faire.
 
@@ -115,6 +115,33 @@ Deux détails de ce cron méritent d'être explicités, parce qu'ils se choisiss
 - Second essai avec un secret volontairement erroné : exécution **rouge**. Sans cette vérification, l'alerte n'est qu'une intention — c'est le seul moyen de savoir que l'échec est réellement bruyant.
 - Après activation de la RLS, contrôle que l'application fonctionne toujours : les deux formulaires de réservation doivent continuer à écrire, et la carte du back office à afficher ses compteurs. La clé service role contourne la RLS, donc rien ne doit changer — mais c'est à vérifier, pas à supposer.
 
+**Contrôle de fermeture, à faire une fois après exécution du SQL.** Il vérifie deux
+choses d'un coup : que les tables sont bien fermées, et que la clé placée dans le
+secret est bien la clé anon et non la service role — auquel cas les réponses ne
+seraient pas vides et le maintien resterait vert à jamais sans rien prouver.
+
+Une table avec RLS activée et zéro politique répond `200` avec un corps `[]` :
+PostgREST filtre les lignes, il ne refuse pas la requête. Ce n'est donc **pas**
+un `401` ni un `403` qu'il faut attendre.
+
+```bash
+URL="…"   # URL du projet Supabase
+ANON="…"  # cle anon, celle du secret GitHub
+for t in submissions clients reservations shop_reservations; do
+  curl -sS -o /tmp/c.txt -w "$t -> %{http_code} " \
+    -H "apikey: $ANON" -H "Authorization: Bearer $ANON" \
+    "$URL/rest/v1/$t?select=id&limit=1"
+  [ "$(cat /tmp/c.txt)" = "[]" ] && echo "ferme" || echo "OUVERT — RLS absente ou cle trop puissante"
+done
+rm -f /tmp/c.txt
+```
+
+Attendu : `200 ferme` pour les quatre tables.
+
+Ne jamais afficher le corps de la réponse : s'il n'est pas vide, il contient des
+données personnelles de clients. C'est aussi pourquoi ce contrôle ne doit pas
+être intégré au workflow, dont les journaux sont conservés par GitHub.
+
 ## Hors périmètre
 
 - Réveil automatique d'un projet suspendu : impossible par API.
@@ -124,10 +151,15 @@ Deux détails de ce cron méritent d'être explicités, parce qu'ils se choisiss
 
 ## À transmettre au client
 
-Trois gestes manuels, dans cet ordre :
-
+0. **Fusionner la branche dans `main`.** `workflow_dispatch` n'expose son bouton de
+   déclenchement manuel que si le fichier existe sur la branche par défaut du dépôt,
+   et la planification (`schedule`) ne démarre pas non plus tant que ce n'est pas
+   fait. Sans cette fusion, rien de ce qui suit ne peut ni tourner ni être vérifié.
 1. Exécuter le bloc SQL de `docs/supabase-schema.sql` (RLS des quatre tables + table `heartbeat`).
 2. Créer les deux secrets GitHub.
 3. Déclencher le workflow manuellement et vérifier qu'il est vert.
+4. Garder en tête que GitHub peut désactiver le maintien après 60 jours sans commit
+   dans le dépôt : il envoie alors un mail avec un lien de réactivation, sur lequel
+   il faut cliquer.
 
 Tant que le point 1 n'est pas fait, le workflow échouera — et c'est le comportement attendu.

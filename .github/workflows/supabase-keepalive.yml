@@ -26,18 +26,19 @@ jobs:
     steps:
       - name: Interroger la table heartbeat
         env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
         run: |
           set -euo pipefail
 
           if [ -z "${SUPABASE_URL:-}" ] || [ -z "${SUPABASE_ANON_KEY:-}" ]; then
-            echo "::error::Secret SUPABASE_URL ou SUPABASE_ANON_KEY absent du depot."
+            echo "::error::Variable SUPABASE_URL ou secret SUPABASE_ANON_KEY absent du depot."
             exit 1
           fi
 
-          # -s : pas de barre de progression. -o : le corps va dans un fichier,
-          # jamais dans la sortie standard, pour ne rien deverser par accident.
+          # -sS : pas de barre de progression, mais les erreurs de curl restent visibles.
+          # -o : le corps va dans un fichier, jamais dans la sortie standard, pour ne
+          # rien deverser par accident.
           statut=$(curl -sS -o /tmp/reponse.txt -w "%{http_code}" \
             --max-time 20 --retry 2 --retry-delay 5 \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
