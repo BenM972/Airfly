@@ -30,6 +30,8 @@ export type WCProduct = {
   categories: { id: number; name: string; slug: string }[];
   images: { src: string; alt: string }[];
   attributes: { id: number; name: string; variation: boolean; options: string[] }[];
+  /** Rendu HTML du prix par WooCommerce. Seule source du prix initial d'un produit variable en promo. */
+  price_html?: string;
 };
 
 export type WCCategory = {
@@ -84,14 +86,40 @@ export function getCategories(): Promise<WCCategory[]> {
  * les attributs et les images au-dela de la deuxieme sont ecartes — ils
  * pesaient lourd dans le payload serialise vers le navigateur sans etre lus.
  */
+/**
+ * Sur un produit variable, WooCommerce laisse `regular_price` et `sale_price`
+ * vides au niveau parent : le prix vit dans les variations. La grille n'a donc
+ * aucun moyen d'afficher le prix barre, alors que `price_html` contient les
+ * deux valeurs dans une balise <del>.
+ *
+ * En cas d'echec d'extraction on ne devine rien : le produit s'affiche au bon
+ * prix, simplement sans prix barre.
+ */
+function prixInitialDepuisHtml(html: string | undefined): string | null {
+  if (!html) return null;
+  const del = html.match(/<del[^>]*>([\s\S]*?)<\/del>/);
+  if (!del) return null;
+  const nombre = del[1].replace(/<[^>]+>/g, "").match(/([0-9]+(?:[.,][0-9]{1,2})?)/);
+  return nombre ? nombre[1].replace(",", ".") : null;
+}
+
 export function toCatalogueProduct(products: WCProduct[]): WCProduct[] {
-  return products.map((p) => ({
-    ...p,
-    description: "",
-    short_description: "",
-    attributes: [],
-    images: p.images?.slice(0, 2) ?? [],
-  }));
+  return products.map((p) => {
+    // Produit variable en promo : on reconstitue les deux prix pour que la
+    // grille affiche le prix solde avec l'initial barre, comme les simples.
+    const initial =
+      p.type === "variable" && p.on_sale && !p.sale_price ? prixInitialDepuisHtml(p.price_html) : null;
+
+    return {
+      ...p,
+      description: "",
+      short_description: "",
+      attributes: [],
+      images: p.images?.slice(0, 2) ?? [],
+      price_html: undefined, // inutile au client, et volumineux
+      ...(initial ? { regular_price: initial, sale_price: p.price } : {}),
+    };
+  });
 }
 
 /** Un seul produit, au lieu des 100 que chargeait la page avant. */

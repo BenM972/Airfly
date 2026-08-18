@@ -13,7 +13,13 @@ type Props = {
 export default function ShopProductCard({ product, index }: Props) {
   const image = product.images?.[0];
   const imageHover = product.images?.[1];
-  const price = product.regular_price || product.price;
+  // En promotion, c'est le prix soldé qui doit s'afficher, le prix normal barré
+  // à côté. Auparavant la carte montrait toujours regular_price : la grille
+  // annonçait 359 € avec un badge « Promo » quand la fiche produit affichait
+  // 251,30 €. Deux prix pour le même article, et le mauvais en vitrine.
+  const enPromo = product.on_sale && !!product.sale_price;
+  const price = enPromo ? product.sale_price : product.regular_price || product.price;
+  const prixBarre = enPromo ? product.regular_price : null;
 
   return (
     <Link href={`/shop/${product.slug}`}>
@@ -77,10 +83,17 @@ export default function ShopProductCard({ product, index }: Props) {
           </p>
           {price && (
             <p
-              className="text-gray-900 text-sm shrink-0"
+              className="text-sm shrink-0 flex items-baseline gap-2"
               style={{ fontFamily: "Mirloanne, serif" }}
             >
-              {parseFloat(price).toFixed(2).replace(".", ",")} €
+              {prixBarre && (
+                <span className="text-gray-400 line-through">
+                  {parseFloat(prixBarre).toFixed(2).replace(".", ",")} €
+                </span>
+              )}
+              <span className={enPromo ? "text-[#FF0080]" : "text-gray-900"}>
+                {parseFloat(price).toFixed(2).replace(".", ",")} €
+              </span>
             </p>
           )}
         </div>

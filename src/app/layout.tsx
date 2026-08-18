@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import AnnonceBandeau from "@/components/AnnonceBandeau";
 import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
 import { CartProvider } from "@/context/CartContext";
@@ -64,6 +65,7 @@ export default function RootLayout({
       <body>
         <CartProvider>
           <Preloader />
+          <AnnonceBandeau />
           <Navbar />
           <CartDrawer />
           {children}

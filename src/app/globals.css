@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Hauteur du bandeau d'annonce. La navbar etant en `fixed`, elle doit etre
+   decalee d'exactement cette valeur : une hauteur declaree evite de la
+   mesurer au jugé et de voir les deux se chevaucher. */
+:root { --h-annonce: 36px; }
+
 @font-face {
   font-family: "Mirloanne";
   /* WOFF2 d'abord (25 Ko contre 63 Ko), TTF en repli pour les navigateurs anciens */
@@ -8,4 +13,11 @@
   font-weight: normal;
   font-style: normal;
   font-display: swap;
+}
+
+/* Bandeau d'annonce : deux copies identiques defilent cote a cote, chacune
+   translatee de sa propre largeur, ce qui donne une boucle sans saut. */
+@keyframes defilement {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
 }
