@@ -5,7 +5,6 @@ import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import type { Partner } from "@/data/partners";
 import { stripAccents } from "@/lib/text";
-import PartnerCalendar from "./PartnerCalendar";
 
 type Props = {
   partner: Partner;
@@ -115,14 +114,6 @@ export default function PartnerCard({ partner, index }: Props) {
           Decouvrir {stripAccents(partner.name)}
         </a>
       </div>
-
-      {/* Calendrier en pleine largeur sous les deux colonnes : il a besoin de
-          place, et l'enfermer dans une demi-colonne le rendrait illisible. */}
-      {partner.calendrierUrl && (
-        <div className="md:col-span-2">
-          <PartnerCalendar url={partner.calendrierUrl} nom={partner.name} />
-        </div>
-      )}
     </motion.article>
   );
 }

@@ -37,15 +37,6 @@ export type Partner = {
    * lisibilite et concurrence la description.
    */
   atouts?: string[];
-  /**
-   * URL d'integration du calendrier de disponibilites (Lodgify pour Salty
-   * Lodge). Absente = aucun calendrier affiche.
-   *
-   * Le widget n'est charge qu'au clic du visiteur : un moteur de reservation
-   * tiers depose des cookies des son chargement, et le site n'a ni bandeau de
-   * consentement ni politique de confidentialite.
-   */
-  calendrierUrl?: string;
 };
 
 export const partners: Partner[] = [
