@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { guardFormSubmission } from "@/lib/formGuard";
 import { isHoneypotFilled } from "@/lib/honeypot";
-import { escapeHtml, getResend, mailFrom, mailTo } from "@/lib/email";
+import { escapeHtml, getResend, mailCc, mailFrom, mailTo } from "@/lib/email";
 import { requireAdmin } from "@/lib/adminAuth";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -145,9 +145,12 @@ export async function POST(req: NextRequest) {
 
     // 5. Notif email
     try {
+      const copies = mailCc();
       await getResend().emails.send({
         from: mailFrom(),
         to: mailTo(),
+        // Champ omis si aucune copie n'est configuree : Resend refuse un tableau vide.
+        ...(copies.length ? { cc: copies } : {}),
         replyTo: submission.email,
         subject: `Nouvelle réservation — ${submission.discipline} — ${submission.prenom} ${submission.nom}`,
         html: `

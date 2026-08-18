@@ -32,9 +32,22 @@ export function mailFrom(): string {
   return process.env.RESEND_FROM ?? "AIRFLY <onboarding@resend.dev>";
 }
 
-/** Destinataire des notifications internes. */
+/** Destinataire principal des notifications internes. */
 export function mailTo(): string {
-  return process.env.NOTIFY_EMAIL ?? "contact@bmconsultingfwi.fr";
+  return process.env.NOTIFY_EMAIL ?? "info@airfly972.com";
+}
+
+/**
+ * Destinataires en copie. Plusieurs adresses possibles, separees par des
+ * virgules dans NOTIFY_CC. Renvoie un tableau vide si rien n'est configure :
+ * l'appelant omet alors le champ, Resend refusant une copie vide.
+ */
+export function mailCc(): string[] {
+  const brut = process.env.NOTIFY_CC ?? "contact@bmconsultingfwi.fr";
+  return brut
+    .split(",")
+    .map((a) => a.trim())
+    .filter(Boolean);
 }
 
 const HTML_ESCAPES: Record<string, string> = {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { guardFormSubmission } from "@/lib/formGuard";
 import { isHoneypotFilled } from "@/lib/honeypot";
-import { escapeHtml, getResend, mailFrom, mailTo } from "@/lib/email";
+import { escapeHtml, getResend, mailCc, mailFrom, mailTo } from "@/lib/email";
 
 type CartItem = { name: string; variante: string | null; qty: number };
 
@@ -54,9 +54,12 @@ export async function POST(req: NextRequest) {
   // La reservation est enregistree : un echec d'email ne doit plus la faire
   // passer pour perdue, sinon le client resoumet et cree un doublon.
   try {
+    const copies = mailCc();
     await getResend().emails.send({
       from: mailFrom(),
       to: mailTo(),
+      // Champ omis si aucune copie n'est configuree : Resend refuse un tableau vide.
+      ...(copies.length ? { cc: copies } : {}),
       replyTo: String(email),
       subject: `Nouvelle reservation click & collect — ${prenom} ${nom}`,
       html: `
