@@ -48,6 +48,17 @@ CREATE TABLE IF NOT EXISTS reservations (
   message          TEXT
 );
 
+-- ─── Rattrapages de schema ───────────────────────────────────────────────────
+-- `CREATE TABLE IF NOT EXISTS` ne modifie pas une table qui existe deja : une
+-- colonne ajoutee au code apres la creation initiale doit l'etre explicitement,
+-- sinon ce fichier decrit un schema que la base n'a pas.
+--
+-- `submissions.creneau` etait declaree dans le CREATE TABLE ci-dessus mais
+-- absente de la base. Le formulaire ecole la collecte (boutons radio) et la
+-- route l'insere : chaque demande de reservation echouait donc en erreur 42703
+-- "column submissions.creneau does not exist", et etait perdue.
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS creneau TEXT;
+
 -- Index utiles pour les ops marketing
 CREATE INDEX IF NOT EXISTS idx_clients_email       ON clients(email);
 CREATE INDEX IF NOT EXISTS idx_clients_tags        ON clients USING GIN(tags);
@@ -56,6 +67,11 @@ CREATE INDEX IF NOT EXISTS idx_reservations_client ON reservations(client_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_email   ON submissions(email);
 
 -- Table : réservations click & collect boutique
+-- `articles` porte le panier entier sous forme de texte, une ligne par article
+-- ("2× T-shirt — M"), tel que le compose src/app/api/shop/reservation/route.ts.
+-- Ce fichier declarait auparavant `produit NOT NULL` et `variante`, deux colonnes
+-- qui n'ont jamais existe dans la base : recreer le schema a partir de cette
+-- version erronee aurait fait echouer toutes les reservations boutique.
 CREATE TABLE IF NOT EXISTS shop_reservations (
   id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -63,8 +79,7 @@ CREATE TABLE IF NOT EXISTS shop_reservations (
   nom           TEXT NOT NULL,
   email         TEXT NOT NULL,
   telephone     TEXT,
-  produit       TEXT NOT NULL,
-  variante      TEXT,
+  articles      TEXT,
   date_retrait  DATE,
   creneau       TEXT
 );
