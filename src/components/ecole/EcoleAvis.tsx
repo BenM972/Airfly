@@ -50,20 +50,22 @@ export default function EcoleAvis() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
   const [current, setCurrent] = useState(0);
-  const direction = useRef(1);
+  // Pilote l'animation, donc lu pendant le rendu : doit etre un etat et non une ref,
+  // sinon la valeur lue peut etre celle du rendu precedent.
+  const [direction, setDirection] = useState(1);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      direction.current = 1;
+      setDirection(1);
       setCurrent((c) => (c + 1) % avis.length);
     }, 10000);
     return () => clearInterval(interval);
   }, []);
 
   const variants = {
-    enter: () => ({ opacity: 0, x: direction.current > 0 ? 60 : -60 }),
+    enter: () => ({ opacity: 0, x: direction > 0 ? 60 : -60 }),
     center: { opacity: 1, x: 0 },
-    exit: () => ({ opacity: 0, x: direction.current > 0 ? -60 : 60 }),
+    exit: () => ({ opacity: 0, x: direction > 0 ? -60 : 60 }),
   };
 
   return (
@@ -78,23 +80,23 @@ export default function EcoleAvis() {
           {/* Card */}
           <div className="relative overflow-hidden min-h-[220px] flex items-center">
             <button
-              onClick={() => { direction.current = -1; setCurrent((c) => (c === 0 ? avis.length - 1 : c - 1)); }}
+              onClick={() => { setDirection(-1); setCurrent((c) => (c === 0 ? avis.length - 1 : c - 1)); }}
               className="absolute left-0 z-10 h-full px-4 text-gray-400 hover:text-[#FF0080] transition-colors duration-300 min-w-[44px]"
               aria-label="Précédent"
             >
               ‹
             </button>
             <button
-              onClick={() => { direction.current = 1; setCurrent((c) => (c + 1) % avis.length); }}
+              onClick={() => { setDirection(1); setCurrent((c) => (c + 1) % avis.length); }}
               className="absolute right-0 z-10 h-full px-4 text-gray-400 hover:text-[#FF0080] transition-colors duration-300 min-w-[44px]"
               aria-label="Suivant"
             >
               ›
             </button>
-            <AnimatePresence mode="wait" custom={direction.current}>
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current}
-                custom={direction.current}
+                custom={direction}
                 variants={variants}
                 initial="enter"
                 animate="center"

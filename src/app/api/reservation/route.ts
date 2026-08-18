@@ -1,14 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
-import { Resend } from "resend";
-
-const NOTIFY_EMAIL = "contact@bmconsultingfwi.fr";
-
-function getResend() {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY manquant.");
-  return new Resend(key);
-}
+import { guardFormSubmission } from "@/lib/formGuard";
+import { isHoneypotFilled } from "@/lib/honeypot";
+import { escapeHtml, getResend, mailFrom, mailTo } from "@/lib/email";
+import { requireAdmin } from "@/lib/adminAuth";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface SubmissionRow {
@@ -27,14 +22,27 @@ interface SubmissionRow {
   ip: string;
 }
 
+// Ces identifiants servent de cles primaires Supabase : Date.now()+Math.random()
+// n'offre aucune garantie d'unicite, randomUUID en donne une.
 function generateId(): string {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  return crypto.randomUUID();
 }
 
 // ─── Handler POST ─────────────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
+  const blocked = guardFormSubmission(req, "reservation");
+  if (blocked) return blocked;
+
   try {
     const body = await req.json();
+
+    // Champ leurre rempli : on renvoie la meme reponse qu'un succes, sans rien
+    // enregistrer. Un bot a qui l'on repond "erreur" adapte son prochain envoi.
+    if (isHoneypotFilled(body)) {
+      console.warn("[reservation] honeypot declenche, soumission ignoree");
+      return NextResponse.json({ success: true, id: generateId() });
+    }
+
     const { prenom, nom, email, telephone, discipline, prestation, niveau, date_souhaitee, creneau, message } = body;
 
     // Validation
@@ -138,25 +146,26 @@ export async function POST(req: NextRequest) {
     // 5. Notif email
     try {
       await getResend().emails.send({
-        from: "AIRFLY <onboarding@resend.dev>",
-        to: NOTIFY_EMAIL,
+        from: mailFrom(),
+        to: mailTo(),
+        replyTo: submission.email,
         subject: `Nouvelle réservation — ${submission.discipline} — ${submission.prenom} ${submission.nom}`,
         html: `
           <div style="font-family:sans-serif;max-width:520px;margin:auto">
             <h2 style="color:#FF0080;margin-bottom:4px">Nouvelle demande de réservation</h2>
-            <p style="color:#888;font-size:13px;margin-top:0">${new Date(now).toLocaleString("fr-FR", { timeZone: "America/Martinique" })} (Martinique)</p>
+            <p style="color:#888;font-size:13px;margin-top:0">${escapeHtml(new Date(now).toLocaleString("fr-FR", { timeZone: "America/Martinique" }))} (Martinique)</p>
             <table style="width:100%;border-collapse:collapse;margin-top:16px">
-              <tr><td style="padding:8px 0;color:#555;width:140px">Prénom / Nom</td><td style="padding:8px 0;font-weight:600">${submission.prenom} ${submission.nom}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Email</td><td style="padding:8px 4px"><a href="mailto:${submission.email}">${submission.email}</a></td></tr>
-              <tr><td style="padding:8px 0;color:#555">Téléphone</td><td style="padding:8px 0">${submission.telephone || "—"}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Discipline</td><td style="padding:8px 4px;font-weight:600">${submission.discipline}</td></tr>
-              <tr><td style="padding:8px 0;color:#555">Prestation</td><td style="padding:8px 0">${submission.prestation}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Niveau</td><td style="padding:8px 4px">${submission.niveau || "—"}</td></tr>
-              <tr><td style="padding:8px 0;color:#555">Date souhaitée</td><td style="padding:8px 0">${submission.date_souhaitee || "—"}</td></tr>
-              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Créneau</td><td style="padding:8px 4px">${submission.creneau || "—"}</td></tr>
-              ${submission.message ? `<tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555;vertical-align:top">Message</td><td style="padding:8px 4px">${submission.message}</td></tr>` : ""}
+              <tr><td style="padding:8px 0;color:#555;width:140px">Prénom / Nom</td><td style="padding:8px 0;font-weight:600">${escapeHtml(submission.prenom)} ${escapeHtml(submission.nom)}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Email</td><td style="padding:8px 4px"><a href="mailto:${escapeHtml(submission.email)}">${escapeHtml(submission.email)}</a></td></tr>
+              <tr><td style="padding:8px 0;color:#555">Téléphone</td><td style="padding:8px 0">${escapeHtml(submission.telephone) || "—"}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Discipline</td><td style="padding:8px 4px;font-weight:600">${escapeHtml(submission.discipline)}</td></tr>
+              <tr><td style="padding:8px 0;color:#555">Prestation</td><td style="padding:8px 0">${escapeHtml(submission.prestation)}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Niveau</td><td style="padding:8px 4px">${escapeHtml(submission.niveau) || "—"}</td></tr>
+              <tr><td style="padding:8px 0;color:#555">Date souhaitée</td><td style="padding:8px 0">${escapeHtml(submission.date_souhaitee) || "—"}</td></tr>
+              <tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555">Créneau</td><td style="padding:8px 4px">${escapeHtml(submission.creneau) || "—"}</td></tr>
+              ${submission.message ? `<tr style="background:#f9f9f9"><td style="padding:8px 4px;color:#555;vertical-align:top">Message</td><td style="padding:8px 4px">${escapeHtml(submission.message)}</td></tr>` : ""}
             </table>
-            <p style="margin-top:24px;font-size:12px;color:#aaa">ID: ${submissionId}</p>
+            <p style="margin-top:24px;font-size:12px;color:#aaa">ID: ${escapeHtml(submissionId)}</p>
           </div>
         `,
       });
@@ -172,8 +181,13 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// ─── Handler GET — stats rapides ─────────────────────────────────────────────
-export async function GET() {
+// ─── Handler GET — stats rapides (back office uniquement) ────────────────────
+export async function GET(req: NextRequest) {
+  // Ces chiffres sont des donnees commerciales : nombre de demandes, de clients,
+  // repartition par discipline. Aucun appel public ne les consomme.
+  const denied = requireAdmin(req);
+  if (denied) return denied;
+
   try {
     const [{ count: totalSubmissions }, { count: totalClients }, { data: disciplineRows }, { count: fideles }] =
       await Promise.all([

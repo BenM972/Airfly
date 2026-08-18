@@ -3,45 +3,12 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShopProductCard from "./ShopProductCard";
+import type { WCCategory, WCProduct } from "@/lib/woocommerce";
+
+// Reexport pour les composants qui importaient ces types d'ici
+export type { WCCategory, WCProduct, WCVariation } from "@/lib/woocommerce";
 
 type Category = "textile" | "materiel" | "soins";
-
-export type WCVariation = {
-  id: number;
-  price: string;
-  regular_price: string;
-  sale_price: string;
-  on_sale: boolean;
-  stock_status: string;
-  stock_quantity: number | null;
-  image: { src: string; alt: string } | null;
-  attributes: { name: string; option: string }[];
-};
-
-export type WCProduct = {
-  id: number;
-  name: string;
-  slug: string;
-  type: "simple" | "variable";
-  price: string;
-  regular_price: string;
-  sale_price: string;
-  on_sale: boolean;
-  stock_status: string;
-  stock_quantity: number | null;
-  short_description: string;
-  description: string;
-  categories: { id: number; name: string; slug: string }[];
-  images: { src: string; alt: string }[];
-  attributes: { id: number; name: string; variation: boolean; options: string[] }[];
-};
-
-export type WCCategory = {
-  id: number;
-  name: string;
-  slug: string;
-  parent: number;
-};
 
 function decodeHTML(str: string) {
   return str
@@ -66,16 +33,16 @@ const GROUP_SLUGS = ["kitesurf", "kite-wing-foil"];
 
 type Props = {
   initialCategory: Category | null;
+  /** Charges cote serveur : la grille est ainsi presente dans le HTML initial. */
+  products: WCProduct[];
+  categories: WCCategory[];
 };
 
-export default function ShopCatalogue({ initialCategory }: Props) {
+export default function ShopCatalogue({ initialCategory, products, categories }: Props) {
   const [activeCategory, setActiveCategory] = useState<Category>(initialCategory ?? "textile");
   const [activeSub, setActiveSub] = useState<string | null>(null);
   const [activeGenre, setActiveGenre] = useState<Genre>(null);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [products, setProducts] = useState<WCProduct[]>([]);
-  const [categories, setCategories] = useState<WCCategory[]>([]);
-  const [loading, setLoading] = useState(true);
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -85,23 +52,6 @@ export default function ShopCatalogue({ initialCategory }: Props) {
       ref.current?.scrollIntoView({ behavior: "smooth" });
     }
   }, [initialCategory]);
-
-  useEffect(() => {
-    fetch("/api/categories")
-      .then((r) => r.json())
-      .then((data: WCCategory[]) => setCategories(Array.isArray(data) ? data : []));
-  }, []);
-
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/products")
-      .then((r) => r.json())
-      .then((data: WCProduct[]) => {
-        setProducts(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
 
   const slugs = CATEGORY_MAP[activeCategory];
 
@@ -116,13 +66,6 @@ export default function ShopCatalogue({ initialCategory }: Props) {
   // Renvoie les enfants d'un groupe (par parent id)
   const childrenOf = (parentId: number) =>
     visibleCats.filter((c) => c.parent === parentId && !GROUP_SLUGS.includes(c.slug));
-
-  // Catégories "à plat" (textile n'a pas de groupes intermédiaires)
-  const flatCats = visibleCats.filter(
-    (c) => !GROUP_SLUGS.includes(c.slug) && groups.every((g) => c.parent !== g.id) === false
-      ? false
-      : !GROUP_SLUGS.includes(c.slug) && groups.length === 0
-  );
 
   // Pour textile : toutes les sous-cats directement (hors genre homme/femme)
   const directCats = visibleCats.filter((c) => !GROUP_SLUGS.includes(c.slug) && !GENRE_SLUGS.includes(c.slug) && groups.length === 0);
@@ -273,32 +216,22 @@ export default function ShopCatalogue({ initialCategory }: Props) {
 
           {/* Grille produits */}
           <div className="flex-1">
-            {loading ? (
-              <div className="flex justify-center py-24">
-                <motion.div
-                  className="w-6 h-6 border-2 border-[#FF0080] border-t-transparent rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
-                />
-              </div>
-            ) : (
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${activeCategory}-${activeSub}`}
-                  className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {filtered.map((product, i) => (
-                    <ShopProductCard key={product.id} product={product} index={i} />
-                  ))}
-                </motion.div>
-              </AnimatePresence>
-            )}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`${activeCategory}-${activeSub}`}
+                className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {filtered.map((product, i) => (
+                  <ShopProductCard key={product.id} product={product} index={i} />
+                ))}
+              </motion.div>
+            </AnimatePresence>
 
-            {!loading && filtered.length === 0 && (
+            {filtered.length === 0 && (
               <p className="text-gray-400 py-24" style={{ fontFamily: "var(--font-cormorant)" }}>
                 Les produits de cette categorie seront bientot ajoutes. Si vous avez une demande urgente, n&apos;hesitez pas a nous contacter ou a passer au shop.
               </p>

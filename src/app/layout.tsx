@@ -14,10 +14,39 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
+
+const TITLE = "Airfly — École de kitesurf & wingfoil, Pointe Faula, Martinique";
+const DESCRIPTION =
+  "École de glisse et surf shop à Pointe Faula, Le Vauclin (Martinique). Cours de kitesurf, wingfoil et kitefoil avec moniteurs diplômés, matériel et textile en boutique.";
+
 export const metadata: Metadata = {
-  title: "Airfly Surf Shop",
-  description: "Surf gear, boards & accessories — Airfly Surf Shop",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: TITLE,
+    // Tiret et non pipe : plusieurs noms de produits WooCommerce contiennent
+    // deja un "|" ("Harnais Apex 2025 | Ion"), ce qui donnait un double separateur.
+    template: "%s — Airfly Martinique",
+  },
+  description: DESCRIPTION,
+  applicationName: "Airfly",
+  alternates: { canonical: "/" },
   icons: { icon: "/logo-airfly.webp" },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: "Airfly",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: "/",
+    images: [{ url: "/hero_ecole.jpg", width: 1200, height: 630, alt: "Airfly, école de glisse à Pointe Faula, Martinique" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/hero_ecole.jpg"],
+  },
 };
 
 export default function RootLayout({
@@ -27,6 +56,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={cormorant.variable}>
+      <head>
+        {/* Mirloanne porte tous les titres : la precharger evite le saut de
+            rendu que provoquait sa decouverte tardive via la feuille de style. */}
+        <link rel="preload" href="/Mirloanne.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body>
         <CartProvider>
           <Preloader />

@@ -4,11 +4,17 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
+// 1800 ms masquaient le site plus longtemps que le rendu complet ne prend,
+// et plafonnaient le LCP d'autant. 600 ms conservent l'effet de marque.
+const DURATION_MS = 600;
+
 export default function Preloader() {
+  // Visible des le rendu serveur : le masquer par defaut ferait apparaitre le
+  // contenu avant que le calque ne le recouvre a l'hydratation.
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(false), 1800);
+    const timer = setTimeout(() => setVisible(false), DURATION_MS);
     return () => clearTimeout(timer);
   }, []);
 

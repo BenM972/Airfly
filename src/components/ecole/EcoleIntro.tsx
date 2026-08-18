@@ -2,7 +2,6 @@
 
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
-import SectionTitle from "../SectionTitle";
 
 const atouts = [
   { icon: "◆", title: "3 eleves max", desc: "Chaque session est limitée pour garantir un suivi personnalisé et une sécurité optimale." },
