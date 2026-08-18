@@ -25,7 +25,7 @@ export default function AnnonceBandeau() {
   const bandeau = (
     <div className="relative flex items-center overflow-hidden bg-gray-900 text-white text-xs uppercase tracking-widest h-[var(--h-annonce)]">
       {/* Premiere copie : la seule lue par les technologies d'assistance */}
-      <div className="flex shrink-0 items-center whitespace-nowrap animate-[defilement_38s_linear_infinite] motion-reduce:animate-none motion-reduce:justify-center motion-reduce:w-full">
+      <div className="flex shrink-0 items-center whitespace-nowrap animate-[defilement_var(--duree-defilement)_linear_infinite] motion-reduce:animate-none motion-reduce:justify-center motion-reduce:w-full">
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className="flex items-center px-8 motion-reduce:hidden motion-reduce:first:flex" aria-hidden={i > 0}>
             {contenu}
@@ -35,7 +35,7 @@ export default function AnnonceBandeau() {
       {/* Seconde copie, purement visuelle : elle prend le relais pour que la
           boucle soit continue, sans saut au moment du rebouclage. */}
       <div
-        className="flex shrink-0 items-center whitespace-nowrap animate-[defilement_38s_linear_infinite] motion-reduce:hidden"
+        className="flex shrink-0 items-center whitespace-nowrap animate-[defilement_var(--duree-defilement)_linear_infinite] motion-reduce:hidden"
         aria-hidden="true"
       >
         {[0, 1, 2, 3].map((i) => (
