@@ -61,8 +61,39 @@ export class WooCommerceIndisponible extends Error {
   }
 }
 
-const TENTATIVES = 3;
-const ATTENTE_MS = 400;
+const TENTATIVES = 4;
+const ATTENTE_MS = 500;
+
+/**
+ * Nombre d'appels simultanes vers WooCommerce, par processus.
+ *
+ * Le build prerend les fiches produit sur sept workers a la fois, et chaque
+ * page interroge WooCommerce pour ses metadonnees, son contenu et ses
+ * variantes. Sans limite, la rafale a fait repondre 500 a l'hebergement
+ * mutualise du WordPress, et les trois tentatives d'alors ont echoue
+ * ensemble : le build s'est arrete alors que l'API etait saine trente
+ * secondes plus tard.
+ *
+ * Etaler les appels sert donc a ne pas provoquer la panne qu'on cherche par
+ * ailleurs a detecter.
+ */
+const SIMULTANES_MAX = 3;
+
+let enCours = 0;
+const enAttente: (() => void)[] = [];
+
+async function avecCreneau<T>(tache: () => Promise<T>): Promise<T> {
+  if (enCours >= SIMULTANES_MAX) {
+    await new Promise<void>((liberer) => enAttente.push(liberer));
+  }
+  enCours++;
+  try {
+    return await tache();
+  } finally {
+    enCours--;
+    enAttente.shift()?.();
+  }
+}
 
 /**
  * Appel WooCommerce qui LEVE en cas d'echec, au lieu de renvoyer un repli.
@@ -74,7 +105,8 @@ const ATTENTE_MS = 400;
  * figees dans la sortie statique alors que les produits existaient toujours.
  *
  * Les echecs transitoires (reseau, 429, 5xx) sont retentes : un hoquet isole ne
- * doit pas faire echouer un build, mais une panne reelle doit se voir.
+ * doit pas faire echouer un build, mais une panne reelle doit se voir. Les
+ * appels sont par ailleurs etales, voir SIMULTANES_MAX.
  */
 async function wcFetch<T>(path: string, extra: Record<string, string> = {}): Promise<T> {
   const url = wcUrl(path, extra);
@@ -83,7 +115,7 @@ async function wcFetch<T>(path: string, extra: Record<string, string> = {}): Pro
   let dernier = "";
   for (let essai = 1; essai <= TENTATIVES; essai++) {
     try {
-      const res = await fetch(url, { next: { revalidate: REVALIDATE } });
+      const res = await avecCreneau(() => fetch(url, { next: { revalidate: REVALIDATE } }));
       // 4xx hors 429 : la requete est fautive, la reessayer ne changera rien.
       if (!res.ok && res.status !== 429 && res.status < 500) {
         throw new WooCommerceIndisponible(path, `HTTP ${res.status}`);
