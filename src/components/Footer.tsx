@@ -117,6 +117,11 @@ export default function Footer() {
           <p className="text-gray-600 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
             © {new Date().getFullYear()} Airfly
           </p>
+          <span className="flex items-center justify-center gap-3">
+            <a href="/mentions-legales" className="text-gray-600 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>Mentions legales</a>
+            <span className="text-gray-700 text-[8px]" aria-hidden="true">◆</span>
+            <a href="/politique-de-confidentialite" className="text-gray-600 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>Confidentialite</a>
+          </span>
           <a href="https://www.bmconsultingfwi.fr" target="_blank" rel="noopener noreferrer"
             className="text-gray-700 hover:text-white transition-colors duration-200 text-xs"
             style={{ fontFamily: "var(--font-cormorant)" }}>
@@ -202,9 +207,15 @@ export default function Footer() {
 
         <div className="border-t border-gray-800">
           <div className="max-w-7xl mx-auto px-16 py-6 flex items-center justify-between">
-            <p className="text-gray-600 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
-              © {new Date().getFullYear()} Airfly — Tous droits reserves
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-gray-600 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>
+                © {new Date().getFullYear()} Airfly — Tous droits reserves
+              </p>
+              <span className="text-gray-700 text-[8px]" aria-hidden="true">◆</span>
+              <a href="/mentions-legales" className="text-gray-600 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>Mentions legales</a>
+              <span className="text-gray-700 text-[8px]" aria-hidden="true">◆</span>
+              <a href="/politique-de-confidentialite" className="text-gray-600 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest" style={{ fontFamily: "Mirloanne, serif" }}>Confidentialite</a>
+            </div>
             <a href="https://www.bmconsultingfwi.fr" target="_blank" rel="noopener noreferrer"
               className="text-gray-600 hover:text-white transition-colors duration-200 text-xs"
               style={{ fontFamily: "var(--font-cormorant)" }}>

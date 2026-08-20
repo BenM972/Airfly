@@ -15,6 +15,11 @@
   font-display: swap;
 }
 
+/* Duree d'un cycle de defilement du bandeau. Declaree ici parce que les deux
+   copies du texte doivent l'appliquer a l'identique : si elles divergent, la
+   seconde ne prend plus le relais au bon moment et la boucle saute. */
+:root { --duree-defilement: 65s; }
+
 /* Bandeau d'annonce : deux copies identiques defilent cote a cote, chacune
    translatee de sa propre largeur, ce qui donne une boucle sans saut. */
 @keyframes defilement {

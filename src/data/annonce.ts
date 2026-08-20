@@ -4,6 +4,6 @@
  */
 export const annonce: { titre: string; detail: string; href?: string } | null = {
   titre: "Promos de fin de saison — -30% sur toute la boutique",
-  detail: "Et bien plus de references en magasin a Pointe Faula",
+  detail: "Encore bien plus de références à découvrir au shop",
   href: "/shop",
 };
