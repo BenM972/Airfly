@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import type { Partner } from "@/data/partners";
 import { stripAccents } from "@/lib/text";
+import { compterClicPartenaire } from "@/lib/compterClicPartenaire";
 
 type Props = {
   partner: Partner;
@@ -106,6 +107,7 @@ export default function PartnerCard({ partner, index }: Props) {
             min-h-[44px] : cible tactile minimale sur mobile. */}
         <a
           href={partner.href}
+          onClick={() => compterClicPartenaire(partner.slug)}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center justify-center min-h-[44px] border border-gray-900 text-gray-900 uppercase tracking-widest text-xs px-8 py-3 transition-colors duration-300 hover:bg-gray-900 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FF0080] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f0e8]"
