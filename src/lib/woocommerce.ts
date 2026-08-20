@@ -53,21 +53,65 @@ function wcUrl(path: string, extra: Record<string, string> = {}): string | null 
   return `${base}/wp-json/wc/v3/${path}?${params}`;
 }
 
-async function wcGet<T>(path: string, extra: Record<string, string> = {}, fallback: T): Promise<T> {
-  const url = wcUrl(path, extra);
-  if (!url) {
-    console.error("[woocommerce] variables d'environnement manquantes");
-    return fallback;
+/** Levee quand WooCommerce n'a pas repondu, par opposition a une reponse vide. */
+export class WooCommerceIndisponible extends Error {
+  constructor(path: string, cause: string) {
+    super(`[woocommerce] ${path} : ${cause}`);
+    this.name = "WooCommerceIndisponible";
   }
-  try {
-    const res = await fetch(url, { next: { revalidate: REVALIDATE } });
-    if (!res.ok) {
-      console.error(`[woocommerce] ${path} -> HTTP ${res.status}`);
-      return fallback;
+}
+
+const TENTATIVES = 3;
+const ATTENTE_MS = 400;
+
+/**
+ * Appel WooCommerce qui LEVE en cas d'echec, au lieu de renvoyer un repli.
+ *
+ * La distinction est le coeur du probleme que ce module a connu : une reponse
+ * vide veut dire "ce produit n'existe pas", une absence de reponse veut dire
+ * "je ne sais pas". Les confondre a fait prerendre six fiches produit en 404
+ * lors d'un build ou WooCommerce avait bafouille ; ces 404 sont ensuite restees
+ * figees dans la sortie statique alors que les produits existaient toujours.
+ *
+ * Les echecs transitoires (reseau, 429, 5xx) sont retentes : un hoquet isole ne
+ * doit pas faire echouer un build, mais une panne reelle doit se voir.
+ */
+async function wcFetch<T>(path: string, extra: Record<string, string> = {}): Promise<T> {
+  const url = wcUrl(path, extra);
+  if (!url) throw new WooCommerceIndisponible(path, "variables d'environnement manquantes");
+
+  let dernier = "";
+  for (let essai = 1; essai <= TENTATIVES; essai++) {
+    try {
+      const res = await fetch(url, { next: { revalidate: REVALIDATE } });
+      // 4xx hors 429 : la requete est fautive, la reessayer ne changera rien.
+      if (!res.ok && res.status !== 429 && res.status < 500) {
+        throw new WooCommerceIndisponible(path, `HTTP ${res.status}`);
+      }
+      if (!res.ok) {
+        dernier = `HTTP ${res.status}`;
+      } else {
+        return (await res.json()) as T;
+      }
+    } catch (err) {
+      if (err instanceof WooCommerceIndisponible) throw err;
+      dernier = err instanceof Error ? err.message : String(err);
     }
-    return (await res.json()) as T;
+    if (essai < TENTATIVES) await new Promise((r) => setTimeout(r, ATTENTE_MS * essai));
+  }
+  throw new WooCommerceIndisponible(path, `${dernier} apres ${TENTATIVES} tentatives`);
+}
+
+/**
+ * Variante tolerante, pour les appels ou une donnee absente degrade la page
+ * sans la rendre fausse : une liste vide s'affiche comme un catalogue vide,
+ * ce qui est passager et se corrige au rechargement suivant.
+ */
+async function wcGet<T>(path: string, extra: Record<string, string> = {}, fallback: T): Promise<T> {
+  try {
+    return await wcFetch<T>(path, extra);
   } catch (err) {
-    console.error(`[woocommerce] ${path} injoignable:`, err);
+    console.error(err instanceof Error ? err.message : err);
     return fallback;
   }
 }
@@ -122,9 +166,15 @@ export function toCatalogueProduct(products: WCProduct[]): WCProduct[] {
   });
 }
 
-/** Un seul produit, au lieu des 100 que chargeait la page avant. */
+/**
+ * Un seul produit, au lieu des 100 que chargeait la page avant.
+ *
+ * Renvoie null UNIQUEMENT quand WooCommerce a repondu qu'aucun produit ne porte
+ * ce slug. Si WooCommerce n'a pas repondu, la fonction leve : l'appelant
+ * transforme un null en 404, et un 404 prerendu au build ne se corrige plus.
+ */
 export async function getProductBySlug(slug: string): Promise<WCProduct | null> {
-  const rows = await wcGet<WCProduct[]>("products", { slug, status: "publish" }, []);
+  const rows = await wcFetch<WCProduct[]>("products", { slug, status: "publish" });
   return rows[0] ?? null;
 }
 
