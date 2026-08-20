@@ -28,6 +28,8 @@ export default function MentionsLegales() {
         <dd>490 460 375 00010</dd>
         <dt>RCS</dt>
         <dd>Fort-de-France 490 460 375</dd>
+        <dt>Capital social</dt>
+        <dd>8 000 €</dd>
         <dt>TVA intracommunautaire</dt>
         <dd>FR68 490 460 375</dd>
         <dt>Code APE</dt>
