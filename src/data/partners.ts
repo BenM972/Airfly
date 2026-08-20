@@ -37,6 +37,13 @@ export type Partner = {
    * lisibilite et concurrence la description.
    */
   atouts?: string[];
+  /**
+   * "principal" par defaut : grande carte avec photo, atouts et description.
+   * "secondaire" : carte compacte, sans photo ni description. Le champ decide
+   * du rendu, pas l'ordre dans le tableau, pour qu'un deplacement d'entree ne
+   * change jamais silencieusement l'importance affichee d'un partenaire.
+   */
+  niveau?: "principal" | "secondaire";
 };
 
 export const partners: Partner[] = [
@@ -58,5 +65,19 @@ export const partners: Partner[] = [
       "Villas avec piscine privée",
       "Bungalows neufs tout équipés",
     ],
+  },
+  {
+    slug: "village-de-la-pointe",
+    name: "Le Village de la Pointe",
+    tagline: "Cottages, lodges et villas face au lagon",
+    description:
+      "Face au lagon de Pointe Faula, Le Village de la Pointe propose des cottages jusqu'à six personnes, des lodges en studio et des villas jusqu'à dix. Le tout au milieu d'une palmeraie, avec piscine et restaurant sur place.",
+    image: {
+      src: "/partners/village-de-la-pointe.jpg",
+      alt: "Allee bordee de palmiers entre des cottages aux toits de tole rose",
+    },
+    href: "https://www.villagedelapointe.fr/",
+    location: "Pointe Faula, Le Vauclin",
+    niveau: "secondaire",
   },
 ];
