@@ -59,6 +59,20 @@ const cacheDocuments = [
 ];
 
 const nextConfig = {
+  experimental: {
+    // Nombre de processus de generation statique.
+    //
+    // Next en lance autant que la machine a de coeurs : sept sur le poste de
+    // developpement, trente-trois sur le serveur de build d'Hostinger. Or
+    // chaque processus interroge WooCommerce en parallele, et le WordPress est
+    // sur un hebergement mutualise qui repond 500 sous la charge. Une limite
+    // posee par processus ne borne donc rien : elle se multiplie par un nombre
+    // de workers qu'on ne choisit pas.
+    //
+    // En figeant les workers ici, le plafond devient absolu :
+    // cpus x SIMULTANES_MAX appels simultanes, la meme valeur partout.
+    cpus: 4,
+  },
   images: {
     // AVIF en premier : ~20 a 30 % de moins que le WebP, repli automatique
     // pour les navigateurs qui ne l'annoncent pas.

@@ -76,8 +76,19 @@ const ATTENTE_MS = 500;
  *
  * Etaler les appels sert donc a ne pas provoquer la panne qu'on cherche par
  * ailleurs a detecter.
+ *
+ * Cette limite ne vaut que multipliee par le nombre de processus, que
+ * `experimental.cpus` fige a 4 dans next.config.mjs. Les deux valeurs se
+ * lisent ensemble : quatre appels simultanes au plus, sur n'importe quelle
+ * machine. Modifier l'une sans l'autre change le plafond reel.
+ *
+ * Une valeur de 1 laisse les quatre processus travailler en parallele sur le
+ * rendu et les images, tout en ne presentant qu'une requete a la fois chacun
+ * au WordPress. Le serveur de build d'Hostinger est vraisemblablement plus
+ * proche du WordPress que le poste de developpement : a concurrence egale il
+ * enchaine plus vite, donc la marge prise ici n'est pas superflue.
  */
-const SIMULTANES_MAX = 3;
+const SIMULTANES_MAX = 1;
 
 let enCours = 0;
 const enAttente: (() => void)[] = [];
