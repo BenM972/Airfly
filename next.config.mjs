@@ -31,6 +31,33 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=31536000" },
 ];
 
+// Cache des documents HTML.
+//
+// Next pose de lui-meme `Cache-Control: s-maxage=31536000` sur les pages
+// prerendues : un an de cache partage. Il ecrit cela en supposant que la
+// plateforme purge son cache a chaque deploiement, ce que fait Vercel. Un
+// hebergement classique, non. Or chaque build renomme les fichiers CSS et JS
+// et supprime les precedents : un cache qui continue de servir l'ancien HTML
+// reclame des fichiers qui n'existent plus, et la page s'affiche sans aucun
+// style. C'est exactement ce symptome qui a ete observe en local.
+//
+// On borne donc la fraicheur des documents a zero seconde, cache partage
+// compris. Le navigateur revalide alors avec l'ETag que Next fournit deja, ce
+// qui coute un 304 vide et non un rechargement complet.
+//
+// La regle ne vise QUE les documents publics. Sont exclus :
+//   - `_next/`, dont les fichiers versionnes gardent leur cache d'un an, sans
+//     danger puisque leur nom change avec leur contenu ;
+//   - tout chemin comportant un point, c'est-a-dire les fichiers de /public ;
+//   - `api/` et `admin`, ou Next pose de lui-meme `private, no-cache,
+//     no-store`. Une premiere version de cette regle les englobait et
+//     remplacait ce `private, no-store` par un `public` : les reponses du back
+//     office et du formulaire de reservation, qui portent des donnees
+//     personnelles, devenaient stockables par un cache partage.
+const cacheDocuments = [
+  { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+];
+
 const nextConfig = {
   images: {
     // AVIF en premier : ~20 a 30 % de moins que le WebP, repli automatique
@@ -39,7 +66,11 @@ const nextConfig = {
     remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      // Documents HTML publics uniquement — voir cacheDocuments.
+      { source: "/((?!_next/|api/|admin|.*\\.).*)", headers: cacheDocuments },
+    ];
   },
   async redirects() {
     if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return [];
