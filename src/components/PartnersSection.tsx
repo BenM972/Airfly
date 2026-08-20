@@ -31,19 +31,30 @@ export default function PartnersSection() {
           </div>
         )}
 
+        {/* Un seul partenaire secondaire : on borne le bloc entier, filet
+            compris. Un filet pleine largeur au-dessus d'une carte a mi-largeur
+            donnait un ensemble bancal. */}
         {secondaires.length > 0 && (
-          <div className={principaux.length > 0 ? "mt-20" : ""}>
-            {/* Intitule discret : il annonce un changement de registre sans
-                reprendre le poids d'un titre de section. */}
-            <p
-              className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-6"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              Aussi partenaires
-            </p>
+          <div
+            className={`${principaux.length > 0 ? "mt-20" : ""} ${
+              secondaires.length > 1 ? "" : "md:max-w-3xl"
+            }`}
+          >
+            {/* Intitule discret, encadre d'un filet : il annonce un changement
+                de registre sans reprendre le poids d'un titre de section. */}
+            <div className="mb-8 flex items-center gap-4">
+              <span className="text-[8px] text-[#FF0080]" aria-hidden="true">◆</span>
+              <p
+                className="shrink-0 text-xs uppercase tracking-[0.25em] text-gray-500"
+                style={{ fontFamily: "Mirloanne, serif" }}
+              >
+                Aussi partenaires
+              </p>
+              <span className="h-px flex-1 bg-gray-300" aria-hidden="true" />
+            </div>
             {/* Une colonne tant qu'ils sont peu nombreux, deux des qu'il y en
                 a assez pour qu'une ligne unique paraisse etiree. */}
-            <div className={`grid gap-4 ${secondaires.length > 1 ? "md:grid-cols-2" : "md:max-w-2xl"}`}>
+            <div className={`grid gap-4 ${secondaires.length > 1 ? "md:grid-cols-2" : ""}`}>
               {secondaires.map((partner) => (
                 <PartnerCardCompacte key={partner.slug} partner={partner} />
               ))}
