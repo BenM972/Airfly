@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SectionTitle from "./SectionTitle";
 
 const WIND_PHRASES: { max: number; text: string }[] = [
@@ -17,23 +17,31 @@ function getWindPhrase(kts: number): string {
 
 const SRC_RELEVES = "https://www.windguru.cz/js/wgs_widget.php";
 
-const CURR_DIV_ID = "wgs_widget_4164_1704756029749";
-const FORECAST_DIV_ID = "wg_fwdg_1206002_100_1777735567467";
+/**
+ * Les deux widgets Windguru gardent une trace de ce qu'ils ont deja construit,
+ * indexee par l'identifiant du conteneur : le widget des releves refuse de se
+ * reconstruire dans un conteneur deja servi, et celui des previsions n'expose
+ * aucun moyen de repartir de zero. Tant que l'identifiant est constant, un
+ * remontage ne peut donc pas les relancer de facon fiable.
+ *
+ * On engendre donc un identifiant neuf a chaque montage. Du point de vue de
+ * Windguru, chaque affichage est un widget qu'il n'a jamais vu, et aucune de
+ * ses gardes internes ne s'applique.
+ */
+let compteurMontages = 0;
 
-const CURR_OPTS = {
+const CURR_OPTS_BASE = {
   id_station: 4164,
   wj: "knots",
   tj: "c",
   avg_min: 0,
   tmprh: true,
   date_format: "Y-m-d H:i:s T",
-  divid: CURR_DIV_ID,
   type: "curr",
 };
 
-const FORECAST_ARGS = [
+const FORECAST_ARGS_BASE = [
   "s=1206002","m=100",
-  "uid=wg_fwdg_1206002_100_1777735567467",
   "ai=1","wj=knots","tj=c","waj=m","tij=cm",
   "odh=0","doh=24","fhours=240","hrsm=2",
   "vt=forecasts","lng=fr","idbs=1",
@@ -41,21 +49,25 @@ const FORECAST_ARGS = [
 ];
 
 /**
- * Vrai si le widget rattache a ce conteneur a bien injecte son iframe.
+ * Vrai si le widget loge dans cet hote a bien injecte son iframe.
  *
- * La recherche porte sur le PARENT du conteneur, pas sur ses enfants : le
- * script des previsions fait `insertBefore(iframe, cible.nextSibling)`, donc
- * l'iframe est un frere du conteneur et non un descendant. Tester
+ * La recherche porte sur l'hote entier et non sur les enfants du conteneur
+ * cible : le script des previsions fait `insertBefore(iframe,
+ * cible.nextSibling)` et place donc son iframe A COTE du conteneur. Tester
  * `cible.hasChildNodes()` ne trouvait jamais rien et rapportait le widget en
  * echec meme quand il s'affichait.
  */
-function widgetAffiche(id: string): boolean {
-  return document.getElementById(id)?.parentElement?.querySelector("iframe") != null;
+function widgetAffiche(hote: HTMLElement | null): boolean {
+  return hote?.querySelector("iframe") != null;
 }
 
 export default function MeteoSection() {
   const [windPhrase, setWindPhrase] = useState("");
   const [showFallback, setShowFallback] = useState(false);
+  // Hotes stables, possedes par React. Les conteneurs que Windguru vise sont
+  // crees dedans a chaque montage, avec un identifiant neuf.
+  const hotePrevisions = useRef<HTMLDivElement>(null);
+  const hoteReleves = useRef<HTMLDivElement>(null);
 
   // Wind phrase from API proxy
   useEffect(() => {
@@ -78,7 +90,7 @@ export default function MeteoSection() {
   // le lien vers Windguru plutot que de laisser deux blocs vides.
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (!widgetAffiche(FORECAST_DIV_ID) && !widgetAffiche(CURR_DIV_ID)) {
+      if (!widgetAffiche(hotePrevisions.current) && !widgetAffiche(hoteReleves.current)) {
         setShowFallback(true);
       }
     }, 10000);
@@ -87,61 +99,65 @@ export default function MeteoSection() {
 
   // Previsions.
   //
-  // Le script de Windguru est une fonction auto-executee : tout son travail a
-  // lieu au moment ou il s'execute, et il n'expose aucune fonction de
-  // reinitialisation. Charge par next/script, il etait dedoublonne par son URL
-  // et ne se rejouait donc jamais lors d'une navigation cote client : en
-  // revenant sur l'accueil, l'emplacement restait vide. On cree un element
-  // <script> neuf a chaque montage, ce que le navigateur execute meme lorsque
-  // l'URL est deja en cache.
+  // Le script est une fonction auto-executee : tout son travail a lieu quand
+  // il s'execute, et il n'expose aucune reinitialisation. Charge par
+  // next/script il etait dedoublonne par son URL et ne se rejouait jamais lors
+  // d'une navigation cote client. On cree un <script> neuf a chaque montage,
+  // que le navigateur execute meme si l'URL est en cache, et on lui donne un
+  // conteneur au nom encore inutilise.
   useEffect(() => {
-    const cible = document.getElementById(FORECAST_DIV_ID);
-    if (!cible) return;
+    const hote = hotePrevisions.current;
+    if (!hote) return;
 
+    const uid = `wg_fwdg_1206002_100_${++compteurMontages}`;
+    const cible = document.createElement("div");
+    cible.id = uid;
+    hote.appendChild(cible);
+
+    const args = [...FORECAST_ARGS_BASE, `uid=${uid}`];
     const script = document.createElement("script");
-    script.src = `https://www.windguru.cz/js/widget.php?${FORECAST_ARGS.join("&")}`;
+    script.src = `https://www.windguru.cz/js/widget.php?${args.join("&")}`;
     script.async = true;
     script.addEventListener("load", () => setShowFallback(false));
     document.body.appendChild(script);
 
     return () => {
       script.remove();
-      // L'iframe est un frere de la cible, pas un enfant : la retirer est
-      // indispensable, sinon un second montage en empilerait une de plus.
-      cible.parentElement?.querySelectorAll("iframe").forEach((f) => f.remove());
+      // Vider l'hote emporte le conteneur et l'iframe que le script a inseree
+      // a cote de lui. React ne gere aucun de ces noeuds, a lui de les retirer.
+      hote.replaceChildren();
     };
   }, []);
 
   // Releves en temps reel.
   //
-  // `WgsWidget()` est protegee par `window.WgsWidget_started[divid]`, posee a
-  // true au premier appel et jamais effacee : la rappeler au remontage ne
-  // faisait rien. Comme le conteneur etait vide juste avant l'appel, la section
-  // repartait vide au retour sur l'accueil. On leve la garde pour ce conteneur
-  // avant chaque appel.
+  // WgsWidget() est protegee par window.WgsWidget_started[divid], posee a true
+  // au premier appel et jamais effacee : rappeler la fonction sur le meme
+  // conteneur ne fait rien. Un conteneur au nom neuf a chaque montage contourne
+  // la garde sans dependre du fonctionnement interne du script.
   useEffect(() => {
-    const div = document.getElementById(CURR_DIV_ID);
-    if (!div) return;
+    const hote = hoteReleves.current;
+    if (!hote) return;
+
+    const uid = `wgs_widget_4164_${++compteurMontages}`;
+    const cible = document.createElement("div");
+    cible.id = uid;
+    hote.appendChild(cible);
 
     const script = document.createElement("script");
     script.src = SRC_RELEVES;
     script.async = true;
     script.addEventListener("load", () => {
-      const win = window as unknown as {
-        WgsWidget?: (opts: unknown) => void;
-        WgsWidget_started?: Record<string, boolean>;
-      };
+      const win = window as unknown as { WgsWidget?: (opts: unknown) => void };
       if (typeof win.WgsWidget !== "function") return;
-      div.innerHTML = "";
-      if (win.WgsWidget_started) delete win.WgsWidget_started[CURR_DIV_ID];
-      win.WgsWidget(CURR_OPTS);
+      win.WgsWidget({ ...CURR_OPTS_BASE, divid: uid });
       setShowFallback(false);
     });
     document.body.appendChild(script);
 
     return () => {
       script.remove();
-      div.innerHTML = "";
+      hote.replaceChildren();
     };
   }, []);
 
@@ -168,7 +184,7 @@ export default function MeteoSection() {
               Previsions
             </p>
             <div className="overflow-x-auto">
-              <div id={FORECAST_DIV_ID} />
+              <div ref={hotePrevisions} />
             </div>
           </div>
 
@@ -181,7 +197,7 @@ export default function MeteoSection() {
               Releves en temps reel
             </p>
             <div className="flex justify-center overflow-x-auto">
-              <div id={CURR_DIV_ID} />
+              <div ref={hoteReleves} />
             </div>
             {windPhrase && (
               <p
