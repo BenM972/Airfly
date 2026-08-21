@@ -1,6 +1,7 @@
 "use client";
 
 import type { WCProduct, WCVariation } from "./ShopCatalogue";
+import { trierOptions } from "@/lib/tailles";
 
 // Couleurs connues → code hex pour affichage swatch
 const COLOR_MAP: Record<string, string> = {
@@ -83,6 +84,10 @@ export default function VariantSelector({ product, variations, selected, onChang
       {variantAttrs.map((attr, attrIdx) => {
         const isColor = isColorAttr(attr.name);
         const isSize = isSizeAttr(attr.name);
+        // WooCommerce rend les options dans l'ordre de saisie, pas dans
+        // l'ordre croissant. trierOptions laisse intacte toute liste qu'il ne
+        // sait pas interpreter, les couleurs notamment.
+        const options = trierOptions(attr.options);
         const useSelect = isSize && isShoeProduct(product);
         const showPrice = priceSlot && attrIdx === lastNonColorIdx;
         return (
@@ -118,7 +123,7 @@ export default function VariantSelector({ product, variations, selected, onChang
                   }}
                 >
                   <option value="">Choisir une taille</option>
-                  {attr.options.map((opt) => {
+                  {options.map((opt) => {
                     const available = isOptionAvailable(attr.name, opt);
                     return (
                       <option key={opt} value={opt} disabled={!available}>
@@ -133,7 +138,7 @@ export default function VariantSelector({ product, variations, selected, onChang
               </div>
             ) : (
               <div className="flex gap-2 flex-wrap items-center">
-                {attr.options.map((opt) => {
+                {options.map((opt) => {
                   const isSelected = selected[attr.name] === opt;
                   const available = isOptionAvailable(attr.name, opt);
                   const hexColor = isColor ? getColor(opt) : null;
