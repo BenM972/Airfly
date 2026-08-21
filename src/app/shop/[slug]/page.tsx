@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProducts, getProductBySlug, getVariations, toPlainText } from "@/lib/woocommerce";
+import { getProductBySlug, getVariations, toPlainText } from "@/lib/woocommerce";
 import ProductDetail from "@/components/shop/ProductDetail";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, productSchema } from "@/lib/schema";
@@ -8,15 +8,22 @@ import { breadcrumbSchema, productSchema } from "@/lib/schema";
 type Props = { params: Promise<{ slug: string }> };
 
 /**
- * Pre-rend les fiches au build : elles deviennent statiques au lieu d'appeler
- * WooCommerce a la premiere visite (~800 ms mesures a froid).
- * dynamicParams reste actif par defaut : un produit ajoute apres le build est
- * genere a la demande, puis mis en cache.
+ * Pas de generateStaticParams, volontairement.
+ *
+ * Pre-rendre les cinquante-six fiches au build demandait plus de cent dix
+ * appels a WooCommerce en quelques secondes. Le WordPress est sur un
+ * hebergement mutualise qui repond 500 sous cette charge, et un seul echec
+ * arrete le build : trois deploiements de suite ont echoue ainsi. Plafonner
+ * les processus a quatre puis les appels simultanes a quatre n'a pas suffi,
+ * alors que les memes requetes, passees une par une, repondent toutes 200 en
+ * moins d'une seconde. Le probleme est la rafale, pas les donnees.
+ *
+ * Les fiches sont donc rendues a la premiere visite puis mises en cache selon
+ * le `revalidate` des appels WooCommerce, soit cinq minutes. Le visiteur qui
+ * essuie les platres attend environ une seconde de plus ; en echange le build
+ * ne touche presque plus a WooCommerce et ne peut plus echouer pour cette
+ * raison. Les moteurs recoivent du HTML complet dans les deux cas.
  */
-export async function generateStaticParams() {
-  const products = await getProducts();
-  return products.map((p) => ({ slug: p.slug }));
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
