@@ -1,7 +1,7 @@
 # Avancement — site Airfly
 
 Journal de travail de BM Consulting sur le site Next.js d'Airfly.
-Couvre la période du 12 au 21 août 2026. Le site lui-même a été construit en
+Couvre la période du 12 au 25 août 2026. Le site lui-même a été construit en
 mai 2026 ; ce document part de l'audit qui a ouvert la reprise.
 
 Les mesures SEO détaillées vivent à part, dans `../../airfly972-audit/` :
@@ -9,11 +9,12 @@ Les mesures SEO détaillées vivent à part, dans `../../airfly972-audit/` :
 
 ---
 
-## État au 21/08/2026
+## État au 25/08/2026
 
-Site déployé sur `honeydew-yak-792807.hostingersite.com`, commit `ac45454`.
-Vérifié en ligne : toutes les pages en 200, les 27 fiches produit liées depuis
-la boutique en 200, feuille de style servie correctement.
+Site en ligne sur **`airfly972.com`**, en HTTPS, certificat valide.
+Vérifié : toutes les pages en 200, les 27 fiches produit en 200, canoniques et
+sitemap sur le domaine définitif, redirection `www` vers l'apex.
+Formulaires opérationnels, notifications envoyées depuis `info@airfly972.com`.
 
 Score de santé SEO : **34 → 81 / 100** (protocole dans `PHASE-1-RESULTS.md`).
 
@@ -143,6 +144,106 @@ Une seule ligne = purge réussie. Une URL avec chaîne de requête contourne le
 cache et joint l'origine, ce qui distingue un problème de CDN d'un problème de
 build.
 
+
+## Migration du domaine — 25/08/2026
+
+Transfert d'`airfly972.com` d'IONOS vers Hostinger, bascule du site sur le
+domaine définitif, et mise en service des notifications par courriel. Journée
+difficile : deux coupures de messagerie et une indisponibilité partielle du
+site. Tout est rétabli. Les causes valent d'être connues.
+
+### Coupure 1 — IONOS supprime la zone au transfert
+
+Les serveurs de noms avaient été volontairement conservés chez IONOS pendant
+le transfert, pour ne rien changer au DNS. IONOS a néanmoins **supprimé la
+zone** en perdant le domaine : ses serveurs répondaient `REFUSED` alors que la
+délégation pointait toujours vers eux. Plus de MX, plus de site, environ deux
+heures.
+
+**Conserver les serveurs de noms ne protège que si l'ancien hébergeur continue
+de servir la zone.** IONOS ne le fait pas. La zone a été recréée chez
+Hostinger, MX en premier, puis la délégation basculée.
+
+### Coupure 2 — une boîte mail Hostinger écrase les MX Google
+
+Créer `hello@airfly972.com` dans hPanel a remplacé les trois MX Google par
+ceux d'Hostinger. Le courrier de `info@` a cessé d'arriver jusqu'au
+rétablissement manuel.
+
+**Un domaine n'a qu'un seul jeu de MX, donc un seul serveur de réception.**
+Les adresses `@airfly972.com` vivent chez Google Workspace : toute boîte créée
+ailleurs sur ce domaine est soit inutile, soit destructrice. La boîte a été
+supprimée et la copie de surveillance déplacée vers
+`contact@bmconsultingfwi.fr`.
+
+### Indisponibilité partielle — CNAME avec descendants
+
+Resend a d'abord été vérifié sur `send.airfly972.com`, puis sur l'apex. Le
+second jeu a transformé `send` en CNAME, alors qu'il portait déjà les
+enregistrements du premier. **Un nom porteur d'un CNAME ne peut avoir aucun
+descendant** (RFC 1034) : la zone est devenue invalide et les résolveurs
+stricts ont répondu `SERVFAIL`, ce que les navigateurs affichent en
+`DNS_PROBE_FINISHED_NXDOMAIN`.
+
+Les trois enregistrements sous `send` ont été supprimés. S'y est ajouté un
+défaut d'Hostinger : leur flotte anycast a servi jusqu'à **trois versions de
+la zone simultanément** pendant plus d'une heure, dont l'ancienne. Résolu
+après ticket.
+
+### Ce qui restait ensuite, et n'était plus un défaut
+
+Orange, Quad9 et OpenDNS ont continué d'échouer après remise en état. Cause :
+le registre `.com` publie la délégation avec un **TTL de 172 800 secondes,
+soit 48 heures**. Ces résolveurs avaient mémorisé l'ancienne délégation vers
+IONOS avant la bascule et continuaient de l'interroger.
+
+Rien à corriger : cela se résout seul, au plus tard 48 h après le changement
+de serveurs de noms. Contournement pendant ce délai : `1.1.1.1` sur les
+postes concernés.
+
+### Notifications par courriel
+
+Resend refuse d'envoyer depuis un domaine qu'il n'a pas vérifié et répond 403.
+La demande est alors enregistrée en base mais la notification meurt là, sans
+que rien ne le signale au visiteur. `airfly972.com` et `send.airfly972.com`
+sont désormais vérifiés tous les deux.
+
+**L'apex a été ajouté avec « receiving » DÉSACTIVÉ**, ce qui limite Resend à
+des CNAME et un TXT de DKIM, sans aucun MX. C'est ce qui rend l'opération
+sans danger. La règle n'est pas « jamais l'apex », c'est **« jamais un MX sur
+l'apex »**.
+
+### Zone de référence au 25/08/2026
+
+```
+@                    A/ALIAS  airfly972.com.cdn.hstgr.net
+@                    MX       1 aspmx.l.google.com
+                              5 alt1.aspmx.l.google.com
+                              5 alt2.aspmx.l.google.com
+www                  CNAME    www.airfly972.com.cdn.hstgr.net
+mail                 CNAME    ghs.google.com
+send                 CNAME    send.forge.rmta.net
+rsend                CNAME    rsend.forge.rmta.net
+resend._domainkey    TXT      p=MIGfMA0... (clé DKIM Resend)
+_dmarc               TXT      v=DMARC1; p=none
+ftp                  A        82.25.114.133
+```
+
+**Ne jamais recréer** `send.send`, `rsend.send`, `resend._domainkey.send` :
+tout nom contenant deux fois `send` casse la zone.
+
+### Commandes de contrôle
+
+```bash
+# Les MX doivent toujours renvoyer les trois lignes Google
+host -t MX airfly972.com
+
+# Les deux serveurs doivent annoncer le même numéro de série
+for ns in byte pixel; do
+  echo "$ns : $(dig @$ns.dns-parking.com airfly972.com SOA +short | awk '{print $3}')"
+done
+```
+
 ---
 
 ## Reste à faire
@@ -150,15 +251,13 @@ build.
 **Sécurité, prioritaire.** La clé WooCommerce a fuité dans une trace d'erreur,
 puis a été passée en écriture. **À régénérer et à révoquer.**
 
-**Avant la bascule du nom de domaine**
-- Resend : nouveau compte, vérifier `send.airfly972.com` — **sous-domaine, jamais l'apex**, sinon les MX Google sont écrasés et le courriel est perdu
-- Reporter les 15 variables de `.env.example` chez Hostinger ; `WC_URL`,
-  `WC_CONSUMER_KEY`, `WC_CONSUMER_SECRET` et `NEXT_PUBLIC_SITE_URL` sont lues
-  **pendant** le build
-- Abaisser le TTL de 3600 à 300, puis changer l'enregistrement A et le CNAME
-  www. **Ne jamais toucher aux MX.** Script de contrôle dans
-  `AIRFLY/dns-airfly972/verifier-bascule.sh`
+**Fait le 25/08** — transfert du domaine, bascule du site, notifications par
+courriel. Voir la section Migration.
+
+**Reste**
 - Plan de redirections depuis les anciennes URL Squarespace
+- DKIM Google Workspace : absent. À activer dans `admin.google.com` avant
+  d'envisager de durcir le DMARC au-delà de `p=none`
 
 **Divers**
 - Confirmer au Village de la Pointe l'usage de leur photo
