@@ -10,8 +10,8 @@ export function getResend(): Resend {
   if (mailFrom().includes("resend.dev")) {
     console.warn(
       "[email] Expediteur sur le domaine bac a sable de Resend : les notifications " +
-        "ne seront delivrees qu'a l'adresse proprietaire du compte. Verifiez airfly972.com " +
-        "dans Resend puis definissez RESEND_FROM."
+        "ne seront delivrees qu'a l'adresse proprietaire du compte. Verifiez " +
+        "send.airfly972.com dans Resend puis retirez RESEND_FROM."
     );
   }
 
@@ -22,14 +22,18 @@ export function getResend(): Resend {
 /**
  * Expediteur des notifications.
  *
- * Le repli `onboarding@resend.dev` est le domaine bac a sable de Resend : il
- * ne delivre qu'a l'adresse proprietaire du compte. Pour recevoir reellement
- * les demandes, verifier airfly972.com dans Resend (SPF + DKIM chez le
- * registrar) puis definir RESEND_FROM, par exemple :
- *   RESEND_FROM="AIRFLY <reservation@airfly972.com>"
+ * Resend REFUSE d'envoyer depuis un domaine qu'il n'a pas verifie : tant que
+ * airfly972.com ne l'est pas, l'envoi echoue en 403 et la demande n'arrive
+ * nulle part. La verification se fait dans Resend, qui fournit des
+ * enregistrements a poser sur un SOUS-DOMAINE, `send.airfly972.com`, jamais
+ * sur l'apex — les poser sur l'apex ecraserait les MX de Google Workspace et
+ * couperait la messagerie.
+ *
+ * RESEND_FROM permet de surcharger, par exemple le temps d'utiliser le bac a
+ * sable `onboarding@resend.dev`, qui ne delivre qu'au proprietaire du compte.
  */
 export function mailFrom(): string {
-  return process.env.RESEND_FROM ?? "AIRFLY <onboarding@resend.dev>";
+  return process.env.RESEND_FROM ?? "AIRFLY <info@airfly972.com>";
 }
 
 /** Destinataire principal des notifications internes. */
@@ -38,12 +42,18 @@ export function mailTo(): string {
 }
 
 /**
- * Destinataires en copie. Plusieurs adresses possibles, separees par des
- * virgules dans NOTIFY_CC. Renvoie un tableau vide si rien n'est configure :
- * l'appelant omet alors le champ, Resend refusant une copie vide.
+ * Destinataires en copie cachee. Plusieurs adresses possibles, separees par
+ * des virgules dans NOTIFY_BCC. Renvoie un tableau vide si la variable est
+ * definie mais vide : l'appelant omet alors le champ, Resend refusant une
+ * liste vide.
+ *
+ * Copie CACHEE et non visible : ces notifications portent le nom, le telephone
+ * et le courriel d'un client. Une copie visible exposerait l'adresse de
+ * surveillance a quiconque recoit ou fait suivre le message, et la ferait
+ * apparaitre dans un "repondre a tous".
  */
-export function mailCc(): string[] {
-  const brut = process.env.NOTIFY_CC ?? "contact@bmconsultingfwi.fr";
+export function mailBcc(): string[] {
+  const brut = process.env.NOTIFY_BCC ?? "hello@airfly972.com";
   return brut
     .split(",")
     .map((a) => a.trim())
