@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { fermeture } from "@/data/fermeture";
 
 const navLinks = [
   { label: "A propos", href: "/#apropos" },
@@ -58,8 +59,20 @@ export default function Footer() {
           <div>
             <p className="uppercase tracking-widest text-xs text-[#FF0080] mb-4" style={{ fontFamily: "Mirloanne, serif" }}>Horaires</p>
             <div className="space-y-3">
+              {/* La fermeture passe avant les horaires : sinon un visiteur lit
+                  "Jeudi 9h" et se deplace pour rien. */}
+              {fermeture && (
+                <div className="border border-[#FF0080]/40 bg-[#FF0080]/10 px-3 py-2.5">
+                  <p className="text-[#FF0080] text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    Boutique fermée &mdash; {fermeture.motif.toLowerCase()}
+                  </p>
+                  <p className="text-white text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {fermeture.libelle}
+                  </p>
+                </div>
+              )}
               {hours.map((h) => (
-                <div key={h.day}>
+                <div key={h.day} className={fermeture ? "opacity-50" : ""}>
                   <p className="text-white text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.day}</p>
                   <p className="text-gray-400 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.time}</p>
                 </div>
@@ -170,8 +183,20 @@ export default function Footer() {
           <div>
             <p className="uppercase tracking-widest text-xs text-[#FF0080] mb-6" style={{ fontFamily: "Mirloanne, serif" }}>Horaires</p>
             <ul className="space-y-4">
+              {/* La fermeture passe avant les horaires : sinon un visiteur lit
+                  "Jeudi 9h" et se deplace pour rien. */}
+              {fermeture && (
+                <li className="border border-[#FF0080]/40 bg-[#FF0080]/10 px-3 py-2.5">
+                  <p className="text-[#FF0080] text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    Boutique fermée &mdash; {fermeture.motif.toLowerCase()}
+                  </p>
+                  <p className="text-white text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {fermeture.libelle}
+                  </p>
+                </li>
+              )}
               {hours.map((h) => (
-                <li key={h.day}>
+                <li key={h.day} className={fermeture ? "opacity-50" : ""}>
                   <p className="text-white text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.day}</p>
                   <p className="text-gray-400 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>{h.time}</p>
                 </li>

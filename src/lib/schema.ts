@@ -3,6 +3,7 @@
 
 import type { WCProduct, WCVariation } from "./woocommerce";
 import { toPlainText } from "./woocommerce";
+import { fermeture } from "@/data/fermeture";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
 
@@ -58,6 +59,21 @@ export function localBusinessSchema() {
         closes: "18:00",
       },
     ],
+    // Fermeture temporaire. Sans cette declaration, les horaires ci-dessus
+    // restent seuls et Google continue d'afficher "Ouvert" pendant les
+    // vacances. `opens` egal a `closes` est la maniere documentee de dire
+    // "ferme toute la journee" sur la periode.
+    ...(fermeture
+      ? {
+          specialOpeningHoursSpecification: {
+            "@type": "OpeningHoursSpecification",
+            opens: "00:00",
+            closes: "00:00",
+            validFrom: new Date().toISOString().slice(0, 10),
+            validThrough: fermeture.jusquAu,
+          },
+        }
+      : {}),
     sameAs: ["https://www.instagram.com/airfly972", "https://www.facebook.com/airfly972"],
     sport: ["Kitesurfing", "Wing foiling", "Kitefoiling"],
   };
