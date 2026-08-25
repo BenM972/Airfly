@@ -22,18 +22,23 @@ export function getResend(): Resend {
 /**
  * Expediteur des notifications.
  *
- * Resend REFUSE d'envoyer depuis un domaine qu'il n'a pas verifie : tant que
- * airfly972.com ne l'est pas, l'envoi echoue en 403 et la demande n'arrive
- * nulle part. La verification se fait dans Resend, qui fournit des
- * enregistrements a poser sur un SOUS-DOMAINE, `send.airfly972.com`, jamais
- * sur l'apex — les poser sur l'apex ecraserait les MX de Google Workspace et
- * couperait la messagerie.
+ * Le sous-domaine et non l'apex, parce que Resend REFUSE d'envoyer depuis un
+ * domaine qu'il n'a pas verifie. Avec info@airfly972.com, il repondait :
+ *   403 "The airfly972.com domain is not verified."
+ * La demande etait enregistree en base, mais la notification mourait la.
+ * Seul send.airfly972.com est verifie, d'ou cette adresse.
  *
- * RESEND_FROM permet de surcharger, par exemple le temps d'utiliser le bac a
- * sable `onboarding@resend.dev`, qui ne delivre qu'au proprietaire du compte.
+ * L'expediteur visible importe peu ici : ces messages ne quittent pas
+ * l'entreprise, ils vont de la boutique a sa propre boite. Et `replyTo` porte
+ * l'adresse du client, donc repondre fonctionne normalement.
+ *
+ * Pour revenir a info@airfly972.com : ajouter airfly972.com comme domaine dans
+ * Resend, avec "receiving" DESACTIVE — il ne demande alors que des CNAME,
+ * aucun MX, donc aucun risque pour les MX de Google Workspace. Une fois
+ * verifie, remplacer la valeur ci-dessous.
  */
 export function mailFrom(): string {
-  return process.env.RESEND_FROM ?? "AIRFLY <info@airfly972.com>";
+  return process.env.RESEND_FROM ?? "AIRFLY <notifications@send.airfly972.com>";
 }
 
 /** Destinataire principal des notifications internes. */
