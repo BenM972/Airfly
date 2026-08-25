@@ -53,7 +53,12 @@ export function mailTo(): string {
  * apparaitre dans un "repondre a tous".
  */
 export function mailBcc(): string[] {
-  const brut = process.env.NOTIFY_BCC ?? "hello@airfly972.com";
+  // contact@bmconsultingfwi.fr et non hello@airfly972.com : un domaine n'a
+  // qu'un seul jeu de MX, ceux d'airfly972.com pointent vers Google Workspace,
+  // et la boite hello@ avait ete creee chez Hostinger — elle n'aurait donc
+  // jamais rien recu. A rebasculer sur hello@airfly972.com le jour ou l'adresse
+  // existera dans Google Workspace, en alias ou en groupe.
+  const brut = process.env.NOTIFY_BCC ?? "contact@bmconsultingfwi.fr";
   return brut
     .split(",")
     .map((a) => a.trim())
