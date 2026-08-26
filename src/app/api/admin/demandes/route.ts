@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { getSupabase } from "@/lib/supabase";
 import { getResend, mailFrom } from "@/lib/email";
 import { tablePour, type Statut } from "@/lib/demandes";
+import { evenementCours } from "@/lib/emails/calendrier";
 import {
   boutiqueAnnulee,
   boutiquePrete,
@@ -100,7 +101,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, courriel: "aucun" });
   }
 
-  const { sujet, html } = composerCourriel({
+  const { sujet, html, piecesJointes } = composerCourriel({
     origine,
     statut,
     demande: avant,
@@ -115,6 +116,8 @@ export async function POST(req: NextRequest) {
       to: String(avant.email),
       subject: sujet,
       html,
+      // Champ omis s'il n'y a rien a joindre : Resend refuse un tableau vide.
+      ...(piecesJointes.length ? { attachments: piecesJointes } : {}),
     });
   } catch (err) {
     console.error("[admin/demandes] envoi au client:", err);
@@ -141,22 +144,46 @@ function composerCourriel({
   dateConfirmee: string | null;
   creneauConfirme: string | null;
   reprogrammation: boolean;
-}): { sujet: string; html: string } {
+}): { sujet: string; html: string; piecesJointes: { filename: string; content: string }[] } {
   if (origine === "ecole") {
     const d = demande as unknown as Parameters<typeof ecoleConfirmee>[0];
     if (statut === "annulee") {
-      return { sujet: "Votre demande de cours — Airfly", html: ecoleAnnulee(d) };
+      return { sujet: "Votre demande de cours — Airfly", html: ecoleAnnulee(d), piecesJointes: [] };
     }
+    // SEQUENCE doit croitre a chaque reprogrammation, sinon les agendas
+    // ignorent la mise a jour et gardent l'ancienne date. Les secondes ecoulees
+    // depuis 2026 font l'affaire : toujours croissantes, et loin sous la borne
+    // de 2^31 qu'impose la norme.
+    const sequence = Math.floor((Date.now() - Date.UTC(2026, 0, 1)) / 1000);
     return {
       sujet: reprogrammation
         ? `Votre cours est reprogramme — ${dateEnClair(dateConfirmee)}`
         : `Cours confirme — ${dateEnClair(dateConfirmee)}`,
       html: ecoleConfirmee(d, dateConfirmee ?? "", creneauConfirme ?? "", reprogrammation),
+      piecesJointes: dateConfirmee
+        ? [
+            {
+              filename: "cours-airfly.ics",
+              content: Buffer.from(
+                evenementCours({
+                  id: String(demande.id),
+                  date: dateConfirmee,
+                  creneau: creneauConfirme,
+                  discipline: String(demande.discipline ?? "Cours"),
+                  prestation: String(demande.prestation ?? ""),
+                  organisateur: "info@airfly972.com",
+                  sequence,
+                }),
+                "utf8"
+              ).toString("base64"),
+            },
+          ]
+        : [],
     };
   }
 
   const d = demande as unknown as Parameters<typeof boutiquePrete>[0];
   return statut === "annulee"
-    ? { sujet: "Votre reservation — Airfly", html: boutiqueAnnulee(d) }
-    : { sujet: "Votre commande vous attend — Airfly", html: boutiquePrete(d) };
+    ? { sujet: "Votre reservation — Airfly", html: boutiqueAnnulee(d), piecesJointes: [] }
+    : { sujet: "Votre commande vous attend — Airfly", html: boutiquePrete(d), piecesJointes: [] };
 }
