@@ -130,3 +130,42 @@ GRANT SELECT ON heartbeat TO anon;
 DROP POLICY IF EXISTS heartbeat_lecture_publique ON heartbeat;
 CREATE POLICY heartbeat_lecture_publique ON heartbeat
   FOR SELECT TO anon USING (true);
+
+-- ─── Suivi des demandes ──────────────────────────────────────────────────────
+-- Chaque demande, cours ou click & collect, suit le meme cycle : elle arrive en
+-- attente, la boutique la confirme ou l'annule depuis le back office, et le
+-- client est notifie a chaque changement.
+--
+-- `en_attente` est le defaut : les lignes creees avant cette migration
+-- basculent donc dans cet etat, ce qui est exact — personne ne les avait
+-- encore traitees.
+
+ALTER TABLE submissions       ADD COLUMN IF NOT EXISTS statut TEXT NOT NULL DEFAULT 'en_attente';
+ALTER TABLE shop_reservations ADD COLUMN IF NOT EXISTS statut TEXT NOT NULL DEFAULT 'en_attente';
+
+-- La contrainte est posee separement et rejouable : ADD CONSTRAINT n'accepte
+-- pas IF NOT EXISTS, et un simple ADD ferait echouer tout le fichier au
+-- deuxieme passage.
+ALTER TABLE submissions       DROP CONSTRAINT IF EXISTS submissions_statut_valide;
+ALTER TABLE submissions       ADD  CONSTRAINT submissions_statut_valide
+  CHECK (statut IN ('en_attente', 'confirmee', 'annulee'));
+ALTER TABLE shop_reservations DROP CONSTRAINT IF EXISTS shop_reservations_statut_valide;
+ALTER TABLE shop_reservations ADD  CONSTRAINT shop_reservations_statut_valide
+  CHECK (statut IN ('en_attente', 'confirmee', 'annulee'));
+
+-- Date et creneau REELLEMENT retenus pour un cours, distincts de ceux que le
+-- client a souhaites : la boutique peut proposer autre chose, et reprogrammer
+-- ensuite. Les colonnes d'origine gardent la demande initiale, ce qui permet
+-- de voir l'ecart.
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS date_confirmee   DATE;
+ALTER TABLE submissions ADD COLUMN IF NOT EXISTS creneau_confirme TEXT;
+
+-- Horodatage du dernier traitement par la boutique, pour trier le back office
+-- et savoir depuis quand une demande attend.
+ALTER TABLE submissions       ADD COLUMN IF NOT EXISTS traite_le TIMESTAMPTZ;
+ALTER TABLE shop_reservations ADD COLUMN IF NOT EXISTS traite_le TIMESTAMPTZ;
+
+-- Le back office liste les demandes en attente d'abord, les plus recentes en
+-- tete : c'est l'ordre de lecture naturel.
+CREATE INDEX IF NOT EXISTS idx_submissions_statut       ON submissions(statut, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_shop_reservations_statut ON shop_reservations(statut, created_at DESC);

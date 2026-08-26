@@ -35,6 +35,21 @@ export default async function AdminDashboard() {
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* En premier : c'est la seule carte qui reclame une action, et un
+              client attend au bout de chaque demande non traitee. */}
+          <Link
+            href="/admin/demandes"
+            className="group bg-gray-900 border border-gray-800 hover:border-[#FF0080] p-8 transition-colors duration-200 sm:col-span-2"
+          >
+            <div className="text-[#FF0080] text-2xl mb-3">◆</div>
+            <p className="text-white uppercase tracking-widest text-sm mb-2" style={{ fontFamily: "Mirloanne, serif" }}>
+              Demandes
+            </p>
+            <p className="text-gray-500 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+              Demandes de cours et reservations click &amp; collect. Confirmer, reprogrammer ou annuler previent le client par courriel.
+            </p>
+          </Link>
+
           <Link
             href="/admin/products"
             className="group bg-gray-900 border border-gray-800 hover:border-[#FF0080] p-8 transition-colors duration-200"

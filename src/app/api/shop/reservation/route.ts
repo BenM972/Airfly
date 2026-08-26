@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSupabase } from "@/lib/supabase";
 import { guardFormSubmission } from "@/lib/formGuard";
 import { isHoneypotFilled } from "@/lib/honeypot";
-import { escapeHtml, getResend, mailBcc, mailFrom, mailTo } from "@/lib/email";
+import { getResend, mailBcc, mailFrom, mailTo } from "@/lib/email";
+import { boutiqueAccuse, boutiqueInterne } from "@/lib/emails/modeles";
 
 type CartItem = { name: string; variante: string | null; qty: number };
 
@@ -31,10 +32,6 @@ export async function POST(req: NextRequest) {
     .map((i) => `${i.qty}× ${i.name}${i.variante ? ` — ${i.variante}` : ""}`)
     .join("\n");
 
-  const articlesHTML = (items as CartItem[])
-    .map((i) => `<li><strong>${escapeHtml(i.qty)}×</strong> ${escapeHtml(i.name)}${i.variante ? ` — <em>${escapeHtml(i.variante)}</em>` : ""}</li>`)
-    .join("");
-
   try {
     const { error: insertError } = await getSupabase().from("shop_reservations").insert({
       prenom,
@@ -51,8 +48,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 
-  // La reservation est enregistree : un echec d'email ne doit plus la faire
-  // passer pour perdue, sinon le client resoumet et cree un doublon.
+  // Notifications. La reservation est enregistree : un echec d'envoi ne doit
+  // plus la faire passer pour perdue, sinon le client resoumet et cree un
+  // doublon. Chaque envoi est isole — une adresse client qui rebondit ne doit
+  // pas priver la boutique de sa notification.
+  const recuLe = new Date().toLocaleString("fr-FR", { timeZone: "America/Martinique" });
+  const pourModele = {
+    prenom: String(prenom),
+    nom: String(nom),
+    email: String(email),
+    telephone: telephone ? String(telephone) : null,
+    articles: articlesText,
+    date_retrait: date_retrait || null,
+    creneau: creneau || null,
+  };
+
   try {
     const copiesCachees = mailBcc();
     await getResend().emails.send({
@@ -62,21 +72,23 @@ export async function POST(req: NextRequest) {
       ...(copiesCachees.length ? { bcc: copiesCachees } : {}),
       replyTo: String(email),
       subject: `Nouvelle reservation click & collect — ${prenom} ${nom}`,
-      html: `
-        <h2>Nouvelle reservation click &amp; collect</h2>
-        <h3>Articles :</h3>
-        <ul>${articlesHTML}</ul>
-        <hr/>
-        <p><strong>Client :</strong> ${escapeHtml(prenom)} ${escapeHtml(nom)}</p>
-        <p><strong>Email :</strong> ${escapeHtml(email)}</p>
-        <p><strong>Tel :</strong> ${escapeHtml(telephone) || "—"}</p>
-        <p><strong>Date souhaitee :</strong> ${escapeHtml(date_retrait) || "—"}</p>
-        <p><strong>Creneau :</strong> ${escapeHtml(creneau) || "—"}</p>
-      `,
+      html: boutiqueInterne(pourModele, recuLe),
     });
   } catch (emailErr) {
-    console.error("[shop-reservation] erreur email:", emailErr);
+    console.error("[shop-reservation] email interne:", emailErr);
   }
+
+  try {
+    await getResend().emails.send({
+      from: mailFrom(),
+      to: String(email),
+      subject: "Votre reservation click & collect — Airfly",
+      html: boutiqueAccuse(pourModele),
+    });
+  } catch (emailErr) {
+    console.error("[shop-reservation] accuse client:", emailErr);
+  }
+
 
   return NextResponse.json({ ok: true });
 }
