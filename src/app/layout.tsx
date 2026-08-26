@@ -8,6 +8,7 @@ import Preloader from "@/components/Preloader";
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/shop/CartDrawer";
 import DefilementVersAncre from "@/components/DefilementVersAncre";
+import { annonce } from "@/data/annonce";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -57,7 +58,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={cormorant.variable}>
+    // --h-annonce commande a la fois le decalage de la navbar et celui des
+    // ancres. La faire decouler de la presence reelle du bandeau evite le vide
+    // de 36 px qui subsistait quand on retirait l'annonce sans y penser.
+    <html
+      lang="fr"
+      className={cormorant.variable}
+      style={{ "--h-annonce": annonce ? "36px" : "0px" } as React.CSSProperties}
+    >
       <head>
         {/* Mirloanne porte tous les titres : la precharger evite le saut de
             rendu que provoquait sa decouverte tardive via la feuille de style. */}

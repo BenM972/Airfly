@@ -9,12 +9,13 @@
  * structurees (`validThrough`). `libelle` est la phrase lue par le visiteur et
  * s'affiche telle quelle : les deux doivent designer le meme jour.
  *
- * Ecrire "Reouverture jusqu'au 17 octobre" dirait l'inverse de ce qu'on veut.
- * La formulation retenue leve aussi l'ambiguite du "jusqu'au", qui laisse
- * hesiter entre le 17 et le 18.
+ * `jusquAu` est le DERNIER jour de fermeture, pas le jour de reouverture :
+ * c'est ce qu'attend `validThrough` dans les donnees structurees. La boutique
+ * rouvre donc le lendemain, et le libelle le dit explicitement — "jusqu'au 16"
+ * seul laisserait hesiter sur le jour de reprise.
  */
 export const fermeture: { motif: string; libelle: string; jusquAu: string } | null = {
   motif: "Vacances annuelles",
-  libelle: "Fermée jusqu'au 17 octobre inclus",
-  jusquAu: "2026-10-17",
+  libelle: "Fermée jusqu'au 16 octobre — réouverture le 17",
+  jusquAu: "2026-10-16",
 };
