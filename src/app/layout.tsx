@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Preloader from "@/components/Preloader";
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/shop/CartDrawer";
+import DefilementVersAncre from "@/components/DefilementVersAncre";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -64,6 +65,7 @@ export default function RootLayout({
       </head>
       <body>
         <CartProvider>
+          <DefilementVersAncre />
           <Preloader />
           <AnnonceBandeau />
           <Navbar />

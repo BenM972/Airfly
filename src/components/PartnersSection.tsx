@@ -19,9 +19,24 @@ export default function PartnersSection() {
   const secondaires = partners.filter((p) => p.niveau === "secondaire");
 
   return (
-    <section id="partenaires" className="bg-[#f5f0e8] py-24 px-10 md:px-16">
+    <section id="hebergement" className="bg-[#f5f0e8] py-24 px-10 md:px-16">
       <div className="max-w-7xl mx-auto">
-        <SectionTitle title="Partenaires" className="mb-12" />
+        <SectionTitle title="Hebergement" className="mb-4" />
+
+        {/* Introduction : elle porte l'argument que les cartes ne peuvent pas
+            dire, la proximite immediate du spot. Meme largeur et meme centrage
+            que les chapeaux des autres sections du site. */}
+        <p
+          className="mx-auto mb-10 max-w-4xl text-center text-base leading-relaxed text-gray-600 md:mb-14 md:text-lg"
+          style={{ fontFamily: "var(--font-cormorant)" }}
+        >
+          Vous venez rider plusieurs jours ? Dormez sur le spot, littéralement.
+          Nos partenaires sont installés à Pointe Faula, à quelques centaines de
+          mètres du lagon : vous traversez la plage le matin, planche sous le
+          bras, et vous rentrez déjeuner entre deux sessions. Pas de voiture, pas
+          de trajet, pas de matériel à charger — le vent se lève, vous êtes
+          à l&apos;eau.
+        </p>
 
         {principaux.length > 0 && (
           <div className="space-y-20">

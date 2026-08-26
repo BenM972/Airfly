@@ -11,6 +11,7 @@ const links = [
   { label: "A propos", href: "/#apropos" },
   { label: "Shop", href: "/shop" },
   { label: "Ecole", href: "/ecole" },
+  { label: "Hebergement", href: "/#hebergement" },
   { label: "Meteo", href: "/#meteo" },
 ];
 
@@ -52,7 +53,11 @@ export default function Navbar() {
           </Link>
 
           {/* Liens desktop */}
-          <nav className="hidden md:flex items-center gap-10">
+          {/* Le menu deroulant tient jusqu'a 1024 px, pas 768 : la barre porte
+              cinq entrees, le lien vers le spot, trois icones, le panier et le
+              bouton de reservation. A 768 px l'ensemble depassait la largeur
+              disponible — c'etait deja vrai avec quatre entrees. */}
+          <nav className="hidden lg:flex items-center gap-8 xl:gap-10">
             {links.map((link) => (
               <NavLink key={link.href} href={link.href} label={link.label} />
             ))}
@@ -63,7 +68,7 @@ export default function Navbar() {
             href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest"
+            className="hidden lg:flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest"
             style={{ fontFamily: "Mirloanne, serif" }}
             aria-label="Itineraire vers le spot"
           >
@@ -78,7 +83,7 @@ export default function Navbar() {
             href="https://wa.me/596696416727"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden md:flex items-center justify-center w-9 h-9 text-white/70 hover:text-[#25D366] transition-colors duration-200"
+            className="hidden lg:flex items-center justify-center w-9 h-9 text-white/70 hover:text-[#25D366] transition-colors duration-200"
             aria-label="WhatsApp"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
@@ -87,7 +92,7 @@ export default function Navbar() {
           </a>
 
           {/* Réseaux sociaux desktop */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden lg:flex items-center gap-4">
             <a
               href="https://www.instagram.com/airfly972/"
               target="_blank"
@@ -117,7 +122,7 @@ export default function Navbar() {
           {/* Panier desktop */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="hidden md:flex items-center justify-center relative w-9 h-9 text-white/70 hover:text-white transition-colors duration-200"
+            className="hidden lg:flex items-center justify-center relative w-9 h-9 text-white/70 hover:text-white transition-colors duration-200"
             aria-label="Panier"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -131,7 +136,7 @@ export default function Navbar() {
           </button>
 
           {/* CTA desktop */}
-          <div className="hidden md:block">
+          <div className="hidden lg:block">
             <Link
               href="/ecole#reservation"
               className="border border-white text-white uppercase tracking-widest text-base px-5 py-2.5 whitespace-nowrap hover:bg-white hover:text-black transition-colors duration-300"
@@ -144,7 +149,7 @@ export default function Navbar() {
           {/* Panier mobile */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="md:hidden relative flex items-center justify-center w-8 h-8 text-white/70"
+            className="lg:hidden relative flex items-center justify-center w-8 h-8 text-white/70"
             aria-label="Panier"
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -159,7 +164,7 @@ export default function Navbar() {
 
           {/* Hamburger mobile */}
           <button
-            className="md:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8 z-[70]"
+            className="lg:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8 z-[70]"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -212,7 +217,10 @@ export default function Navbar() {
               >
                 <Link
                   href={link.href}
-                  onClick={() => setMenuOpen(false)}
+                  onClick={(e) => {
+                    setMenuOpen(false);
+                    clicVersAncre(link.href, pathname)(e);
+                  }}
                   className="block py-3 px-6 text-white uppercase tracking-widest text-2xl"
                   style={{ fontFamily: "Mirloanne, serif" }}
                 >
@@ -282,12 +290,38 @@ export default function Navbar() {
   );
 }
 
+/**
+ * Clic sur un lien d'ancre.
+ *
+ * Quand la cible est sur la page courante, `Link` change le hash via
+ * l'API History — qui n'emet ni `hashchange` ni changement de chemin. Rien ne
+ * peut donc reagir, et le routeur, ne voyant pas de changement de route, ne
+ * defile pas non plus : le lien parait mort. On fait le travail nous-memes.
+ *
+ * Vers une AUTRE page, on laisse Next naviguer : DefilementVersAncre vise
+ * l'ancre au montage de la page d'arrivee.
+ */
+function clicVersAncre(href: string, cheminCourant: string) {
+  return (e: React.MouseEvent) => {
+    const [chemin, ancre] = href.split("#");
+    if (!ancre) return;
+    if ((chemin || "/") !== cheminCourant) return;
+    const cible = document.getElementById(ancre);
+    if (!cible) return;
+    e.preventDefault();
+    history.replaceState(null, "", href);
+    cible.scrollIntoView({ block: "start" });
+  };
+}
+
 function NavLink({ href, label }: { href: string; label: string }) {
   const [hovered, setHovered] = useState(false);
+  const pathname = usePathname();
 
   return (
     <Link
       href={href}
+      onClick={clicVersAncre(href, pathname)}
       className="relative flex flex-col items-center gap-0.5 group"
       style={{ fontFamily: "Mirloanne, serif" }}
       onMouseEnter={() => setHovered(true)}

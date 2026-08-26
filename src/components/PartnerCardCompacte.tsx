@@ -52,7 +52,7 @@ export default function PartnerCardCompacte({ partner }: { partner: Partner }) {
             object-cover — le cadrage se fait a l'affichage, la photo source
             reste en 16/9. */}
         {image && (
-          <div className="relative w-28 shrink-0 self-stretch overflow-hidden sm:w-40">
+          <div className="relative w-24 shrink-0 self-stretch overflow-hidden sm:w-40">
             <Image
               src={image.src}
               alt={image.alt}
@@ -63,7 +63,7 @@ export default function PartnerCardCompacte({ partner }: { partner: Partner }) {
           </div>
         )}
 
-        <div className={`flex flex-1 items-center gap-5 py-6 pr-6 ${image ? "pl-6" : "pl-8"}`}>
+        <div className={`flex flex-1 items-center gap-3 py-5 pr-4 sm:gap-5 sm:py-6 sm:pr-6 ${image ? "pl-4 sm:pl-6" : "pl-6 sm:pl-8"}`}>
           {partner.logo && (
             <>
               <div className="relative h-12 w-24 shrink-0">
@@ -83,7 +83,7 @@ export default function PartnerCardCompacte({ partner }: { partner: Partner }) {
               {stripAccents(partner.location)}
             </p>
             <p
-              className="text-2xl font-light leading-snug text-gray-900"
+              className="text-xl font-light leading-snug text-gray-900 sm:text-2xl"
               style={{ fontFamily: "var(--font-cormorant)" }}
             >
               {partner.name}
@@ -98,8 +98,10 @@ export default function PartnerCardCompacte({ partner }: { partner: Partner }) {
 
           {/* Decoratif : la nature de lien est deja portee par la balise, et le
               libelle accessible par le texte de la carte. */}
+          {/* Masquee en etroit : purement decorative, elle coutait 44 px
+              sur les 295 disponibles, au detriment du nom du partenaire. */}
           <span
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-300 text-gray-500 transition-all duration-300 group-hover:border-gray-900 group-hover:bg-gray-900 group-hover:text-white motion-reduce:transition-none"
+            className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gray-300 text-gray-500 transition-all duration-300 group-hover:border-gray-900 group-hover:bg-gray-900 group-hover:text-white motion-reduce:transition-none sm:flex"
             aria-hidden="true"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

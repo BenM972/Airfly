@@ -77,8 +77,12 @@ export default function Hero() {
 
       <HeroTicker />
 
-      {/* Panels mobile — empilés verticalement */}
-      <div className="flex flex-col md:hidden w-full h-full">
+      {/* Panels mobile — empilés verticalement.
+          `divide-y` trace un filet d'un pixel entre les panneaux, jamais avant
+          le premier ni apres le dernier : les trois photos se touchent sinon,
+          et la limite entre elles se devine mal. Le conteneur etant deja
+          md:hidden, le filet ne concerne que le mobile. */}
+      <div className="flex flex-col md:hidden w-full h-full divide-y divide-white/25">
         {panels.map((panel, i) => (
           // Seul le premier panneau est prioritaire : marquer les trois les
           // faisait se disputer la bande passante, sans qu'aucun ne le soit.

@@ -3,7 +3,24 @@
 /* Hauteur du bandeau d'annonce. La navbar etant en `fixed`, elle doit etre
    decalee d'exactement cette valeur : une hauteur declaree evite de la
    mesurer au jugé et de voir les deux se chevaucher. */
-:root { --h-annonce: 36px; }
+/* Hauteur de la barre de navigation, utilisee pour decaler les ancres. */
+:root { --h-annonce: 36px; --h-navbar: 56px; }
+
+/* Ancres de navigation.
+   Le bandeau et la barre sont tous deux `fixed` : sans ce decalage, cliquer
+   sur "Hebergement" ou "Meteo" amene le titre de la section DERRIERE eux, et
+   le visiteur croit que le lien n'a pas fonctionne. Les 1,5rem ajoutes sont
+   la respiration au-dessus du titre, plus l'ecart que la barre prend quand
+   elle passe en mode compact. */
+section[id] {
+  scroll-margin-top: calc(var(--h-annonce) + var(--h-navbar) + 1.5rem);
+}
+
+/* Deplacement doux vers les ancres, sauf pour qui a demande la reduction des
+   animations : un saut instantane reste alors le comportement attendu. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
 
 @font-face {
   font-family: "Mirloanne";
