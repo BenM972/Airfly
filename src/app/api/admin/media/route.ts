@@ -20,7 +20,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Fichier trop volumineux (10 Mo max)" }, { status: 413 });
   }
 
-  const user = process.env.WP_APP_USER!;
+  // WordPress accepte l'identifiant OU l'adresse comme login d'un mot de passe
+  // d'application. WP_APP_USER contenait une valeur que WordPress ne reconnait
+  // pas : l'envoi de photos depuis le back office repondait 401 sans que rien
+  // ne le signale. On privilegie donc l'adresse, verifiee fonctionnelle.
+  const user = process.env.WP_APP_USER_EMAIL || process.env.WP_APP_USER!;
   const pass = process.env.WP_APP_PASSWORD!;
   const credentials = Buffer.from(`${user}:${pass}`).toString("base64");
 
