@@ -31,7 +31,14 @@ export default function ShopProductCard({ product, index }: Props) {
       >
         {/* Image */}
         <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 mb-4 p-3">
-          <div className="relative w-full h-full">
+          {/* Le bandeau "Voir le produit" est toujours visible sur mobile et
+              recouvre le bas du cadre. L'image, centree sur la hauteur totale,
+              paraissait donc poussee vers le bas. On lui retire cette hauteur
+              pour qu'elle se centre dans la zone REELLEMENT visible.
+              `inset-0` d'une image `fill` se cale sur la boite de rembourrage :
+              un padding sur le parent ne la decalerait pas, il faut donc
+              positionner ce conteneur explicitement. */}
+          <div className="absolute inset-x-3 top-3 bottom-14 md:bottom-3">
           {image ? (
             <>
               <Image
@@ -74,7 +81,11 @@ export default function ShopProductCard({ product, index }: Props) {
         </div>
 
         {/* Info */}
-        <div className="flex items-baseline justify-between gap-2">
+        {/* Empiles sur mobile, cote a cote a partir de sm.
+            Sur une demi-largeur de telephone, mettre le titre et le prix sur la
+            meme ligne comprimait le titre sur trois lignes et tronquait le
+            prix. Un prix a moitie lisible est pire que pas de prix. */}
+        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-2">
           <p
             className="text-gray-900 text-base leading-snug"
             style={{ fontFamily: "var(--font-cormorant)" }}
@@ -83,7 +94,7 @@ export default function ShopProductCard({ product, index }: Props) {
           </p>
           {price && (
             <p
-              className="text-sm shrink-0 flex items-baseline gap-2"
+              className="text-sm flex items-baseline gap-2 whitespace-nowrap sm:shrink-0"
               style={{ fontFamily: "Mirloanne, serif" }}
             >
               {prixBarre && (

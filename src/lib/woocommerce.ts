@@ -182,12 +182,41 @@ export function getCategories(): Promise<WCCategory[]> {
  * En cas d'echec d'extraction on ne devine rien : le produit s'affiche au bon
  * prix, simplement sans prix barre.
  */
+/**
+ * Normalise un montant tel que WooCommerce l'ecrit en HTML.
+ *
+ * Le format depend des reglages de la boutique, pas de la langue du site : ici
+ * WooCommerce rend "1,169.00" — virgule pour les milliers, point pour les
+ * decimales. Une lecture naive y lisait "1,16", et la grille affichait donc
+ * 1,16 EUR barre au lieu de 1 169 EUR.
+ *
+ * Regle appliquee : le dernier separateur suivi d'exactement une ou deux
+ * decimales et de rien d'autre est le separateur decimal ; tous les autres
+ * sont des separateurs de milliers. "1,169.00" et "1 169,00" donnent donc tous
+ * deux 1169.00, et "25" reste 25.
+ */
+export function normaliserMontant(brut: string): string | null {
+  const nettoye = brut.replace(/[^\d.,]/g, "");
+  if (!nettoye) return null;
+
+  const decimal = nettoye.match(/[.,](\d{1,2})$/);
+  if (!decimal) {
+    const entier = nettoye.replace(/[.,]/g, "");
+    return entier || null;
+  }
+  const position = nettoye.lastIndexOf(decimal[0][0]);
+  const partieEntiere = nettoye.slice(0, position).replace(/[.,]/g, "");
+  return `${partieEntiere || "0"}.${decimal[1]}`;
+}
+
 function prixInitialDepuisHtml(html: string | undefined): string | null {
   if (!html) return null;
   const del = html.match(/<del[^>]*>([\s\S]*?)<\/del>/);
   if (!del) return null;
-  const nombre = del[1].replace(/<[^>]+>/g, "").match(/([0-9]+(?:[.,][0-9]{1,2})?)/);
-  return nombre ? nombre[1].replace(",", ".") : null;
+  // Les entites sont retirees avec les balises : "&euro;" precede le montant et
+  // ses chiffres pollueraient la lecture.
+  const texte = del[1].replace(/<[^>]+>/g, "").replace(/&[a-z]+;|&#\d+;/gi, "");
+  return normaliserMontant(texte);
 }
 
 export function toCatalogueProduct(products: WCProduct[]): WCProduct[] {
