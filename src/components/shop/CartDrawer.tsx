@@ -89,7 +89,7 @@ export default function CartDrawer() {
                       {items.map((item) => (
                         <div key={item.id} className="flex gap-4 py-4 border-b border-gray-100">
                           {/* Image */}
-                          <div className="relative w-16 h-20 bg-white border border-gray-100 shrink-0 overflow-hidden">
+                          <div className="relative w-16 h-20 bg-white shrink-0 overflow-hidden">
                             {item.image ? (
                               <Image src={item.image} alt={item.name} fill className="object-cover" sizes="64px" />
                             ) : (

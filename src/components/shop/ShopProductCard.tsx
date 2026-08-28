@@ -33,8 +33,9 @@ export default function ShopProductCard({ product, index }: Props) {
         {/* Cadre blanc et non gris : cinq photos sur douze ont un fond blanc
             massif, qui dessinait un rectangle clair sur le gris. Les sept
             autres sont deja transparentes et se posent aussi bien sur blanc.
-            Un filet remplace le fond pour que la grille garde son rythme. */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-white border border-gray-100 mb-4 p-3">
+            Aucune bordure : le cadre doit disparaitre entierement, sinon on
+            remplace un rectangle visible par un autre. */}
+        <div className="relative aspect-[3/4] overflow-hidden bg-white mb-4 p-3">
           {/* Le bandeau "Voir le produit" est toujours visible sur mobile et
               recouvre le bas du cadre. L'image, centree sur la hauteur totale,
               paraissait donc poussee vers le bas. On lui retire cette hauteur

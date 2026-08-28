@@ -254,7 +254,7 @@ export default function ProductDetail({ product, variations }: Props) {
 
             <div className="flex-1">
               <div
-                className="relative aspect-[3/4] overflow-hidden bg-white border border-gray-100 cursor-zoom-in"
+                className="relative aspect-[3/4] overflow-hidden bg-white cursor-zoom-in"
                 onClick={openLightbox}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => { isHovering.current = true; setZoomed(true); }}
