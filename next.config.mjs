@@ -1,3 +1,5 @@
+import { redirectionsAnciennesUrls } from "./redirections-anciennes-urls.mjs";
+
 /** @type {import('next').NextConfig} */
 
 // Hote WooCommerce, deduit de WC_URL quand la variable est disponible au build.
@@ -99,7 +101,14 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return [];
+    // Les redirections des anciennes URLs ne sont PAS conditionnees au domaine :
+    // elles doivent aussi fonctionner en local et en preproduction, ne serait-ce
+    // que pour etre testables. Seule la bascule www -> apex l'est, puisqu'elle
+    // n'a de sens qu'en production.
+    const anciennes = redirectionsAnciennesUrls();
+
+    if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return anciennes;
+
     return [
       {
         source: "/:path*",
@@ -107,6 +116,7 @@ const nextConfig = {
         destination: "https://airfly972.com/:path*",
         permanent: true,
       },
+      ...anciennes,
     ];
   },
 };

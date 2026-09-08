@@ -17,8 +17,12 @@ export default function SpotSection() {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
+  // `id="spot"` sert de cible aux redirections des anciennes URLs
+  // (/pointe-faula du Squarespace, /spot.html et /vauclin_kite.html des
+  // versions plus anciennes) : sans ancre, elles retombaient en haut de
+  // l'accueil, loin du sujet cherche.
   return (
-    <section className="bg-[#f5f0e8] py-24 px-10 md:px-16 overflow-hidden" ref={ref}>
+    <section id="spot" className="bg-[#f5f0e8] py-24 px-10 md:px-16 overflow-hidden" ref={ref}>
       <div className="max-w-7xl mx-auto">
 
         <SectionTitle title="Le Spot" className="mb-12" />
