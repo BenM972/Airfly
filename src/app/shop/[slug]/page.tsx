@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getProductBySlug, getVariations, toPlainText } from "@/lib/woocommerce";
+import { getProductBySlug, getProducts, getVariations, toPlainText } from "@/lib/woocommerce";
 import ProductDetail from "@/components/shop/ProductDetail";
 import JsonLd from "@/components/JsonLd";
 import { breadcrumbSchema, productSchema } from "@/lib/schema";
+import ProduitsSimilaires, { choisirSimilaires } from "@/components/shop/ProduitsSimilaires";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -47,9 +48,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       url: `/shop/${product.slug}`,
       type: "website",
+      // Repli sur le visuel du site quand la fiche n'a pas de photo : trois
+      // produits sont dans ce cas et n'avaient aucun apercu au partage. Ce
+      // repli ne vaut que pour l'apercu social — le `Product.image` du JSON-LD
+      // reste vide, car y mettre une photo qui n'est pas celle du produit
+      // serait une fausse declaration.
       images: product.images?.[0]?.src
         ? [{ url: product.images[0].src, alt: product.images[0].alt || name }]
-        : undefined,
+        : [{ url: "/hero_materiel.jpg", width: 1200, height: 630, alt: "Airfly, surf shop a Pointe Faula, Martinique" }],
     },
   };
 }
@@ -62,6 +68,11 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound();
 
   const variations = product.type === "variable" ? await getVariations(product.id) : [];
+
+  // `getProducts` partage le cache de la page catalogue (revalidate 300) :
+  // proposer des fiches liees ne multiplie donc pas les appels a WooCommerce,
+  // dont la fragilite sous rafale est documentee plus haut.
+  const similaires = choisirSimilaires(product, await getProducts());
 
   const category = product.categories?.[product.categories.length - 1];
 
@@ -76,6 +87,7 @@ export default async function ProductPage({ params }: Props) {
         ])}
       />
       <ProductDetail product={product} variations={variations} />
+      <ProduitsSimilaires produits={similaires} marque={product.brands?.[0]?.name} />
     </>
   );
 }

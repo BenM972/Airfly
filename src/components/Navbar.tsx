@@ -44,7 +44,7 @@ export default function Navbar() {
           <Link href="/" className="flex-shrink-0">
             <Image
               src="/logo-airfly.webp"
-              alt="Airfly Surf Shop"
+              alt="Airfly"
               width={55}
               height={22}
               className="object-contain"

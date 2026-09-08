@@ -466,11 +466,18 @@ export default function ProductDetail({ product, variations }: Props) {
             {/* Description longue */}
             {product.description && (
               <details className="mt-10 border-t border-gray-100 pt-6" open>
-                <summary
-                  className="text-xs uppercase tracking-widest text-gray-500 cursor-pointer hover:text-gray-900 transition-colors"
-                  style={{ fontFamily: "Mirloanne, serif" }}
-                >
-                  Description complete
+                {/* Le titre est un h2 : les cinquante-six fiches produit
+                    n'avaient aucun titre intermediaire, ce qui laissait une
+                    structure plate — mauvais pour la lecture d'ecran comme pour
+                    l'extraction d'un passage par un moteur. `summary` accepte
+                    du contenu de titre, la semantique du repli est preservee. */}
+                <summary className="cursor-pointer list-item">
+                  <h2
+                    className="inline text-xs uppercase tracking-widest text-gray-500 hover:text-gray-900 transition-colors font-normal"
+                    style={{ fontFamily: "Mirloanne, serif" }}
+                  >
+                    Description complete
+                  </h2>
                 </summary>
                 <div
                   className="mt-4 text-gray-600 text-base leading-relaxed prose prose-sm max-w-none"

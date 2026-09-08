@@ -52,7 +52,7 @@ export default function PartnerCard({ partner, index }: Props) {
       <div className={!image ? "md:col-span-2 md:max-w-3xl" : ""}>
         {partner.logo && (
           <div className="relative h-11 w-36 mb-6">
-            <Image src={partner.logo} alt="" fill sizes="144px" className="object-contain object-left" />
+            <Image src={partner.logo} alt={partner.name} fill sizes="144px" className="object-contain object-left" />
           </div>
         )}
 

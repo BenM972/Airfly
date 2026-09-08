@@ -1,3 +1,5 @@
+import { redirectionsAnciennesUrls } from "./redirections-anciennes-urls.mjs";
+
 /** @type {import('next').NextConfig} */
 
 // Hote WooCommerce, deduit de WC_URL quand la variable est disponible au build.
@@ -77,6 +79,18 @@ const nextConfig = {
     // AVIF en premier : ~20 a 30 % de moins que le WebP, repli automatique
     // pour les navigateurs qui ne l'annoncent pas.
     formats: ["image/avif", "image/webp"],
+    // Duree de cache des images optimisees. Le defaut de Next place
+    // `max-age=14400`, soit quatre heures, sur des URL pourtant immuables :
+    // /_next/image porte deja la source, la largeur et la qualite dans sa query
+    // string, donc un visuel remplace produit une URL differente. Mesure du
+    // 8 septembre : 1,77 a 2,42 s pour servir une image de 44 Ko a froid, avec
+    // un CDN en MISS ou STALE. Trente et un jours de cache suppriment ces
+    // revalidations sans risque de servir une image perimee.
+    //
+    // Reserve : si WooCommerce reutilise le meme nom de fichier lors du
+    // remplacement d'une photo produit, l'URL ne change pas et l'ancienne image
+    // resterait servie jusqu'a un mois. A verifier avant d'allonger davantage.
+    minimumCacheTTL: 60 * 60 * 24 * 31,
     remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
   async headers() {
@@ -87,7 +101,14 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return [];
+    // Les redirections des anciennes URLs ne sont PAS conditionnees au domaine :
+    // elles doivent aussi fonctionner en local et en preproduction, ne serait-ce
+    // que pour etre testables. Seule la bascule www -> apex l'est, puisqu'elle
+    // n'a de sens qu'en production.
+    const anciennes = redirectionsAnciennesUrls();
+
+    if (!process.env.NEXT_PUBLIC_SITE_URL?.includes("airfly972.com")) return anciennes;
+
     return [
       {
         source: "/:path*",
@@ -95,6 +116,7 @@ const nextConfig = {
         destination: "https://airfly972.com/:path*",
         permanent: true,
       },
+      ...anciennes,
     ];
   },
 };

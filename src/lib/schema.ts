@@ -4,6 +4,7 @@
 import type { WCProduct, WCVariation } from "./woocommerce";
 import { toPlainText } from "./woocommerce";
 import { fermeture } from "@/data/fermeture";
+import { offresPourSchema } from "@/data/tarifs";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
 
@@ -109,8 +110,15 @@ export function productSchema(product: WCProduct, variations: WCVariation[]) {
     url: `${SITE_URL}/shop/${product.slug}`,
     image: product.images?.map((i) => i.src).slice(0, 6) ?? [],
     category: product.categories?.[product.categories.length - 1]?.name,
-    // Pas de champ "brand" : WooCommerce n'expose pas la marque ici, et un
-    // brand inference a partir du nom produirait de fausses declarations.
+    // La marque vient du champ `brands` de WooCommerce, present dans la reponse
+    // de l'API et deja serialise dans la page. L'audit d'aout concluait qu'elle
+    // n'etait pas exposee ; c'etait faux, elle l'etait mais n'etait pas lue.
+    // Elle reste facultative : aucune marque n'est deduite d'un nom de produit,
+    // ce qui produirait de fausses declarations. `brand` conditionne
+    // l'eligibilite aux Merchant listings de Google.
+    ...(product.brands?.[0]?.name
+      ? { brand: { "@type": "Brand", name: product.brands[0].name } }
+      : {}),
     offers: price
       ? {
           "@type": "Offer",
@@ -129,19 +137,14 @@ export function productSchema(product: WCProduct, variations: WCVariation[]) {
 }
 
 /**
- * Les prestations de l'ecole. Tarifs repris de EcoleTarifs.tsx : toute
- * evolution des prix doit etre repercutee ici, sinon Google affichera
- * une offre perimee.
+ * Les prestations de l'ecole.
+ *
+ * Les tarifs ne sont plus recopies ici : ils viennent de `@/data/tarifs`, que
+ * EcoleTarifs.tsx affiche. Les deux listes avaient diverge — six offres
+ * declarees pour treize affichees. Une seule source supprime la classe de bug.
  */
 export function schoolServiceSchema() {
-  const lessons = [
-    { name: "Cours de kitesurf collectif", description: "3 h, 3 élèves maximum", price: "115" },
-    { name: "Cours de kitesurf solo", description: "2 h, encadrement exclusif", price: "200" },
-    { name: "Cours de kitefoil solo", description: "2 h, encadrement exclusif", price: "150" },
-    { name: "Cours de kitefoil duo", description: "2 h, 2 élèves", price: "135" },
-    { name: "Initiation wingfoil", description: "1 h 30, paddle avec une aile de wing, tous niveaux", price: "90" },
-    { name: "Départ de plage", description: "Technique de lancement autonome", price: "85" },
-  ];
+  const lessons = offresPourSchema();
 
   return {
     "@context": "https://schema.org",
