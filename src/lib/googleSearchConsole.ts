@@ -63,9 +63,33 @@ async function jetonAcces(config: ConfigGSC): Promise<string> {
     }),
   );
 
-  const signature = base64url(
-    createSign("RSA-SHA256").update(`${entete}.${charge}`).sign(config.cle),
-  );
+  let signature: string;
+  try {
+    signature = base64url(
+      createSign("RSA-SHA256").update(`${entete}.${charge}`).sign(config.cle),
+    );
+  } catch (e) {
+    // OpenSSL ne dit que "DECODER routines::unsupported", ce qui n'aide
+    // personne. La cause est presque toujours la meme : la cle PEM a perdu ses
+    // sauts de ligne en transitant par un panneau de variables d'environnement.
+    // Un PEM sans separateurs ne se decode pas, alors que la valeur a l'air
+    // parfaitement correcte a l'oeil.
+    const lignes = config.cle.split("\n").filter(Boolean).length;
+    if (lignes <= 1) {
+      throw new Error(
+        "La cle privee est sur une seule ligne : un PEM a besoin de ses sauts de ligne. " +
+          "Recopiez la valeur du champ private_key du fichier JSON telle quelle, avec ses \\n " +
+          "litteraux, entre guillemets doubles — le code les restaure. Certains panneaux " +
+          "d'hebergeur suppriment les vrais retours a la ligne a l'enregistrement, ce qui " +
+          "produit exactement ce cas.",
+      );
+    }
+    throw new Error(
+      `La cle privee n'a pas pu etre lue (${lignes} lignes). Verifiez qu'elle commence par ` +
+        `-----BEGIN PRIVATE KEY----- et se termine par -----END PRIVATE KEY-----. ` +
+        `Detail : ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 
   const res = await fetch(TOKEN_URL, {
     method: "POST",

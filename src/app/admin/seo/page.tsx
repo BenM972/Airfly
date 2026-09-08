@@ -248,13 +248,19 @@ export default async function SeoPage() {
           <p className="text-gray-300 text-sm mb-3" style={{ fontFamily: "var(--font-cormorant)" }}>
             {e instanceof Error ? e.message : "Erreur inconnue"}
           </p>
-          <p className="text-gray-500 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
-            Les causes les plus frequentes : le compte de service n&apos;a pas ete ajoute aux utilisateurs
-            de la propriete, ou <span className="text-gray-400">GSC_SITE_URL</span> ne correspond pas
-            exactement a la propriete declaree — une propriete Domaine s&apos;ecrit
-            <span className="text-gray-400"> sc-domain:airfly972.com</span>, une propriete Prefixe
-            d&apos;URL s&apos;ecrit <span className="text-gray-400">https://airfly972.com/</span>, slash final compris.
-          </p>
+          {/* Le message ci-dessus est desormais explicite pour le cas le plus
+              frequent, la cle privee aplatie sur une ligne. Ces deux autres
+              causes ne valent que si l'erreur vient de Google, pas du decodage
+              de la cle — d'ou le repli conditionnel. */}
+          {!(e instanceof Error && e.message.includes("cle privee")) && (
+            <p className="text-gray-500 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+              Les causes les plus frequentes : le compte de service n&apos;a pas ete ajoute aux utilisateurs
+              de la propriete, ou <span className="text-gray-400">GSC_SITE_URL</span> ne correspond pas
+              exactement a la propriete declaree — une propriete Domaine s&apos;ecrit
+              <span className="text-gray-400"> sc-domain:airfly972.com</span>, une propriete Prefixe
+              d&apos;URL s&apos;ecrit <span className="text-gray-400">https://airfly972.com/</span>, slash final compris.
+            </p>
+          )}
         </div>
       </Cadre>
     );
