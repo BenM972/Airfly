@@ -27,14 +27,54 @@ export type ConfigGSC = { email: string; cle: string; propriete: string };
  * marche a suivre au lieu d'une erreur : tant que le client n'a pas cree son
  * compte de service, l'absence de configuration est l'etat NORMAL, pas une panne.
  */
+/**
+ * Remet une cle PEM en etat, quelle que soit la maniere dont le panneau de
+ * l'hebergeur l'a abimee en la stockant.
+ *
+ * Cinq malformations differentes produisent la MEME erreur OpenSSL,
+ * `DECODER routines::unsupported`, ce qui rend le diagnostic a l'oeil
+ * impraticable — verifie en les rejouant une par une :
+ *
+ *   - aplatie sur une seule ligne, separateurs perdus ;
+ *   - guillemets conserves autour de la valeur, parce qu'un fichier .env les
+ *     retire mais qu'un champ de formulaire les garde ;
+ *   - antislashs doubles, quand le panneau echappe ce qu'on lui donne ;
+ *   - espaces ou retours a la ligne parasites au debut ou a la fin ;
+ *   - combinaisons des precedentes.
+ *
+ * Aucune n'est de la faute de celui qui colle la valeur. On normalise donc au
+ * lieu d'exiger une forme exacte, et on ne signale que ce qui reste vraiment
+ * indechiffrable.
+ */
+function normaliserCle(brute: string): string {
+  let cle = brute.trim();
+
+  // Guillemets simples ou doubles conserves par le champ de saisie.
+  if ((cle.startsWith('"') && cle.endsWith('"')) || (cle.startsWith("'") && cle.endsWith("'"))) {
+    cle = cle.slice(1, -1).trim();
+  }
+
+  // Antislashs doubles d'abord : sinon le remplacement suivant laisse un
+  // antislash orphelin devant chaque saut de ligne.
+  cle = cle.replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
+
+  // Retours chariot Windows, qu'un copier-coller depuis un panneau ramene parfois.
+  cle = cle.replace(/\r/g, "");
+
+  // Espaces en bout de ligne : le base64 du corps PEM ne les tolere pas.
+  return cle
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .join("\n");
+}
+
 export function lireConfig(): ConfigGSC | null {
-  const email = process.env.GSC_SERVICE_ACCOUNT_EMAIL;
-  const propriete = process.env.GSC_SITE_URL;
-  // Les sauts de ligne d'une cle PEM ne survivent pas a un panneau de variables
-  // d'environnement : ils y sont colles en `\n` litteraux, qu'il faut restaurer.
-  const cle = process.env.GSC_PRIVATE_KEY?.replace(/\\n/g, "\n");
-  if (!email || !cle || !propriete) return null;
-  return { email, cle, propriete };
+  const email = process.env.GSC_SERVICE_ACCOUNT_EMAIL?.trim();
+  const propriete = process.env.GSC_SITE_URL?.trim();
+  const brute = process.env.GSC_PRIVATE_KEY;
+  if (!email || !brute || !propriete) return null;
+  return { email, cle: normaliserCle(brute), propriete };
 }
 
 function base64url(donnee: string | Buffer): string {
