@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import AdminLogoutButton from "@/components/admin/AdminLogoutButton";
 import SeoCourbe from "@/components/admin/SeoCourbe";
-import { lireConfig, chargerDonnees, inspecter, type Ligne } from "@/lib/googleSearchConsole";
+import { lireConfig, chargerDonnees, inspecter, listerSitemaps, type Ligne, type Sitemap } from "@/lib/googleSearchConsole";
 
 // Comme le tableau de bord principal : ces chiffres changent tous les jours, un
 // prerendu au build les figerait a la valeur du dernier deploiement.
@@ -230,9 +230,11 @@ export default async function SeoPage() {
 
   let donnees;
   let urls;
+  let sitemaps: Sitemap[] = [];
   try {
     donnees = await chargerDonnees(config);
     urls = await inspecter(config, [SITE, `${SITE}/ecole`, `${SITE}/shop`]);
+    sitemaps = await listerSitemaps(config);
   } catch (e) {
     return (
       <Cadre>
@@ -270,6 +272,20 @@ export default async function SeoPage() {
           du {periode.debut} au {periode.fin} · {donnees.propriete}
         </p>
       </div>
+
+      {actuel.impressions === 0 && (
+        <div className="bg-gray-900 border border-[#FBBF24]/40 px-5 py-4 mb-8 max-w-3xl">
+          <p className="text-[#FBBF24] text-xs uppercase tracking-widest mb-2" style={{ fontFamily: "Mirloanne, serif" }}>
+            Pas encore de donnees
+          </p>
+          <p className="text-gray-400 text-sm" style={{ fontFamily: "var(--font-cormorant)" }}>
+            La connexion fonctionne, mais Search Console n&apos;a rien a servir pour l&apos;instant : les
+            statistiques de performance ne commencent a s&apos;accumuler qu&apos;a partir de la validation de
+            la propriete, sans reprise de l&apos;historique. Comptez deux a trois jours avant les premiers
+            chiffres. L&apos;etat d&apos;indexation ci-dessous, lui, est deja disponible.
+          </p>
+        </div>
+      )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
         <Tuile libelle="Clics" valeur={nombre(actuel.clics)} delta={ecart(actuel.clics, precedent.clics)} />
@@ -353,6 +369,45 @@ export default async function SeoPage() {
           </ul>
         </section>
       </div>
+
+      <section className="bg-gray-900 border border-gray-800 mt-3">
+        <h2 className="text-gray-400 text-xs uppercase tracking-widest px-5 py-4 border-b border-gray-800" style={{ fontFamily: "Mirloanne, serif" }}>
+          Sitemaps declares
+        </h2>
+        {sitemaps.length === 0 ? (
+          <p className="text-gray-600 text-sm px-5 py-6" style={{ fontFamily: "var(--font-cormorant)" }}>
+            Aucun sitemap soumis. Search Console decouvrira quand meme les pages par le lien present dans
+            robots.txt, mais un sitemap soumis explicitement se suit page par page.
+          </p>
+        ) : (
+          <ul>
+            {sitemaps.map((s) => (
+              <li key={s.chemin} className="px-5 py-3 border-t border-gray-800/70">
+                <div className="flex items-start justify-between gap-4">
+                  <p className="text-gray-200 text-sm break-all" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {s.chemin}
+                  </p>
+                  {s.obsolete && (
+                    <span
+                      className="text-[11px] uppercase tracking-widest whitespace-nowrap flex items-center gap-2"
+                      style={{ fontFamily: "Mirloanne, serif", color: "#F87171" }}
+                    >
+                      <span aria-hidden="true" className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: "#F87171" }} />
+                      Obsolete
+                    </span>
+                  )}
+                </div>
+                <p className="text-gray-600 text-xs mt-1 tabular-nums" style={{ fontFamily: "var(--font-cormorant)" }}>
+                  {s.urlsSoumises} URLs · derniere lecture{" "}
+                  {s.derniereLecture ? s.derniereLecture.slice(0, 10) : "jamais"}
+                  {s.erreurs > 0 && ` · ${s.erreurs} erreur${s.erreurs > 1 ? "s" : ""}`}
+                  {s.avertissements > 0 && ` · ${s.avertissements} avertissement${s.avertissements > 1 ? "s" : ""}`}
+                </p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <p className="text-gray-700 text-xs mt-8" style={{ fontFamily: "var(--font-cormorant)" }}>
         Search Console accuse trois jours de retard : la periode s&apos;arrete volontairement a J−3, sans

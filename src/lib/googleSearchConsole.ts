@@ -244,3 +244,54 @@ export async function inspecter(config: ConfigGSC, urls: string[]): Promise<Etat
     }),
   );
 }
+
+export type Sitemap = {
+  chemin: string;
+  derniereLecture: string | null;
+  urlsSoumises: number;
+  erreurs: number;
+  avertissements: number;
+  obsolete: boolean;
+};
+
+type ReponseSitemaps = {
+  sitemap?: {
+    path: string;
+    lastDownloaded?: string;
+    errors?: string;
+    warnings?: string;
+    contents?: { type: string; submitted: string }[];
+  }[];
+};
+
+/**
+ * Sitemaps declares dans Search Console.
+ *
+ * Utile bien au-dela de la curiosite : la propriete d'Airfly ne declarait que
+ * `http://www.airfly972.com/page-sitemap.xml`, un vestige du WordPress lu pour
+ * la derniere fois en octobre 2022, en erreur. Le sitemap actuel n'y figurait
+ * pas. Sans ce panneau, rien dans le back office ne l'aurait montre.
+ *
+ * `obsolete` marque un sitemap qui ne pointe pas vers le domaine canonique
+ * courant : c'est presque toujours le residu d'une generation precedente du site.
+ */
+export async function listerSitemaps(config: ConfigGSC): Promise<Sitemap[]> {
+  const jeton = await jetonAcces(config);
+  const res = await fetch(
+    `${API}/webmasters/v3/sites/${encodeURIComponent(config.propriete)}/sitemaps`,
+    { headers: { Authorization: `Bearer ${jeton}` }, cache: "no-store" },
+  );
+  if (!res.ok) return [];
+
+  const data = (await res.json()) as ReponseSitemaps;
+  const canonique = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com").replace(/\/$/, "");
+
+  return (data.sitemap ?? []).map((s) => ({
+    chemin: s.path,
+    derniereLecture: s.lastDownloaded ?? null,
+    urlsSoumises: Number(s.contents?.find((c) => c.type === "web")?.submitted ?? 0),
+    erreurs: Number(s.errors ?? 0),
+    avertissements: Number(s.warnings ?? 0),
+    obsolete: !s.path.startsWith(canonique),
+  }));
+}
