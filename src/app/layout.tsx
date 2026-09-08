@@ -35,6 +35,13 @@ export const metadata: Metadata = {
   applicationName: "Airfly",
   alternates: { canonical: "/" },
   icons: { icon: "/logo-airfly.webp" },
+  // Jeton de validation Search Console, pose seulement s'il est fourni.
+  // Utile pour une propriete de type "prefixe d'URL" ; une propriete "Domaine",
+  // qui couvre l'apex, le www, le http et le https d'un coup, se valide par un
+  // enregistrement DNS TXT et n'a pas besoin de cette balise.
+  ...(process.env.GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION } }
+    : {}),
   openGraph: {
     type: "website",
     locale: "fr_FR",
