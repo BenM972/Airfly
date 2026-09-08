@@ -1,48 +1,30 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, useInView, AnimatePresence } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import SectionTitle from "../SectionTitle";
 import Link from "next/link";
+import { disciplines, tarifs, kiteLoyaltyRates, options, type Discipline } from "@/data/tarifs";
 
-const tabs = ["Kitesurf", "Wingfoil", "Kitefoil"] as const;
-type Tab = typeof tabs[number];
-
-const tarifs: Record<Tab, { label: string; detail: string; price: string; badge?: string; note?: string }[]> = {
-  Kitesurf: [
-    { label: "Cours collectif", detail: "3h · 3 eleves max", price: "115 €", badge: "Populaire" },
-    { label: "Navigation encadree", detail: "Session sur le spot · meme creneau que le cours collectif", price: "85 €", note: "Prestation distincte du cours collectif — les deux se deroulent sur le meme creneau." },
-    { label: "Cours solo", detail: "2h · encadrement exclusif", price: "200 €" },
-    { label: "Cours duo", detail: "2h · groupe constitue uniquement", price: "135 € / pers.", note: "Uniquement pour un groupe deja forme — deux personnes seules ne peuvent pas composer un duo." },
-    { label: "Tracte / Simulateur", detail: "Waterstart & equilibre en traction douce sans gestion du kite", price: "Sur demande", note: "Ideal pour progresser rapidement ou s'entrainer sans vent. Tracte par bateau ou simulateur a terre." },
-  ],
-  Wingfoil: [
-    { label: "Cours collectif", detail: "2h · 2 eleves max · individuel", price: "135 € / pers.", badge: "Populaire", note: "Pas besoin de venir a deux — les places sont ouvertes a tous." },
-    { label: "Cours trio", detail: "3h · groupe constitue uniquement", price: "100 € / pers.", note: "Session reservee a un groupe deja forme de 3 personnes." },
-    { label: "Initiation wing", detail: "1h30 · paddle avec une aile de wing · tous niveaux", price: "90 € / pers." },
-    { label: "Tracte / Simulateur", detail: "Foil tracte derriere bateau — equilibre sans gestion de l'aile", price: "Sur demande", note: "Progresser sur le foil en conditions controlees, vent ou pas. Ideal en debut de formation." },
-  ],
-  Kitefoil: [
-    { label: "Cours solo", detail: "2h · encadrement exclusif", price: "150 €", badge: "Recommande" },
-    { label: "Cours duo", detail: "2h · 2 eleves", price: "135 € / pers." },
-    { label: "Tracte / Simulateur", detail: "Foil tracte bateau · simulateur mast fixe · apprentissage accelere", price: "Sur demande", note: "La methode la plus rapide pour apprendre le kitefoil : simulateur mast fixe sur bateau ou traction douce — concentration totale sur l'equilibre et le pilotage." },
-  ],
-};
-
-const kiteLoyaltyRates = [
-  { label: "Cours collectif", before: "115 €", after: "100 €" },
-  { label: "Cours solo", before: "200 €", after: "175 €" },
-  { label: "Cours duo", before: "135 € / pers.", after: "115 € / pers." },
-];
-
-const options = [
-  { label: "Navigation encadree", detail: "Session accompagnee sur le spot", price: "85 €", note: "Incluse avec le cours collectif" },
-  { label: "Depart de plage", detail: "Technique de lancement autonome", price: "85 €" },
-  { label: "Coaching perfection", detail: "Tricks & progression avancee" },
-];
+/**
+ * Les trois grilles tarifaires sont toutes montees dans le DOM, les inactives
+ * masquees par l'attribut `hidden`.
+ *
+ * Auparavant un `AnimatePresence mode="wait"` ne montait que l'onglet actif.
+ * Consequence mesuree le 8 septembre 2026 : hors JSON-LD, le HTML servi ne
+ * contenait que les prix du kitesurf. "150" et "90" n'apparaissaient nulle part
+ * ailleurs que dans le balisage, et les libelles "Cours trio" et "Initiation
+ * wing" pas meme dans le payload RSC. Googlebot execute le JavaScript et
+ * finissait par les voir ; les crawlers des moteurs IA, non — pour eux Airfly
+ * n'etait qu'une ecole de kitesurf.
+ *
+ * Le fondu entre onglets est perdu au passage : `display: none` interrompt
+ * toute transition. C'est le prix a payer, et il est faible au regard des deux
+ * tiers du catalogue rendus visibles.
+ */
 
 export default function EcoleTarifs() {
-  const [activeTab, setActiveTab] = useState<Tab>("Kitesurf");
+  const [activeTab, setActiveTab] = useState<Discipline>("Kitesurf");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -59,7 +41,7 @@ export default function EcoleTarifs() {
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
         >
-          {tabs.map((tab) => (
+          {disciplines.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -75,17 +57,15 @@ export default function EcoleTarifs() {
           ))}
         </motion.div>
 
-        {/* Grille tarifaire */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
+        {/* Grille tarifaire — les trois disciplines sont dans le DOM */}
+        {disciplines.map((discipline) => (
+          <div
+            key={discipline}
             className="grid gap-4 mb-6"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.35 }}
+            hidden={discipline !== activeTab}
+            aria-label={`Tarifs ${discipline}`}
           >
-            {tarifs[activeTab].map((t) => (
+            {tarifs[discipline].map((t) => (
               <div
                 key={t.label}
                 className="bg-gray-900 px-6 py-5 border border-gray-800 hover:border-[#FF0080]/40 transition-colors duration-300"
@@ -132,52 +112,44 @@ export default function EcoleTarifs() {
                 )}
               </div>
             ))}
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        ))}
 
-        {/* Bloc fidelite Kitesurf */}
-        <AnimatePresence>
-          {activeTab === "Kitesurf" && (
-            <motion.div
-              key="fidelite"
-              className="mb-10 border border-[#FF0080]/20 bg-gray-900/60 px-6 py-5"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.3 }}
+        {/* Bloc fidelite Kitesurf — monte en permanence, masque hors kitesurf */}
+        <div
+          className="mb-10 border border-[#FF0080]/20 bg-gray-900/60 px-6 py-5"
+          hidden={activeTab !== "Kitesurf"}
+        >
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-[#FF0080] text-xs">◆</span>
+            <p
+              className="uppercase tracking-widest text-xs text-[#FF0080]"
+              style={{ fontFamily: "Mirloanne, serif" }}
             >
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-[#FF0080] text-xs">◆</span>
+              Tarifs fidelite — a partir du 4eme cours
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-3">
+            {kiteLoyaltyRates.map((r) => (
+              <div key={r.label} className="flex flex-col gap-1">
                 <p
-                  className="uppercase tracking-widest text-xs text-[#FF0080]"
+                  className="text-gray-400 text-xs uppercase tracking-widest"
                   style={{ fontFamily: "Mirloanne, serif" }}
                 >
-                  Tarifs fidelite — a partir du 4eme cours
+                  {r.label}
                 </p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-white text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {r.after}
+                  </p>
+                  <p className="text-gray-600 text-sm line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
+                    {r.before}
+                  </p>
+                </div>
               </div>
-              <div className="grid md:grid-cols-3 gap-3">
-                {kiteLoyaltyRates.map((r) => (
-                  <div key={r.label} className="flex flex-col gap-1">
-                    <p
-                      className="text-gray-400 text-xs uppercase tracking-widest"
-                      style={{ fontFamily: "Mirloanne, serif" }}
-                    >
-                      {r.label}
-                    </p>
-                    <div className="flex items-baseline gap-2">
-                      <p className="text-white text-lg" style={{ fontFamily: "var(--font-cormorant)" }}>
-                        {r.after}
-                      </p>
-                      <p className="text-gray-600 text-sm line-through" style={{ fontFamily: "var(--font-cormorant)" }}>
-                        {r.before}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            ))}
+          </div>
+        </div>
 
         {/* Options perfectionnement */}
         <motion.div

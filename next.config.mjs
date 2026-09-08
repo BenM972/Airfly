@@ -77,6 +77,18 @@ const nextConfig = {
     // AVIF en premier : ~20 a 30 % de moins que le WebP, repli automatique
     // pour les navigateurs qui ne l'annoncent pas.
     formats: ["image/avif", "image/webp"],
+    // Duree de cache des images optimisees. Le defaut de Next place
+    // `max-age=14400`, soit quatre heures, sur des URL pourtant immuables :
+    // /_next/image porte deja la source, la largeur et la qualite dans sa query
+    // string, donc un visuel remplace produit une URL differente. Mesure du
+    // 8 septembre : 1,77 a 2,42 s pour servir une image de 44 Ko a froid, avec
+    // un CDN en MISS ou STALE. Trente et un jours de cache suppriment ces
+    // revalidations sans risque de servir une image perimee.
+    //
+    // Reserve : si WooCommerce reutilise le meme nom de fichier lors du
+    // remplacement d'une photo produit, l'URL ne change pas et l'ancienne image
+    // resterait servie jusqu'a un mois. A verifier avant d'allonger davantage.
+    minimumCacheTTL: 60 * 60 * 24 * 31,
     remotePatterns: imageHosts.map((hostname) => ({ protocol: "https", hostname })),
   },
   async headers() {

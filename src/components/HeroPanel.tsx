@@ -31,6 +31,13 @@ export default function HeroPanel({
   return (
     <motion.div
       className="relative overflow-hidden cursor-pointer h-full"
+      // `initial={false}` : sans lui, framer-motion anime `flex` depuis sa
+      // valeur par defaut jusqu'a la valeur cible au montage. `flex` etant une
+      // propriete de mise en page, cette animation d'entree produisait a elle
+      // seule une fenetre de decalage de 0,375 mesuree vers 1 300 ms, avant
+      // meme toute interaction. Le panneau prend desormais sa taille finale
+      // directement, ce que le HTML du serveur decrit deja.
+      initial={false}
       animate={{ flex }}
       transition={{ duration: 0.7, ease: [0.4, 0, 0.2, 1] }}
       onMouseEnter={onMouseEnter}

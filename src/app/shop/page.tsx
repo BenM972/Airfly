@@ -38,7 +38,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const copy = category
     ? CAT_LABELS[category]
     : {
-        title: "Shop — Surf shop kitesurf & wingfoil en Martinique",
+        // "Shop — " etait redondant avec "Surf shop", et "en Martinique"
+        // avec le suffixe du template : 74 caracteres servis, tronques a 60.
+        title: "Surf shop kitesurf & wingfoil",
         description:
           "Le surf shop Airfly à Pointe Faula, Le Vauclin : matériel de kitesurf et wingfoil, textile de glisse et soins solaires. Retrait en boutique, sans prépaiement.",
       };
@@ -48,11 +50,14 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     description: copy.description,
     // Les variantes ?cat= pointent toutes vers /shop : une seule page a indexer.
     alternates: { canonical: "/shop" },
+    // `images` est indispensable : Next fusionne `openGraph` a plat, donc
+    // definir l'objet ici effacait l'image heritee du layout.
     openGraph: {
       title: copy.title,
       description: copy.description,
       url: "/shop",
       type: "website",
+      images: [{ url: "/hero_materiel.jpg", width: 1200, height: 630, alt: "Surf shop Airfly, Pointe Faula, Martinique" }],
     },
   };
 }

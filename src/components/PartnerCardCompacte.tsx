@@ -69,7 +69,7 @@ export default function PartnerCardCompacte({ partner }: { partner: Partner }) {
               <div className="relative h-12 w-24 shrink-0">
                 {/* alt vide : le nom suit immediatement en texte, le repeter
                     alourdirait la lecture vocale. */}
-                <Image src={partner.logo} alt="" fill sizes="96px" className="object-contain object-left" />
+                <Image src={partner.logo} alt={partner.name} fill sizes="96px" className="object-contain object-left" />
               </div>
               <span className="h-12 w-px shrink-0 bg-gray-200" aria-hidden="true" />
             </>

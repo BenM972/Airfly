@@ -149,7 +149,7 @@ export default function Footer() {
         <div className="max-w-7xl mx-auto px-16 py-20 grid grid-cols-4 gap-12">
 
           <div className="flex flex-col gap-6">
-            <Image src="/logo-airfly.webp" alt="Airfly Surf Shop" width={90} height={36} className="object-contain" />
+            <Image src="/logo-airfly.webp" alt="Airfly" width={90} height={36} className="object-contain" />
             <p className="text-gray-400 text-base leading-relaxed" style={{ fontFamily: "var(--font-cormorant)" }}>
               Ecole de glisse & surf shop à Pointe Faula, Vauclin, Martinique.
             </p>

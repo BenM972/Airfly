@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -13,41 +13,41 @@ const panels = [
   { id: "materiel", label: "Materiel", image: "/hero_materiel.jpg", cta: "Voir le matos technique", href: "/shop?cat=materiel" },
 ];
 
+/**
+ * Rotation automatique des panneaux : retiree le 8 septembre 2026.
+ *
+ * Un `setInterval` de 5 s faisait tourner le panneau ouvert. HeroPanel anime
+ * la propriete `flex` (0,5 <-> 3), qui est une propriete de MISE EN PAGE : le
+ * navigateur recalcule la disposition a chaque image de l'animation, et chaque
+ * recalcul compte comme un decalage. Mesure du 8 septembre dans Chrome, page
+ * d'accueil : 120 decalages, dont 107 apres la cinquieme seconde, le dernier a
+ * 16 849 ms. CLS de 0,467 par fenetre de session, contre 0,1 pour le seuil
+ * "bon" de Google et 0,25 au-dela duquel la page est classee mauvaise.
+ * `/shop` et les fiches produit, sans accordeon, mesurent 0,002.
+ *
+ * Effet de bord : chaque ouverture repeignait un nouvel element le plus grand,
+ * et Chrome reaffecte le LCP tant qu'aucune interaction n'a eu lieu. Le LCP
+ * derivait donc de 2,6 a 16,3 s selon le moment de la mesure.
+ *
+ * L'accordeon reste pilote par le survol : le mouvement repond desormais a une
+ * intention de l'utilisateur au lieu de se declencher seul. Les decalages
+ * eventuels sont alors rares, volontaires, et absents sur mobile ou cette
+ * disposition n'existe pas (les panneaux y sont empiles).
+ *
+ * Pour retablir la rotation il faudrait d'abord rendre l'animation neutre pour
+ * la mise en page : panneaux en position absolue animes par `transform`, seul
+ * moyen documente de bouger un element sans generer de decalage. Rebrancher le
+ * minuteur sur l'animation `flex` actuelle ramenerait le CLS a 0,467.
+ */
 export default function Hero() {
   const [hovered, setHovered] = useState<string | null>(null);
-  const [autoIndex, setAutoIndex] = useState(0);
-  const isUserHovering = useRef(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const startAutoplay = () => {
-    intervalRef.current = setInterval(() => {
-      if (!isUserHovering.current) {
-        setAutoIndex((i) => (i + 1) % panels.length);
-      }
-    }, 5000);
-  };
+  // Au repos, le premier panneau est ouvert : c'est l'etat rendu par le
+  // serveur, donc aucun decalage au chargement.
+  const activePanel = hovered ?? panels[0].id;
 
-  useEffect(() => {
-    startAutoplay();
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
-
-  const activePanel = hovered ?? panels[autoIndex].id;
-
-  const handleMouseEnter = (id: string) => {
-    isUserHovering.current = true;
-    setHovered(id);
-  };
-
-  const handleMouseLeave = () => {
-    isUserHovering.current = false;
-    setHovered(null);
-    // Resync l'autoplay sur le panel suivant
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    startAutoplay();
-  };
+  const handleMouseEnter = (id: string) => setHovered(id);
+  const handleMouseLeave = () => setHovered(null);
 
   return (
     <section className="relative w-full h-screen min-h-[500px]">
