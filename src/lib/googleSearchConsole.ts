@@ -62,11 +62,41 @@ function normaliserCle(brute: string): string {
   cle = cle.replace(/\r/g, "");
 
   // Espaces en bout de ligne : le base64 du corps PEM ne les tolere pas.
-  return cle
+  const lignes = cle
     .split("\n")
     .map((l) => l.trim())
-    .filter(Boolean)
-    .join("\n");
+    .filter(Boolean);
+
+  // Marqueurs disparus.
+  //
+  // Constate en production : le panneau Hostinger avait retire les deux lignes
+  // `-----BEGIN PRIVATE KEY-----` et `-----END PRIVATE KEY-----`, ne laissant
+  // que les 26 lignes de corps. Beaucoup de champs de configuration traitent
+  // une ligne commencant par un tiret comme un commentaire ou une option et la
+  // suppriment sans rien dire.
+  //
+  // Le corps seul est inexploitable, alors que l'information qu'il porte est
+  // intacte : les marqueurs sont une constante, pas une donnee. On les repose
+  // donc, plutot que de renvoyer l'utilisateur a une valeur de 1 700
+  // caracteres en lui demandant de trouver ce qui manque.
+  //
+  // Uniquement si le contenu ressemble bien a du base64 : hors de question de
+  // deguiser en cle privee quelque chose qui n'en est pas une.
+  const aUnDebut = lignes.some((l) => l.startsWith("-----BEGIN"));
+  const aUneFin = lignes.some((l) => l.startsWith("-----END"));
+  const corpsSeul = lignes.filter((l) => !l.startsWith("-----"));
+  const ressembleAduBase64 =
+    corpsSeul.length > 0 && corpsSeul.every((l) => /^[A-Za-z0-9+/=]+$/.test(l));
+
+  if (!aUnDebut && !aUneFin && ressembleAduBase64) {
+    return ["-----BEGIN PRIVATE KEY-----", ...corpsSeul, "-----END PRIVATE KEY-----"].join("\n");
+  }
+  // Un seul marqueur present : on complete celui qui manque.
+  if (ressembleAduBase64 && (aUnDebut !== aUneFin)) {
+    return ["-----BEGIN PRIVATE KEY-----", ...corpsSeul, "-----END PRIVATE KEY-----"].join("\n");
+  }
+
+  return lignes.join("\n");
 }
 
 export function lireConfig(): ConfigGSC | null {
@@ -125,9 +155,11 @@ async function jetonAcces(config: ConfigGSC): Promise<string> {
       );
     }
     throw new Error(
-      `La cle privee n'a pas pu etre lue (${lignes} lignes). Verifiez qu'elle commence par ` +
-        `-----BEGIN PRIVATE KEY----- et se termine par -----END PRIVATE KEY-----. ` +
-        `Detail : ${e instanceof Error ? e.message : String(e)}`,
+      `La cle privee n'a pas pu etre lue (${lignes} lignes). Une cle de compte de service ` +
+        `Google en compte 28 : deux marqueurs et 26 lignes de corps. Si vous en comptez 26, ` +
+        `les marqueurs ont ete manges par le champ de saisie — le code sait desormais les ` +
+        `reposer, donc ce n'est plus la cause. Detail : ` +
+        `${e instanceof Error ? e.message : String(e)}`,
     );
   }
 
