@@ -224,10 +224,17 @@ export default function ProductDetail({ product, variations }: Props) {
 
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20">
 
-          {/* Galerie */}
+          {/* Galerie.
+       
+              `initial={false}` : cette colonne contient l'image la plus grande
+              de la page, donc l'element LCP. Elle partait de `opacity: 0` et
+              n'etait peinte qu'une fois framer-motion hydrate — le `priority`
+              de l'image la prechargeait bien, mais le navigateur ne pouvait
+              pas la compter comme peinte. Mesure du 9 septembre : LCP a
+              3 476 ms sur une fiche produit, pour un TTFB de 523 ms. */}
           <motion.div
             className="flex flex-col gap-3"
-            initial={{ opacity: 0, x: -20 }}
+            initial={false}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6 }}
           >
@@ -260,7 +267,10 @@ export default function ProductDetail({ product, variations }: Props) {
                 onMouseEnter={() => { isHovering.current = true; setZoomed(true); }}
                 onMouseLeave={() => { isHovering.current = false; setZoomed(false); }}
               >
-                <AnimatePresence mode="wait">
+                {/* `initial={false}` sur AnimatePresence supprime l'animation
+                    d'entree du PREMIER rendu seulement : le fondu au
+                    changement d'image ou de variante continue de fonctionner. */}
+                <AnimatePresence mode="wait" initial={false}>
                   {images[activeImage] ? (
                     <motion.div
                       key={`${activeVariation?.id ?? "base"}-${activeImage}`}

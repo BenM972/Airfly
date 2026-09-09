@@ -8,9 +8,13 @@ import type { WCProduct } from "./ShopCatalogue";
 type Props = {
   product: WCProduct;
   index: number;
+  /** Masquee par le filtre : montee dans le DOM, mais retiree de l'affichage. */
+  hidden?: boolean;
+  /** Precharge l'image : reservee aux toutes premieres cartes visibles. */
+  priority?: boolean;
 };
 
-export default function ShopProductCard({ product, index }: Props) {
+export default function ShopProductCard({ product, index, hidden = false, priority = false }: Props) {
   const image = product.images?.[0];
   const imageHover = product.images?.[1];
   // En promotion, c'est le prix soldé qui doit s'afficher, le prix normal barré
@@ -22,12 +26,25 @@ export default function ShopProductCard({ product, index }: Props) {
   const prixBarre = enPromo ? product.regular_price : null;
 
   return (
-    <Link href={`/shop/${product.slug}`}>
+    <Link href={`/shop/${product.slug}`} hidden={hidden}>
+      {/* L'animation d'entree ne doit pas retarder la peinture de ce qui est
+          au-dessus de la ligne de flottaison.
+       
+          Chaque carte partait de `opacity: 0` avec un delai de 50 ms multiplie
+          par son rang : la vingtieme attendait une seconde avant d'etre
+          peinte. Un element a `opacity: 0` n'est pas peint, donc le LCP ne
+          pouvait pas se declencher avant. Mesure du 9 septembre sur /shop :
+          LCP a 2 908 ms, pour un TTFB de 518 ms.
+       
+          Les trois premieres cartes visibles apparaissent donc immediatement.
+          Les suivantes gardent l'animation, avec un delai plafonne : au-dela
+          d'un tiers de seconde, l'effet ne se remarque plus et ne fait que
+          repousser la peinture. */}
       <motion.div
         className="group cursor-pointer"
-        initial={{ opacity: 0, y: 20 }}
+        initial={index < 3 ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: index * 0.05 }}
+        transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
       >
         {/* Image */}
         {/* Cadre blanc et non gris : cinq photos sur douze ont un fond blanc
@@ -51,6 +68,8 @@ export default function ShopProductCard({ product, index }: Props) {
                 alt={image.alt || product.name}
                 fill
                 sizes="(max-width: 768px) 50vw, 25vw"
+                priority={priority}
+                loading={priority ? undefined : "lazy"}
                 className={`object-contain transition-opacity duration-500 ${imageHover ? "group-hover:opacity-0" : "group-hover:scale-105 transition-transform"}`}
               />
               {imageHover && (

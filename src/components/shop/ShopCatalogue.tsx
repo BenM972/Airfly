@@ -73,15 +73,26 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
   // Catégories genre pour la sidebar (hors filtres principaux)
   const genreCats = categories.filter((c) => GENRE_SLUGS.includes(c.slug));
 
-  // Filtrage produits
-  const filtered = products.filter((p) => {
+  // Correspondance d'un produit avec les filtres actifs.
+  //
+  // Extraite en predicat parce que la grille ne rend plus seulement les
+  // produits correspondants : elle les rend TOUS et masque les autres.
+  const correspond = (p: WCProduct) => {
     const catSlugs = p.categories.map((c) => c.slug);
     const inUniverse = catSlugs.some((s) => slugs.includes(s));
     if (!inUniverse) return false;
     if (activeGenre && !catSlugs.includes(activeGenre)) return false;
     if (activeSub) return catSlugs.includes(activeSub);
     return true;
-  });
+  };
+
+  const filtered = products.filter(correspond);
+
+  // Rang parmi les produits VISIBLES, pour ne prioriser que les premieres
+  // images reellement affichees. Le rang dans la liste complete n'aurait aucun
+  // sens : la carte numero 3 du DOM peut etre la 40e visible.
+  const rangVisible = new Map<number, number>();
+  filtered.forEach((p, i) => rangVisible.set(p.id, i));
 
   const switchCategory = (cat: Category) => {
     setActiveCategory(cat);
@@ -216,20 +227,39 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
 
           {/* Grille produits */}
           <div className="flex-1">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={`${activeCategory}-${activeSub}`}
-                className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                {filtered.map((product, i) => (
-                  <ShopProductCard key={product.id} product={product} index={i} />
-                ))}
-              </motion.div>
-            </AnimatePresence>
+            {/* Les 56 produits sont montes dans le DOM, les non-correspondants
+                masques par l'attribut `hidden`.
+       
+                Auparavant seuls les produits du filtre actif etaient rendus.
+                Le filtre par defaut etant "textile", la page ne liait que
+                27 fiches sur 56 — mesure du 9 septembre 2026, dans le HTML
+                servi comme dans le DOM rendu. Les 29 autres, tout le materiel
+                technique, n'avaient aucun lien entrant depuis la page
+                catalogue et n'etaient atteignables que par le sitemap. Trois
+                des huit fiches inspectees dans Search Console etaient alors
+                "inconnues de Google".
+       
+                Le fondu au changement de categorie est perdu : `display: none`
+                interrompt toute transition. Meme arbitrage que pour les
+                onglets de /ecole, et pour la meme raison — un effet de
+                transition ne vaut pas la moitie du catalogue. */}
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+              {products.map((product) => {
+                const visible = correspond(product);
+                return (
+                  <ShopProductCard
+                    key={product.id}
+                    product={product}
+                    index={rangVisible.get(product.id) ?? 0}
+                    hidden={!visible}
+                    // Seules les premieres images reellement affichees sont
+                    // priorisees : precharger une image masquee gaspillerait la
+                    // bande passante que l'on cherche justement a economiser.
+                    priority={visible && (rangVisible.get(product.id) ?? 99) < 3}
+                  />
+                );
+              })}
+            </div>
 
             {filtered.length === 0 && (
               <p className="text-gray-400 py-24" style={{ fontFamily: "var(--font-cormorant)" }}>
