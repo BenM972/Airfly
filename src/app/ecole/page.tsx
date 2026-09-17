@@ -2,11 +2,12 @@ import EcoleHero from "@/components/ecole/EcoleHero";
 import EcoleIntro from "@/components/ecole/EcoleIntro";
 import EcoleTarifs from "@/components/ecole/EcoleTarifs";
 import EcoleAvis from "@/components/ecole/EcoleAvis";
+import EcoleFaq from "@/components/ecole/EcoleFaq";
 import EcoleReservation from "@/components/ecole/EcoleReservation";
 
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
-import { schoolServiceSchema } from "@/lib/schema";
+import { faqSchema, schoolServiceSchema } from "@/lib/schema";
 
 // Le suffixe " — Airfly Martinique" ajoute par le template de layout.tsx coute
 // vingt caracteres. Avec "École de glisse — " en tete, le titre servi faisait
@@ -32,14 +33,22 @@ export const metadata: Metadata = {
   },
 };
 
+
+// Pages statiques : sans revalidation, le HTML est fige au build et l'annonce de
+// fermeture y resterait apres la date de reouverture. Une heure suffit — la
+// bascule se fait d'elle-meme, sans redeploiement.
+export const revalidate = 3600;
+
 export default function EcolePage() {
   return (
     <main>
       <JsonLd data={schoolServiceSchema()} />
+      <JsonLd data={faqSchema()} />
       <EcoleHero />
       <EcoleIntro />
       <EcoleTarifs />
       <EcoleAvis />
+      <EcoleFaq />
       <EcoleReservation />
     </main>
   );

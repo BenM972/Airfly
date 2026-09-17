@@ -1,5 +1,5 @@
 import { escapeHtml } from "@/lib/email";
-import { fermeture } from "@/data/fermeture";
+import { getFermeture } from "@/data/fermeture";
 
 /**
  * Gabarit commun a tous les courriels du site.
@@ -95,6 +95,7 @@ export function enveloppe({
   /** Ajoute les horaires au pied : utile quand le client doit se deplacer. */
   rappelHoraires?: boolean;
 }): string {
+  const fermeture = getFermeture();
   const banniereFermeture =
     rappelHoraires && fermeture
       ? `<p style="margin:12px 0 0;font-family:${SANS};font-size:13px;color:${ROSE}">

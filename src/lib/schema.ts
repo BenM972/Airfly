@@ -3,7 +3,8 @@
 
 import type { WCProduct, WCVariation } from "./woocommerce";
 import { toPlainText } from "./woocommerce";
-import { fermeture } from "@/data/fermeture";
+import { getFermeture } from "@/data/fermeture";
+import { questionsFrequentes } from "@/data/faq";
 import { offresPourSchema } from "@/data/tarifs";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
@@ -11,6 +12,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.c
 const BUSINESS_ID = `${SITE_URL}/#business`;
 
 export function localBusinessSchema() {
+  const fermeture = getFermeture();
   return {
     "@context": "https://schema.org",
     "@type": ["SportsActivityLocation", "SportingGoodsStore"],
@@ -166,6 +168,27 @@ export function schoolServiceSchema() {
         itemOffered: { "@type": "Service", name: l.name, description: l.description },
       })),
     },
+  };
+}
+
+/**
+ * Questions frequentes de /ecole.
+ *
+ * Meme source que la section affichee : le balisage doit decrire ce que le
+ * visiteur voit, sinon Google le traite comme trompeur. Aucune reponse n'est
+ * balisee sans etre lisible sur la page.
+ */
+export function faqSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE_URL}/ecole#questions`,
+    isPartOf: { "@id": BUSINESS_ID },
+    mainEntity: questionsFrequentes.map((q) => ({
+      "@type": "Question",
+      name: q.question,
+      acceptedAnswer: { "@type": "Answer", text: q.reponse },
+    })),
   };
 }
 

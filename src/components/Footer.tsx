@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { fermeture } from "@/data/fermeture";
+import { getFermeture } from "@/data/fermeture";
 
 const navLinks = [
   { label: "A propos", href: "/#apropos" },
@@ -16,6 +16,9 @@ const hours = [
 ];
 
 export default function Footer() {
+  // Recalcule a chaque rendu : passe la date de reouverture, l'annonce disparait.
+  const fermeture = getFermeture();
+
   return (
     <footer className="bg-gray-950 text-white">
 

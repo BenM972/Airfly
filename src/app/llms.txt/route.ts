@@ -1,5 +1,6 @@
-import { fermeture } from "@/data/fermeture";
+import { getFermeture } from "@/data/fermeture";
 import { disciplines, tarifs, options } from "@/data/tarifs";
+import { questionsFrequentes } from "@/data/faq";
 
 /**
  * /llms.txt — resume du site a destination des moteurs conversationnels.
@@ -29,6 +30,7 @@ function grille(): string {
 }
 
 export function GET() {
+  const fermeture = getFermeture();
   const fermetureBloc = fermeture
     ? `\n> Fermeture en cours jusqu'au ${fermeture.jusquAu}. Les cours et la boutique reprennent a cette date.\n`
     : "";
@@ -63,6 +65,10 @@ ${options.map((o) => `- ${o.label} — ${o.detail}${o.price ? ` — ${o.price}` 
 
 Une licence FFVL ou FFV est requise (assurance RC incluse). Une assurance
 personnelle couvrant la pratique du kitesurf est egalement acceptee.
+
+## Questions frequentes
+
+${questionsFrequentes.map((q) => `### ${q.question}\n\n${q.reponse}`).join("\n\n")}
 
 ## Le spot
 
