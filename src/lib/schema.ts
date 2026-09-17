@@ -77,8 +77,24 @@ export function localBusinessSchema() {
           },
         }
       : {}),
-    sameAs: ["https://www.instagram.com/airfly972", "https://www.facebook.com/airfly972"],
+    // Tous les profils tenus par l'ecole, pour rattacher l'entite "Airfly" a
+    // une identite unique. C'est ce qui permet de distinguer cette ecole de
+    // l'Airfly normand et de l'adaptateur Bluetooth du meme nom, qui occupent
+    // seuls le graphe aujourd'hui.
+    sameAs: [
+      "https://www.instagram.com/airfly972",
+      "https://www.facebook.com/airfly972",
+      "https://www.youtube.com/@airfly323",
+    ],
     sport: ["Kitesurfing", "Wing foiling", "Kitefoiling"],
+    knowsAbout: [
+      "Kitesurf",
+      "Wingfoil",
+      "Kitefoil",
+      "Spot de Pointe Faula",
+      "Le Vauclin",
+      "Martinique",
+    ],
   };
 }
 
