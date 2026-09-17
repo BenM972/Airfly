@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { getFermeture } from "@/data/fermeture";
+import { ITINERAIRE } from "@/data/lieu";
 
 const navLinks = [
   { label: "A propos", href: "/#apropos" },
@@ -101,7 +102,7 @@ export default function Footer() {
                 Plage de Pointe Faula, Le Vauclin
               </p>
               <a
-                href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                href={ITINERAIRE}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-gray-500 hover:text-[#FF0080] transition-colors duration-200 text-xs uppercase tracking-widest pt-1"
@@ -217,7 +218,7 @@ export default function Footer() {
               <li className="pt-2">
                 <p className="text-gray-500 text-sm leading-relaxed mb-2" style={{ fontFamily: "var(--font-cormorant)" }}>Plage de Pointe Faula<br />Le Vauclin, Martinique</p>
                 <a
-                  href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                  href={ITINERAIRE}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-gray-600 hover:text-[#FF0080] transition-colors duration-200 text-xs uppercase tracking-widest"

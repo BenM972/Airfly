@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "@/context/CartContext";
+import { ITINERAIRE } from "@/data/lieu";
 
 const links = [
   { label: "A propos", href: "/#apropos" },
@@ -65,7 +66,7 @@ export default function Navbar() {
 
           {/* GPS desktop */}
           <a
-            href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+            href={ITINERAIRE}
             target="_blank"
             rel="noopener noreferrer"
             className="hidden lg:flex items-center gap-2 text-white/60 hover:text-white transition-colors duration-200 text-xs uppercase tracking-widest"
@@ -250,7 +251,7 @@ export default function Navbar() {
               transition={{ delay: 0.05 * (links.length + 1), duration: 0.3 }}
             >
               <a
-                href="https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289"
+                href={ITINERAIRE}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}

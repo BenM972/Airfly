@@ -6,6 +6,7 @@ import { toPlainText } from "./woocommerce";
 import { getFermeture } from "@/data/fermeture";
 import { questionsFrequentes } from "@/data/faq";
 import { videoEcole } from "@/data/video";
+import { FICHE, LAT, LON } from "@/data/lieu";
 import { offresPourSchema } from "@/data/tarifs";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
@@ -38,11 +39,13 @@ export function localBusinessSchema() {
     },
     geo: {
       "@type": "GeoCoordinates",
-      latitude: 14.541922560749377,
-      longitude: -60.82981741961289,
+      latitude: LAT,
+      longitude: LON,
     },
-    hasMap:
-      "https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289",
+    // `hasMap` designe la fiche d'etablissement, pas un itineraire : c'est ce
+    // lien qui rattache le site a la fiche Google Business Profile. L'itineraire
+    // reste offert au visiteur dans l'interface.
+    hasMap: FICHE,
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -86,6 +89,7 @@ export function localBusinessSchema() {
       "https://www.instagram.com/airfly972",
       "https://www.facebook.com/airfly972",
       "https://www.youtube.com/@airfly323",
+      FICHE,
     ],
     sport: ["Kitesurfing", "Wing foiling", "Kitefoiling"],
     knowsAbout: [

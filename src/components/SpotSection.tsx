@@ -4,12 +4,13 @@ import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 import CarteMartinique from "./CarteMartinique";
 import SectionTitle from "./SectionTitle";
+import { ITINERAIRE, LAT, LON } from "@/data/lieu";
 
 function openNavigation() {
   const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   const url = isIOS
-    ? `maps://maps.apple.com/?q=14.541922560749377,-60.82981741961289`
-    : `https://www.google.com/maps/dir/?api=1&destination=14.541922560749377,-60.82981741961289`;
+    ? `maps://maps.apple.com/?q=${LAT},${LON}`
+    : ITINERAIRE;
   window.open(url, "_blank");
 }
 

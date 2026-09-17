@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
+import { AVIS } from "@/data/lieu";
 
 const avis = [
   {
@@ -120,6 +121,27 @@ export default function EcoleAvis() {
               </motion.div>
             </AnimatePresence>
           </div>
+
+          {/* Les temoignages ci-dessus ne sont ni dates ni sources. Ce lien mene
+              aux avis Google de la fiche, qui le sont — et c'est la que les
+              nouveaux avis comptent : leur volume et leur regularite pesent sur
+              le pack local, ce qu'un carrousel interne ne fait pas.
+
+              Ils ne sont volontairement pas recopies ici, et aucun
+              `aggregateRating` n'est declare a partir d'eux : Google interdit
+              d'agreger dans son propre balisage des avis collectes sur une
+              autre plateforme. */}
+          <p className="mt-8 text-center">
+            <a
+              href={AVIS}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm uppercase tracking-widest text-gray-500 underline decoration-[#FF0080] decoration-1 underline-offset-4 transition-colors duration-300 hover:text-[#FF0080]"
+              style={{ fontFamily: "Mirloanne, serif" }}
+            >
+              Lire les avis Google
+            </a>
+          </p>
 
         </motion.div>
 
