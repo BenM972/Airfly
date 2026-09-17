@@ -11,11 +11,17 @@ import { tarifs } from "./tarifs";
  * 40 a 60 mots et se suffisent a elles-memes : chacune nomme son sujet plutot
  * que de dire "il" ou "ici", parce qu'un extrait cite arrive sans son contexte.
  *
- * Regle de redaction : tout ce qui est affirme ici est deja publie ailleurs sur
- * le site. Rien n'est invente pour remplir. Les questions auxquelles l'ecole
- * seule peut repondre — age minimum, savoir nager, nombre de cours pour etre
- * autonome, location de materiel — sont volontairement absentes plutot que
- * devinees ; les ajouter demande une reponse du client, pas une redaction.
+ * Regle de redaction : rien n'est invente. Chaque affirmation vient soit d'une
+ * page deja publiee, soit d'une reponse directe de l'ecole. Les quatre
+ * questions que seule l'ecole pouvait trancher — age minimum, savoir nager,
+ * nombre de cours pour etre autonome, location de materiel — ont ete posees et
+ * repondues le 17 septembre 2026, et ajoutees ensuite.
+ *
+ * La reponse sur la location ne donne aucun tarif : la grille n'existe pas
+ * encore. Elle renvoie au telephone et au formulaire, et ne promet pas de date
+ * de publication — une promesse datee vieillit mal, comme l'a montre la ligne
+ * de fermeture ecrite en dur dans /llms.txt. Quand la grille sera connue, la
+ * location meritera sa propre section, pas seulement une reponse.
  *
  * Les prix sont lus dans `tarifs.ts` pour la meme raison qu'ailleurs : un prix
  * recopie a la main finit par contredire la grille affichee, et le balisage
@@ -48,6 +54,16 @@ export const questionsFrequentes: QuestionFrequente[] = [
       "Le cours collectif de kitesurf d'Airfly est limité à trois élèves, et le cours collectif de wingfoil à deux élèves. Cette limite est la règle de l'école : elle permet au moniteur de suivre chacun individuellement sur l'eau et de garder le groupe en sécurité.",
   },
   {
+    question: "Y a-t-il un âge minimum pour apprendre le kitesurf ?",
+    reponse:
+      "Airfly n'impose pas d'âge minimum pour apprendre le kitesurf, le wingfoil ou le kitefoil. La seule condition est de savoir nager. Le kitesurf est un sport de finesse et de technique plutôt que de force : la condition physique n'est pas un prérequis, et le moniteur adapte son enseignement à chaque élève.",
+  },
+  {
+    question: "Combien de cours faut-il pour être autonome en kitesurf ?",
+    reponse:
+      "Il n'y a pas de nombre de cours fixe : l'autonomie dépend de la progression de chacun. Certains élèves avancent vite, d'autres ont besoin de plus de temps sur l'eau, et les conditions de vent du jour comptent aussi. Le moniteur fait le point avec vous à chaque session.",
+  },
+  {
     question: "Le matériel est-il fourni pendant les cours ?",
     reponse:
       "Oui. Airfly fournit l'ensemble de l'équipement nécessaire au cours : casque radio, gilet, chaussons, planche et aile. L'élève n'a rien à apporter ni à louer. Un bateau de sécurité accompagne chaque session sur le spot de Pointe Faula.",
@@ -71,6 +87,11 @@ export const questionsFrequentes: QuestionFrequente[] = [
     question: "Le spot de Pointe Faula convient-il aux débutants ?",
     reponse:
       "Oui, et c'est ce qui en fait un spot d'apprentissage reconnu. La barrière de corail au large casse la houle et crée une eau plate, sans vague. Le banc de sable permet d'avoir pied sur une grande partie de la zone école, et les zones de navigation sont balisées par arrêté préfectoral.",
+  },
+  {
+    question: "Airfly loue-t-il du matériel de kitesurf ou de wingfoil ?",
+    reponse:
+      "Oui, Airfly propose de la location de matériel sur le spot de Pointe Faula. Les tarifs et les disponibilités varient selon la saison et le matériel demandé : ils sont communiqués sur demande, par téléphone au +596 596 76 25 31 ou depuis le formulaire de contact du site.",
   },
   {
     question: "Comment acheter du matériel dans le surf shop Airfly ?",
