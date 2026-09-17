@@ -5,6 +5,7 @@ import type { WCProduct, WCVariation } from "./woocommerce";
 import { toPlainText } from "./woocommerce";
 import { getFermeture } from "@/data/fermeture";
 import { questionsFrequentes } from "@/data/faq";
+import { videoEcole } from "@/data/video";
 import { offresPourSchema } from "@/data/tarifs";
 
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
@@ -205,6 +206,29 @@ export function faqSchema() {
       name: q.question,
       acceptedAnswer: { "@type": "Answer", text: q.reponse },
     })),
+  };
+}
+
+/**
+ * Video de presentation de /ecole.
+ *
+ * `uploadDate` est la vraie date de publication YouTube. La legende affichee ne
+ * la mentionne pas, mais le balisage ne doit pas la maquiller : Google la
+ * recoupe avec la page de la video.
+ */
+export function videoSchema() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "VideoObject",
+    name: videoEcole.titre,
+    description: videoEcole.description,
+    thumbnailUrl: `${SITE_URL}${videoEcole.miniature}`,
+    uploadDate: videoEcole.publieeLe,
+    duration: videoEcole.duree,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${videoEcole.id}`,
+    contentUrl: `https://www.youtube.com/watch?v=${videoEcole.id}`,
+    publisher: { "@id": BUSINESS_ID },
+    isPartOf: { "@id": BUSINESS_ID },
   };
 }
 

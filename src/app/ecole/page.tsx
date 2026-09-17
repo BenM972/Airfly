@@ -3,11 +3,12 @@ import EcoleIntro from "@/components/ecole/EcoleIntro";
 import EcoleTarifs from "@/components/ecole/EcoleTarifs";
 import EcoleAvis from "@/components/ecole/EcoleAvis";
 import EcoleFaq from "@/components/ecole/EcoleFaq";
+import EcoleVideo from "@/components/ecole/EcoleVideo";
 import EcoleReservation from "@/components/ecole/EcoleReservation";
 
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
-import { faqSchema, schoolServiceSchema } from "@/lib/schema";
+import { faqSchema, schoolServiceSchema, videoSchema } from "@/lib/schema";
 
 // Le suffixe " — Airfly Martinique" ajoute par le template de layout.tsx coute
 // vingt caracteres. Avec "École de glisse — " en tete, le titre servi faisait
@@ -44,8 +45,10 @@ export default function EcolePage() {
     <main>
       <JsonLd data={schoolServiceSchema()} />
       <JsonLd data={faqSchema()} />
+      <JsonLd data={videoSchema()} />
       <EcoleHero />
       <EcoleIntro />
+      <EcoleVideo />
       <EcoleTarifs />
       <EcoleAvis />
       <EcoleFaq />
