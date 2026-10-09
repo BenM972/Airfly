@@ -3,6 +3,7 @@
 
 import type { WCProduct, WCVariation } from "./woocommerce";
 import { toPlainText } from "./woocommerce";
+import { etatDuProduit } from "./shop-categories";
 import { getFermeture } from "@/data/fermeture";
 import { questionsFrequentes } from "@/data/faq";
 import { videoEcole } from "@/data/video";
@@ -147,6 +148,9 @@ export function productSchema(product: WCProduct, variations: WCVariation[]) {
           "@type": "Offer",
           price,
           priceCurrency: "EUR",
+          // Occasion = materiel de l'ecole revendu ; une fin de serie rangee
+          // dans Occasion porte l'etiquette `neuf` et reste declaree neuve.
+          itemCondition: etatDuProduit(product),
           availability: inStock
             ? "https://schema.org/InStock"
             : "https://schema.org/OutOfStock",

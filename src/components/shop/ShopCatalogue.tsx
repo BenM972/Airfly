@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShopProductCard from "./ShopProductCard";
 import type { WCCategory, WCProduct } from "@/lib/woocommerce";
+import { CATEGORY_MAP, SLUG_OCCASION, UNIVERS, estOccasion, type Univers } from "@/lib/shop-categories";
 
 // Reexport pour les composants qui importaient ces types d'ici
 export type { WCCategory, WCProduct, WCVariation } from "@/lib/woocommerce";
 
-type Category = "textile" | "materiel" | "soins";
+type Category = Univers;
 
 function decodeHTML(str: string) {
   return str
@@ -18,12 +19,6 @@ function decodeHTML(str: string) {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'");
 }
-
-const CATEGORY_MAP: Record<Category, string[]> = {
-  textile: ["textile", "tee-shirts", "hoodies", "shorts", "pantalons", "lycras", "casquettes-chapeaux", "chaussures", "homme", "femme"],
-  materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
-  soins: ["soins-solaires", "go-wild", "sun-kissed", "feel-good"],
-};
 
 const GENRE_SLUGS = ["homme", "femme"];
 type Genre = "homme" | "femme" | null;
@@ -55,9 +50,25 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
 
   const slugs = CATEGORY_MAP[activeCategory];
 
+  // Occasion n'a pas de sous-categories propres : ses filtres sont les
+  // categories techniques des pieces presentes (Ailes, Foils...). Elles sont
+  // deduites des produits, pour ne jamais proposer un filtre vide.
+  const slugsOccasion = new Set(
+    products.filter(estOccasion).flatMap((p) => p.categories.map((c) => c.slug))
+  );
+  const estFiltreOccasion = (slug: string) =>
+    slugsOccasion.has(slug) &&
+    slug !== SLUG_OCCASION &&
+    !(UNIVERS as readonly string[]).includes(slug) &&
+    slug !== "soins-solaires" &&
+    !GROUP_SLUGS.includes(slug) &&
+    !GENRE_SLUGS.includes(slug);
+
   // Catégories visibles pour l'univers actif (hors racine textile/materiel)
-  const visibleCats = categories.filter(
-    (c) => slugs.includes(c.slug) && c.slug !== activeCategory
+  const visibleCats = categories.filter((c) =>
+    activeCategory === "occasion"
+      ? estFiltreOccasion(c.slug)
+      : slugs.includes(c.slug) && c.slug !== activeCategory
   );
 
   // Groupes de premier niveau (kitesurf, kite-wing-foil pour matériel — rien pour textile)
@@ -111,13 +122,15 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
     <section id="catalogue" ref={ref} className="bg-white py-16 px-6 md:px-16">
       <div className="max-w-7xl mx-auto">
 
-        {/* Toggle Textile / Matériel / Soins */}
-        <div className="flex justify-center gap-0 mb-12">
-          {(["textile", "materiel", "soins"] as Category[]).map((cat) => (
+        {/* Toggle Textile / Matériel / Soins / Occasion.
+            Quatre onglets en px-10 debordaient d'un ecran de telephone :
+            marges reduites sous md, et retour a la ligne en dernier recours. */}
+        <div className="flex flex-wrap justify-center gap-0 mb-12">
+          {UNIVERS.map((cat) => (
             <button
               key={cat}
               onClick={() => switchCategory(cat)}
-              className={`uppercase tracking-widest text-sm px-10 py-3 border transition-colors duration-300 ${
+              className={`uppercase tracking-widest text-xs md:text-sm px-3 md:px-10 py-3 border transition-colors duration-300 ${
                 activeCategory === cat
                   ? "bg-gray-900 border-gray-900 text-white"
                   : "border-gray-300 text-gray-400 hover:border-gray-600 hover:text-gray-700"

@@ -30,6 +30,8 @@ export type WCProduct = {
   categories: { id: number; name: string; slug: string }[];
   /** Marques WooCommerce. Deja renvoyees par l'API, simplement jamais lues jusqu'ici. */
   brands?: { id: number; name: string; slug: string }[];
+  /** Etiquettes WooCommerce. Seule `neuf` est lue, pour l'etat declare a Google. */
+  tags?: { id: number; name: string; slug: string }[];
   images: { src: string; alt: string }[];
   attributes: { id: number; name: string; variation: boolean; options: string[] }[];
   /** Rendu HTML du prix par WooCommerce. Seule source du prix initial d'un produit variable en promo. */
