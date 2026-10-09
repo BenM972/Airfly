@@ -144,6 +144,18 @@ Une seule ligne = purge réussie. Une URL avec chaîne de requête contourne le
 cache et joint l'origine, ce qui distingue un problème de CDN d'un problème de
 build.
 
+**Le build se fait avec webpack, pas Turbopack (09/10/2026).** Le 9 octobre,
+tous les builds Hostinger ont échoué dans Turbopack, sur `globals.css` :
+« node process exited before we could connect to it », puis une fois sur la
+police Google. Le commit `66eaa61`, construit sans erreur le 17 septembre, a
+échoué de la même façon une fois redéployé sur une branche de diagnostic :
+l'environnement de build d'Hostinger a changé, pas le code. Turbopack lance un
+processus Node annexe pour PostCSS, et la machine ne le laisse plus démarrer ;
+webpack traite le CSS dans le processus principal. Même commit, Node 22 et
+`npm install` : le build passe en local dans les deux modes. D'où
+`next build --webpack` dans `package.json`. On pourra revenir à Turbopack
+quand Hostinger aura corrigé — tester d'abord sur une branche.
+
 
 ## Migration du domaine — 25/08/2026
 

@@ -2,7 +2,10 @@ import Link from "next/link";
 import Image from "next/image";
 import ProductForm from "@/components/admin/ProductForm";
 
-export default async function EditProduct({ params }: { params: { id: string } }) {
+// Next 16 ne fournit plus `params` qu'en promesse : `params.id` lu directement
+// valait undefined, et le formulaire recevait NaN au lieu de l'id du produit.
+export default async function EditProduct({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
@@ -19,7 +22,7 @@ export default async function EditProduct({ params }: { params: { id: string } }
           </span>
         </div>
       </header>
-      <ProductForm productId={Number(params.id)} />
+      <ProductForm productId={Number(id)} />
     </div>
   );
 }
