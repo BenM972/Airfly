@@ -2,9 +2,10 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import type { Univers } from "@/lib/shop-categories";
 
 type Props = {
-  onSelect: (cat: "textile" | "materiel" | "soins") => void;
+  onSelect: (cat: Univers) => void;
 };
 
 const panels = [

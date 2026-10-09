@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import type { WCProduct } from "./ShopCatalogue";
+import { estOccasion } from "@/lib/shop-categories";
 
 type Props = {
   product: WCProduct;
@@ -86,13 +87,27 @@ export default function ShopProductCard({ product, index, hidden = false, priori
             <div className="w-full h-full bg-gray-200" />
           )}
           </div>
-          {product.on_sale && (
-            <span
-              className="absolute top-3 left-3 bg-[#FF0080] text-white text-[10px] uppercase tracking-widest px-2 py-1"
-              style={{ fontFamily: "Mirloanne, serif" }}
-            >
-              Promo
-            </span>
+          {/* Occasion en noir, distinct du rose Promo : une piece peut porter
+              les deux, et le client ne doit pas confondre usage et remise. */}
+          {(product.on_sale || estOccasion(product)) && (
+            <div className="absolute top-3 left-3 flex flex-col items-start gap-1">
+              {product.on_sale && (
+                <span
+                  className="bg-[#FF0080] text-white text-[10px] uppercase tracking-widest px-2 py-1"
+                  style={{ fontFamily: "Mirloanne, serif" }}
+                >
+                  Promo
+                </span>
+              )}
+              {estOccasion(product) && (
+                <span
+                  className="bg-gray-900 text-white text-[10px] uppercase tracking-widest px-2 py-1"
+                  style={{ fontFamily: "Mirloanne, serif" }}
+                >
+                  Occasion
+                </span>
+              )}
+            </div>
           )}
           <div className="absolute inset-x-0 bottom-0 md:translate-y-full md:group-hover:translate-y-0 transition-transform duration-300 bg-gray-900/90 py-3 text-center">
             <span

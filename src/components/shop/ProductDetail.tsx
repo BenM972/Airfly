@@ -9,6 +9,7 @@ import type { WCProduct, WCVariation } from "@/lib/woocommerce";
 import VariantSelector from "@/components/shop/VariantSelector";
 import { useCart } from "@/context/CartContext";
 import { stripAccents } from "@/lib/text";
+import { estOccasion, universDuProduit } from "@/lib/shop-categories";
 
 type Props = {
   product: WCProduct;
@@ -190,16 +191,9 @@ export default function ProductDetail({ product, variations }: Props) {
   // Strip accents for Mirloanne font compatibility
   const category = stripAccents(categoryRaw);
 
-  // Map product category slugs to shop ?cat= param
-  const BREADCRUMB_MAP: Record<string, string[]> = {
-    textile: ["textile", "tee-shirts", "hoodies", "shorts", "pantalons", "lycras", "casquettes-chapeaux", "chaussures", "homme", "femme"],
-    materiel: ["materiel", "kitesurf", "ailes-de-kitesurf", "planches-de-kitesurf", "harnais", "accessoires", "kite-wing-foil", "foils", "planches-de-kite-wing-foil", "accessoires-kite-wing-foil"],
-    soins: ["soins-solaires", "go-wild", "sun-kissed", "feel-good"],
-  };
-  const productSlugs = product.categories?.map((c) => c.slug) ?? [];
-  const shopCat = (Object.entries(BREADCRUMB_MAP).find(([, slugs]) =>
-    productSlugs.some((s) => slugs.includes(s))
-  ) ?? [])[0] ?? null;
+  // Univers du shop vers lequel renvoie le fil d'Ariane (?cat=)
+  const shopCat = universDuProduit(product);
+  const occasion = estOccasion(product);
 
   return (
     <main className="bg-white min-h-screen pt-24 pb-24 px-6 md:px-16">
@@ -298,13 +292,25 @@ export default function ProductDetail({ product, variations }: Props) {
                   )}
                 </AnimatePresence>
 
-                {isOnSale && (
-                  <span
-                    className="absolute top-4 left-4 z-10 bg-[#FF0080] text-white text-[10px] uppercase tracking-widest px-2 py-1"
-                    style={{ fontFamily: "Mirloanne, serif" }}
-                  >
-                    Promo
-                  </span>
+                {(isOnSale || occasion) && (
+                  <div className="absolute top-4 left-4 z-10 flex flex-col items-start gap-1">
+                    {isOnSale && (
+                      <span
+                        className="bg-[#FF0080] text-white text-[10px] uppercase tracking-widest px-2 py-1"
+                        style={{ fontFamily: "Mirloanne, serif" }}
+                      >
+                        Promo
+                      </span>
+                    )}
+                    {occasion && (
+                      <span
+                        className="bg-gray-900 text-white text-[10px] uppercase tracking-widest px-2 py-1"
+                        style={{ fontFamily: "Mirloanne, serif" }}
+                      >
+                        Occasion
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

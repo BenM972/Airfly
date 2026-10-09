@@ -3,11 +3,9 @@ import { getCategories, getProducts, toCatalogueProduct } from "@/lib/woocommerc
 import ShopClient from "@/components/shop/ShopClient";
 import JsonLd from "@/components/JsonLd";
 import { shopCollectionSchema } from "@/lib/schema";
+import { lireUnivers, type Univers } from "@/lib/shop-categories";
 
-type Category = "textile" | "materiel" | "soins";
-const VALID_CATS: Category[] = ["textile", "materiel", "soins"];
-
-const CAT_LABELS: Record<Category, { title: string; description: string }> = {
+const CAT_LABELS: Record<Univers, { title: string; description: string }> = {
   textile: {
     title: "Textile — T-shirts, hoodies et lycras de glisse",
     description:
@@ -23,17 +21,18 @@ const CAT_LABELS: Record<Category, { title: string; description: string }> = {
     description:
       "Sticks et soins solaires adaptés aux sports de glisse, sélectionnés par Airfly au Vauclin, Martinique. Retrait en boutique à Pointe Faula.",
   },
+  occasion: {
+    title: "Kitesurf et wingfoil d'occasion",
+    description:
+      "Kitesurf et wingfoil d'occasion chez Airfly, Pointe Faula au Vauclin : le matériel de l'école revendu et des fins de série. Retrait en boutique en Martinique.",
+  },
 };
 
 type Props = { searchParams: Promise<{ cat?: string }> };
 
-function readCategory(cat: string | undefined): Category | null {
-  return VALID_CATS.includes(cat as Category) ? (cat as Category) : null;
-}
-
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const { cat } = await searchParams;
-  const category = readCategory(cat);
+  const category = lireUnivers(cat);
 
   const copy = category
     ? CAT_LABELS[category]
@@ -64,7 +63,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default async function ShopPage({ searchParams }: Props) {
   const { cat } = await searchParams;
-  const category = readCategory(cat);
+  const category = lireUnivers(cat);
 
   // Chargement cote serveur : la grille produits et ses liens internes sont
   // presents dans le HTML initial, la ou ils etaient invisibles auparavant.

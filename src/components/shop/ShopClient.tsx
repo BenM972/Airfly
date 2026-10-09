@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import type { WCCategory, WCProduct } from "@/lib/woocommerce";
+import type { Univers } from "@/lib/shop-categories";
 import ShopEntry from "./ShopEntry";
 import ShopCatalogue from "./ShopCatalogue";
 
-type Category = "textile" | "materiel" | "soins";
-
 type Props = {
-  initialCategory: Category | null;
+  initialCategory: Univers | null;
   products: WCProduct[];
   categories: WCCategory[];
 };
@@ -22,8 +21,8 @@ export default function ShopClient({ initialCategory, products, categories }: Pr
   // initialCategory vient de l'URL ; une navigation vers /shop?cat=... remonte
   // ici avec une nouvelle valeur. On resynchronise pendant le rendu plutot que
   // dans un effet, ce qui evite un rendu intermediaire avec l'ancienne categorie.
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(initialCategory);
-  const [lastUrlCategory, setLastUrlCategory] = useState<Category | null>(initialCategory);
+  const [selectedCategory, setSelectedCategory] = useState<Univers | null>(initialCategory);
+  const [lastUrlCategory, setLastUrlCategory] = useState<Univers | null>(initialCategory);
 
   if (initialCategory !== lastUrlCategory) {
     setLastUrlCategory(initialCategory);
