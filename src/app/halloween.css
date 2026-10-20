@@ -1,0 +1,172 @@
+/* Theme Halloween 2026.
+ *
+ * Toutes les regles sont prefixees par html.halloween : la classe est posee
+ * avant le premier affichage par le script de app/layout.tsx, et retiree le
+ * 1er novembre 2026 a 6 h (heure de Martinique). Hors periode, ce fichier ne
+ * s'applique a rien.
+ *
+ * Les couleurs du site sont ecrites en classes Tailwind (text-gray-900,
+ * bg-[#FF0080]...) : on les surcharge une a une. Remapper la palette entiere
+ * aurait ete plus court, mais `white` sert aussi au texte pose sur les photos,
+ * qui serait devenu illisible.
+ *
+ * Pour retirer le theme apres l'echeance : supprimer ce fichier, son import et
+ * le script dans app/layout.tsx, et components/HalloweenHabillage.tsx. */
+
+html.halloween {
+  --hw-nuit: #0d0912;
+  --hw-surface: #18111f;
+  --hw-sombre: #1f1529;
+  --hw-os: #f2e7d5;
+  --hw-brume: #bcaecb;
+  --hw-ombre: #8c7d9c;
+  --hw-bord: #33263f;
+  --hw-orange: #ff7518;
+  --hw-orange-fonce: #e05a00;
+  --hw-violet: #9b5de5;
+  --hw-titre: var(--font-halloween), "Mirloanne", serif;
+
+  color-scheme: dark;
+  background: var(--hw-nuit);
+}
+
+html.halloween body {
+  color: var(--hw-os);
+  /* Lueur de lune en haut de page, visible la ou les sections sont transparentes */
+  background:
+    radial-gradient(ellipse 80% 40% at 50% 0%, rgba(155, 93, 229, 0.18), transparent 70%),
+    var(--hw-nuit);
+}
+
+html.halloween ::selection {
+  background: var(--hw-orange);
+  color: var(--hw-nuit);
+}
+
+/* ---------- Police : les titres passent en Creepster ----------
+   Mirloanne est posee en style en ligne : seul !important la surpasse.
+   Les petits libelles (boutons, menus) la gardent : Creepster devient
+   illisible sous 16 px. */
+html.halloween :is(h1, h2),
+html.halloween [style*="Mirloanne"][style*="font-size"],
+html.halloween [style*="Mirloanne"]:is(.text-2xl, .text-3xl, .text-4xl, .text-5xl, .text-6xl, .text-7xl) {
+  font-family: var(--hw-titre) !important;
+  letter-spacing: 0.06em !important;
+  color: var(--hw-orange);
+  text-shadow: 0 0 18px rgba(255, 117, 24, 0.35);
+}
+/* Titres poses sur une photo : orange aussi, mais avec une ombre portee pour
+   rester lisibles sur les images claires */
+html.halloween .text-white:is(h1, h2, [style*="font-size"]) {
+  color: var(--hw-orange);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.85), 0 0 22px rgba(255, 117, 24, 0.45);
+}
+
+/* ---------- Fonds ---------- */
+/* Les span en bg-white sont des traits (icone du menu, separateurs) : ils
+   doivent rester blancs, sinon le menu mobile devient invisible. */
+html.halloween :is(.bg-white:not(span), .bg-\[\#f5f0e8\]) {
+  background-color: var(--hw-nuit);
+}
+html.halloween :is(.bg-gray-50, .bg-gray-100) {
+  background-color: var(--hw-surface);
+}
+html.halloween .bg-gray-200 {
+  background-color: var(--hw-bord);
+}
+html.halloween :is(.bg-gray-900, .bg-gray-950) {
+  background-color: var(--hw-sombre);
+}
+html.halloween .hover\:bg-gray-50:hover {
+  background-color: var(--hw-surface);
+}
+
+/* Cadres photo produit : les photos a fond blanc y dessineraient un
+   rectangle clair sur la nuit. Ils restent blancs, comme des etiquettes. */
+html.halloween .bg-white:is(.aspect-\[3\/4\], :has(> img), :has(> div > img)) {
+  background-color: #fff;
+}
+
+/* Boutons pleins : sombres sur fond sombre, ils ne se voyaient plus */
+html.halloween :is(button, a).bg-gray-900 {
+  background-color: var(--hw-orange);
+  color: var(--hw-nuit);
+}
+html.halloween :is(button, a).bg-gray-900:hover {
+  background-color: var(--hw-orange-fonce);
+}
+
+/* ---------- Textes ---------- */
+html.halloween :is(.text-gray-900, .text-black, .text-gray-800) {
+  color: var(--hw-os);
+}
+html.halloween :is(.text-gray-700, .text-gray-600, .text-gray-500) {
+  color: var(--hw-brume);
+}
+html.halloween :is(.text-gray-400, .text-gray-300) {
+  color: var(--hw-ombre);
+}
+html.halloween :is(.hover\:text-gray-900, .hover\:text-gray-700):hover {
+  color: var(--hw-os);
+}
+
+/* ---------- Bordures ---------- */
+html.halloween :is(.border-gray-100, .border-gray-200, .border-gray-300) {
+  border-color: var(--hw-bord);
+}
+html.halloween .border-gray-900 {
+  border-color: var(--hw-orange);
+}
+html.halloween :is(.hover\:border-gray-600, .hover\:border-gray-900):hover {
+  border-color: var(--hw-orange);
+}
+
+/* ---------- Le rose Airfly devient orange citrouille ---------- */
+html.halloween .text-\[\#FF0080\],
+html.halloween .hover\:text-\[\#FF0080\]:hover,
+html.halloween .group:hover .group-hover\:text-\[\#FF0080\] {
+  color: var(--hw-orange);
+}
+html.halloween .text-\[\#FF0080\]\/80 { color: rgba(255, 117, 24, 0.8); }
+html.halloween .text-\[\#FF0080\]\/70 { color: rgba(255, 117, 24, 0.7); }
+
+html.halloween .bg-\[\#FF0080\],
+html.halloween .hover\:bg-\[\#FF0080\]:hover {
+  background-color: var(--hw-orange);
+}
+html.halloween .bg-\[\#FF0080\]\/80 { background-color: rgba(255, 117, 24, 0.8); }
+html.halloween .bg-\[\#FF0080\]\/10 { background-color: rgba(255, 117, 24, 0.1); }
+html.halloween :is(.bg-\[\#d60070\], .hover\:bg-\[\#d60070\]:hover) {
+  background-color: var(--hw-orange-fonce);
+}
+
+html.halloween .border-\[\#FF0080\],
+html.halloween .hover\:border-\[\#FF0080\]:hover,
+html.halloween .focus\:border-\[\#FF0080\]:focus {
+  border-color: var(--hw-orange);
+}
+html.halloween :is(.border-\[\#FF0080\]\/40, .hover\:border-\[\#FF0080\]\/40:hover, .hover\:border-\[\#FF0080\]\/50:hover) {
+  border-color: rgba(255, 117, 24, 0.45);
+}
+html.halloween .border-\[\#FF0080\]\/20 { border-color: rgba(255, 117, 24, 0.2); }
+
+html.halloween .accent-\[\#FF0080\] { accent-color: var(--hw-orange); }
+html.halloween .decoration-\[\#FF0080\] { text-decoration-color: var(--hw-orange); }
+html.halloween .focus-visible\:ring-\[\#FF0080\]:focus-visible { --tw-ring-color: var(--hw-orange); }
+
+/* ---------- Champs de formulaire ---------- */
+html.halloween :is(input, textarea, select):not([type="radio"], [type="checkbox"]) {
+  background-color: var(--hw-surface);
+  color: var(--hw-os);
+}
+html.halloween ::placeholder {
+  color: var(--hw-ombre);
+}
+
+/* ---------- Barre de navigation ---------- */
+html.halloween nav.bg-black\/50,
+html.halloween .bg-black\/50.backdrop-blur-xl {
+  background-color: rgba(24, 12, 34, 0.72);
+  border-color: rgba(255, 117, 24, 0.35);
+  box-shadow: 0 8px 32px rgba(155, 93, 229, 0.25);
+}

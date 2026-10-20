@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond } from "next/font/google";
+import { Cormorant_Garamond, Creepster } from "next/font/google";
 import "./globals.css";
+// Halloween 2026 : theme actif jusqu au 01/11 a 6 h, a retirer ensuite
+import "./halloween.css";
 import Navbar from "@/components/Navbar";
 import AnnonceBandeau from "@/components/AnnonceBandeau";
 import Footer from "@/components/Footer";
@@ -9,12 +11,24 @@ import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/shop/CartDrawer";
 import DefilementVersAncre from "@/components/DefilementVersAncre";
 import { annonce } from "@/data/annonce";
+import HalloweenHabillage from "@/components/HalloweenHabillage";
+import { SCRIPT_HALLOWEEN } from "@/data/halloween";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600"],
   variable: "--font-cormorant",
   display: "swap",
+});
+
+// Titres du theme Halloween. Non prechargee : hors periode, aucun element ne
+// l'utilise et le navigateur ne la telecharge pas.
+const creepster = Creepster({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-halloween",
+  display: "swap",
+  preload: false,
 });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://airfly972.com";
@@ -70,10 +84,13 @@ export default function RootLayout({
     // de 36 px qui subsistait quand on retirait l'annonce sans y penser.
     <html
       lang="fr"
-      className={cormorant.variable}
+      className={`${cormorant.variable} ${creepster.variable}`}
+      // Le script Halloween ajoute une classe avant l'hydratation
+      suppressHydrationWarning
       style={{ "--h-annonce": annonce ? "36px" : "0px" } as React.CSSProperties}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_HALLOWEEN }} />
         {/* Mirloanne porte tous les titres : la precharger evite le saut de
             rendu que provoquait sa decouverte tardive via la feuille de style. */}
         <link rel="preload" href="/Mirloanne.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
@@ -85,6 +102,7 @@ export default function RootLayout({
           <AnnonceBandeau />
           <Navbar />
           <CartDrawer />
+          <HalloweenHabillage />
           {children}
           <Footer />
         </CartProvider>
