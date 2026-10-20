@@ -9,6 +9,8 @@ import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/shop/CartDrawer";
 import DefilementVersAncre from "@/components/DefilementVersAncre";
 import { annonce } from "@/data/annonce";
+// Halloween 2026 : se retire seul le 01/11 a 6 h. Ligne et import a supprimer ensuite.
+import HalloweenHabillage from "@/components/HalloweenHabillage";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -85,6 +87,7 @@ export default function RootLayout({
           <AnnonceBandeau />
           <Navbar />
           <CartDrawer />
+          <HalloweenHabillage />
           {children}
           <Footer />
         </CartProvider>
