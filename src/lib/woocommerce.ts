@@ -2,6 +2,8 @@
 // Les routes /api/products et /api/categories restent en place : elles servent
 // encore le back office et le rafraichissement cote client.
 
+import { estOccasion } from "./shop-categories";
+
 export type WCVariation = {
   id: number;
   price: string;
@@ -19,6 +21,8 @@ export type WCProduct = {
   name: string;
   slug: string;
   type: "simple" | "variable";
+  /** "publish", "draft"... Seul un produit publie a une fiche. */
+  status?: string;
   price: string;
   regular_price: string;
   sale_price: string;
@@ -234,7 +238,8 @@ export function toCatalogueProduct(products: WCProduct[]): WCProduct[] {
       ...p,
       description: "",
       short_description: "",
-      attributes: [],
+      // Le tableau Occasion affiche la taille et la couleur de chaque piece
+      attributes: estOccasion(p) ? p.attributes : [],
       images: p.images?.slice(0, 2) ?? [],
       price_html: undefined, // inutile au client, et volumineux
       ...(initial ? { regular_price: initial, sale_price: p.price } : {}),

@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WCProduct, WCVariation } from "@/lib/woocommerce";
 import VariantSelector from "@/components/shop/VariantSelector";
+import PhotoSurDemande from "@/components/shop/PhotoSurDemande";
 import { useCart } from "@/context/CartContext";
 import { stripAccents } from "@/lib/text";
 import { estOccasion, universDuProduit } from "@/lib/shop-categories";
@@ -17,7 +18,14 @@ type Props = {
 };
 
 export default function ProductDetail({ product, variations }: Props) {
-  const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>({});
+  // Une seule variante (piece d'occasion unique) : elle est deja choisie.
+  // Sinon le client devait cliquer la seule taille proposee avant de pouvoir
+  // ajouter au panier, le bouton affichant "Choisir une option".
+  const [selectedAttrs, setSelectedAttrs] = useState<Record<string, string>>(() =>
+    variations.length === 1
+      ? Object.fromEntries(variations[0].attributes.map((a) => [a.name, a.option]))
+      : {}
+  );
   const [activeImage, setActiveImage] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const [zoomPos, setZoomPos] = useState({ x: 50, y: 50 });
@@ -287,6 +295,8 @@ export default function ProductDetail({ product, variations }: Props) {
                         priority
                       />
                     </motion.div>
+                  ) : occasion ? (
+                    <PhotoSurDemande avecLien />
                   ) : (
                     <div className="w-full h-full bg-gray-200" />
                   )}

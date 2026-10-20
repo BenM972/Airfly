@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ShopProductCard from "./ShopProductCard";
+import OccasionTable from "./OccasionTable";
 import type { WCCategory, WCProduct } from "@/lib/woocommerce";
 import { CATEGORY_MAP, SLUG_OCCASION, UNIVERS, estOccasion, type Univers } from "@/lib/shop-categories";
 
@@ -256,7 +257,16 @@ export default function ShopCatalogue({ initialCategory, products, categories }:
                 interrompt toute transition. Meme arbitrage que pour les
                 onglets de /ecole, et pour la meme raison — un effet de
                 transition ne vaut pas la moitie du catalogue. */}
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+            {/* Occasion se lit en tableau. La grille reste montee mais masquee :
+                ses liens vers les fiches demeurent dans le HTML servi, pour
+                la meme raison que ci-dessus. */}
+            {activeCategory === "occasion" && filtered.length > 0 && (
+              <OccasionTable products={filtered} />
+            )}
+            <div
+              className="grid grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12"
+              hidden={activeCategory === "occasion"}
+            >
               {products.map((product) => {
                 const visible = correspond(product);
                 return (
