@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { FIN_HALLOWEEN as FIN } from "@/data/halloween";
 
 /**
  * Habillage Halloween : chauves-souris, araignee suspendue a la navbar et
@@ -16,10 +17,9 @@ import { usePathname } from "next/navigation";
  * Rien n'est rendu cote serveur : aucun effet sur le HTML indexe ni sur le
  * LCP, et tous les elements sont `fixed` — aucun decalage de mise en page.
  *
- * Apres l'echeance, il suffit de supprimer ce fichier et sa ligne dans
- * app/layout.tsx ; rien d'autre n'en depend (styles inclus ci-dessous).
+ * Apres l'echeance : supprimer ce fichier, data/halloween.ts, app/halloween.css
+ * et leurs lignes dans app/layout.tsx (import, police Creepster, script).
  */
-const FIN = Date.parse("2026-11-01T06:00:00-04:00");
 
 // Toile en quart de cercle, ancree au coin inferieur gauche (0,100).
 // Rayons tous les 15 degres, fils concentriques legerement creuses vers le coin.
@@ -66,7 +66,14 @@ export default function HalloweenHabillage() {
     // Lancement differe d'un tick : l'etat ne change pas pendant l'effet lui-meme
     const debut = setTimeout(() => setActif(true), 0);
     // setTimeout plafonne a ~24,8 jours ; au-dela, la page sera rechargee d'ici la
-    const fin = reste < 2 ** 31 - 1 ? setTimeout(() => setActif(false), reste) : undefined;
+    // A l'echeance, le theme (couleurs, police) part avec les decors
+    const fin =
+      reste < 2 ** 31 - 1
+        ? setTimeout(() => {
+            setActif(false);
+            document.documentElement.classList.remove("halloween");
+          }, reste)
+        : undefined;
     return () => {
       clearTimeout(debut);
       if (fin) clearTimeout(fin);
@@ -140,10 +147,11 @@ export default function HalloweenHabillage() {
         </svg>
       </div>
 
-      {/* Toile dans le coin inferieur gauche, a l'oppose du chatbot */}
+      {/* Toile dans le coin inferieur gauche, a l'oppose du chatbot. Reduite et
+          plus discrete sur telephone, ou elle recouvrait le texte. */}
       <svg
         viewBox="0 0 100 100"
-        className="absolute bottom-0 left-0 w-28 sm:w-36 md:w-48 h-auto text-white/75 drop-shadow-[0_0_1.5px_rgba(0,0,0,0.7)]"
+        className="absolute bottom-0 left-0 w-16 sm:w-28 md:w-48 h-auto text-white/50 md:text-white/75 drop-shadow-[0_0_1.5px_rgba(0,0,0,0.7)]"
       >
         <path d={TOILE} stroke="currentColor" strokeWidth="0.8" fill="none" />
       </svg>
