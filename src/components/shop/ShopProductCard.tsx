@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WCProduct } from "./ShopCatalogue";
 import { estOccasion } from "@/lib/shop-categories";
+import PhotoSurDemande from "./PhotoSurDemande";
 
 type Props = {
   product: WCProduct;
@@ -83,6 +84,8 @@ export default function ShopProductCard({ product, index, hidden = false, priori
                 />
               )}
             </>
+          ) : estOccasion(product) ? (
+            <PhotoSurDemande />
           ) : (
             <div className="w-full h-full bg-gray-200" />
           )}

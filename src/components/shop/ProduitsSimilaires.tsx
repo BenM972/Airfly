@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import type { WCProduct } from "@/lib/woocommerce";
 import { toPlainText } from "@/lib/woocommerce";
+import { estOccasion } from "@/lib/shop-categories";
+import PhotoSurDemande from "./PhotoSurDemande";
 
 /**
  * Produits lies, rendus cote serveur.
@@ -80,6 +82,8 @@ export default function ProduitsSimilaires({
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       loading="lazy"
                     />
+                  ) : estOccasion(p) ? (
+                    <PhotoSurDemande className="absolute inset-0" />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs uppercase tracking-widest">
                       Photo a venir
